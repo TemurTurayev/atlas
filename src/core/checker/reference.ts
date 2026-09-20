@@ -1,0 +1,73 @@
+import { setLatex } from '../math/latex'
+import type { AnswerSpec, IntervalPart } from '../templates/types'
+import type { UserAnswer } from './check'
+
+export function intervalLatex(parts: readonly IntervalPart[]): string {
+  if (parts.length === 0) return '\\emptyset'
+  return parts
+    .map((p) => {
+      const open = p.lo !== null && p.loClosed ? '[' : '('
+      const close = p.hi !== null && p.hiClosed ? ']' : ')'
+      return `${open}${p.lo ?? '-\\infty'}, ${p.hi ?? '\\infty'}${close}`
+    })
+    .join(' \\cup ')
+}
+
+/** The correct answer, as the UI would submit it. */
+export function referenceAnswer(spec: AnswerSpec): UserAnswer {
+  switch (spec.kind) {
+    case 'number':
+    case 'expression':
+      return { kind: 'latex', latex: spec.value }
+    case 'numberSet':
+      return { kind: 'latex', latex: spec.values.length > 0 ? spec.values.join(', ') : '\\emptyset' }
+    case 'finiteSet':
+      return { kind: 'latex', latex: setLatex(spec.elements) }
+    case 'interval':
+      return { kind: 'interval', parts: spec.parts }
+    case 'choice':
+      return { kind: 'choice', id: spec.correctId }
+  }
+}
+
+function perturbIntervals(parts: readonly IntervalPart[]): IntervalPart[] {
+  if (parts.length === 0) return [{ lo: '0', hi: '1', loClosed: true, hiClosed: true }]
+  const [first, ...rest] = parts
+  if (first.lo !== null) return [{ ...first, loClosed: !first.loClosed }, ...rest]
+  if (first.hi !== null) return [{ ...first, hiClosed: !first.hiClosed }, ...rest]
+  return [{ lo: '0', hi: null, loClosed: true, hiClosed: false }]
+}
+
+/** A plausible wrong answer — used by tests to prove the checker is not trivially permissive. */
+export function perturbedAnswer(spec: AnswerSpec): UserAnswer {
+  switch (spec.kind) {
+    case 'number':
+    case 'expression':
+      return { kind: 'latex', latex: `\\left(${spec.value}\\right)+1` }
+    case 'numberSet':
+      return { kind: 'latex', latex: [...spec.values, '1000'].join(', ') }
+    case 'finiteSet':
+      return { kind: 'latex', latex: setLatex([...spec.elements, '1000']) }
+    case 'interval':
+      return { kind: 'interval', parts: perturbIntervals(spec.parts) }
+    case 'choice':
+      return { kind: 'choice', id: spec.options.find((o) => o.id !== spec.correctId)?.id ?? `${spec.correctId}-wrong` }
+  }
+}
+
+/** LaTeX (or label text for choices) to display the correct answer. */
+export function answerToLatex(spec: AnswerSpec): string {
+  switch (spec.kind) {
+    case 'number':
+    case 'expression':
+      return spec.value
+    case 'numberSet':
+      return spec.values.length > 0 ? spec.values.join(', ') : '\\emptyset'
+    case 'finiteSet':
+      return setLatex(spec.elements)
+    case 'interval':
+      return intervalLatex(spec.parts)
+    case 'choice':
+      return spec.options.find((o) => o.id === spec.correctId)?.label ?? ''
+  }
+}
