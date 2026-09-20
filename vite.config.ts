@@ -10,7 +10,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'prompt',
+      // Updates must land by themselves: 'prompt' leaves the new worker waiting for a dialog the
+      // app never shows, and the published version stays frozen on the old bundle.
+      registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'mathlive-fonts/**/*'],
       manifest: {
         name: 'Атлас — математика и физика',
