@@ -8,6 +8,26 @@ interface Props {
   readonly disabled?: boolean
 }
 
+/** MathLive's own state, reached for one thing only — see `releaseFocus`. */
+interface FieldInternals {
+  blurred?: boolean
+}
+
+const internalsOf = (field: MathfieldElement): FieldInternals | undefined =>
+  (field as unknown as { _mathfield?: FieldInternals })._mathfield
+
+/**
+ * MathLive keeps a global pointer to the focused field and blurs it when the next field takes the
+ * focus. When a field leaves the document while still focused — the exam clock handing the paper in
+ * while the learner is typing, for instance — the library has already dropped that field's host, and
+ * the blur then throws from deep inside MathLive and takes the whole app down. Telling the field it
+ * is no longer focused is enough: the library skips it, and the next field replaces the pointer.
+ * The field drops its own internals on disconnect, so the handle is taken while it is still alive.
+ */
+function releaseFocus(internals: FieldInternals | undefined): void {
+  if (internals) internals.blurred = true
+}
+
 /** MathLive field created imperatively — avoids custom-element JSX typings. */
 export function MathInput({ value, onChange, onEnter, disabled = false }: Props) {
   const host = useRef<HTMLDivElement>(null)
@@ -32,10 +52,13 @@ export function MathInput({ value, onChange, onEnter, disabled = false }: Props)
     mf.addEventListener('keydown', onKeyDown)
     container.appendChild(mf)
     field.current = mf
+    const internals = internalsOf(mf)
     mf.focus()
     return () => {
       mf.removeEventListener('input', onInput)
       mf.removeEventListener('keydown', onKeyDown)
+      mf.blur()
+      releaseFocus(internals)
       mf.remove()
       field.current = null
     }
