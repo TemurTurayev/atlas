@@ -188,7 +188,7 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
     )
   }
 
-  const onPaper = world.settings.paperNudge && (task.tier === 3 || problem.solution.length >= 3)
+  const onPaper = world.settings.paperNudge && (task.tier === 3 || problem.solution.length >= 4)
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
