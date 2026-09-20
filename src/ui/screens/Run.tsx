@@ -6,6 +6,7 @@ import { getTemplate } from '../../core/templates/registry'
 import { AnswerInput, emptyAnswer } from '../components/AnswerInput'
 import { ModeBadge } from '../components/Meter'
 import { RichText, Tex } from '../components/Tex'
+import { formatPercent } from '../format'
 import { useAtlas } from '../store'
 
 const card = 'rounded-card bg-surface border border-line p-5 space-y-4'
@@ -37,7 +38,10 @@ function Steps({ steps }: { steps: readonly { ru: string; tex?: string }[] }) {
 }
 
 export function Run({ go }: { go: (screen: 'home') => void }) {
-  const { world, task, problem, result, events, hintsUsed, submit, revealAnswer, useHint, acknowledge, advance, decideJump, oneMore } = useAtlas()
+  const {
+    world, task, problem, result, events, hintsUsed, forecast, mixPrediction, mixResults,
+    submit, revealAnswer, useHint, acknowledge, advance, decideJump, oneMore, setMixPrediction,
+  } = useAtlas()
   const [answer, setAnswer] = useState<UserAnswer>({ kind: 'latex', latex: '' })
   const [showRu, setShowRu] = useState(false)
 
@@ -60,6 +64,21 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
             XP сегодня: {world.day.xp} / {world.settings.dailyGoalXp}
           </p>
           <p>Серия: {world.streak.current} дн.</p>
+          {forecast && world.run && (
+            <p>
+              Прогноз на экзамене: {formatPercent(forecast.exam)}{' '}
+              <span className="text-muted">
+                ({forecast.exam >= world.run.forecastAtStart ? '+' : ''}
+                {((forecast.exam - world.run.forecastAtStart) * 100).toFixed(1)} п.п. за забег)
+              </span>
+            </p>
+          )}
+          {mixPrediction !== null && mixResults.total > 0 && (
+            <p>
+              Микс: предсказал {mixPrediction}, решил {mixResults.correct} из {mixResults.total}
+              {mixPrediction === mixResults.correct ? ' — точная оценка себя' : ''}
+            </p>
+          )}
         </div>
         <div className="flex gap-3">
           <button type="button" className={primary} onClick={() => oneMore()}>
@@ -138,6 +157,38 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
 
   if (task.type !== 'problem' || !problem) return null
   const graded = result !== null && result.status !== 'malformed'
+  const run = world.run
+  const masteredCount = Object.values(world.progress).filter((p) => p.phase === 'mastered').length
+  const mixTarget = Math.min(run?.short === true ? 3 : 5, masteredCount)
+
+  if (task.mode === 'mix' && run?.mixDone === 0 && mixPrediction === null && mixTarget > 0) {
+    return (
+      <div className="mx-auto max-w-2xl p-5 space-y-5">
+        <PauseBar go={go} />
+        <div className={card}>
+          <h2 className="text-xl">Сколько решишь верно?</h2>
+          <p className="text-muted">
+            Дальше {mixTarget} задач вперемешку по пройденному. Оцени себя до начала — это тренирует чувствовать, что ты знаешь, а что
+            только кажется знакомым.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: mixTarget + 1 }, (_, n) => (
+              <button
+                key={n}
+                type="button"
+                className="px-4 py-3 rounded-xl border border-line hover:border-accent"
+                onClick={() => setMixPrediction(n)}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const onPaper = world.settings.paperNudge && (task.tier === 3 || problem.solution.length >= 3)
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
@@ -155,6 +206,7 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
 
         <AnswerInput spec={problem.answer} answer={answer} onChange={setAnswer} onSubmit={() => submit(answer)} disabled={graded} />
         {problem.inputHint && !graded && <p className="text-xs text-muted">{problem.inputHint}</p>}
+        {onPaper && !graded && <p className="text-xs text-warn">Реши на бумаге, потом введи ответ — на экзамене будет так же.</p>}
 
         {!graded && (
           <div className="flex flex-wrap gap-3">

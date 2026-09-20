@@ -75,6 +75,10 @@ export function Settings({ go }: { go: (screen: 'home') => void }) {
           <input type="checkbox" checked={world.settings.sound} onChange={(e) => updateSettings({ sound: e.target.checked })} />
           <span>Звуки</span>
         </label>
+        <label className="flex items-center gap-3">
+          <input type="checkbox" checked={world.settings.paperNudge} onChange={(e) => updateSettings({ paperNudge: e.target.checked })} />
+          <span>Напоминать решать многошаговые задачи на бумаге</span>
+        </label>
       </div>
 
       <div className={row}>

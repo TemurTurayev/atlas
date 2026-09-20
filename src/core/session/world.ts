@@ -42,6 +42,8 @@ export interface RunState {
   readonly jumpDeclined: boolean
   readonly twin: { readonly skillId: string; readonly tier: Tier; readonly mode: Mode } | null
   readonly mixDone: number
+  /** A five-minute run: reviews and a short mix only, no new skills. */
+  readonly short: boolean
   readonly lastSkill: string | null
   /** The task currently on screen. */
   readonly current: Task | null
@@ -59,6 +61,8 @@ export interface Settings {
   readonly examDate: string
   readonly dailyGoalXp: number
   readonly sound: boolean
+  /** Reminds the learner to work multi-step problems on paper, as in the written exam. */
+  readonly paperNudge: boolean
 }
 
 export interface World {
@@ -78,9 +82,11 @@ export interface EngineCtx {
   readonly rng: Rng
 }
 
-export const DEFAULT_SETTINGS: Settings = { examDate: '2027-01-29', dailyGoalXp: 40, sound: true }
+export const DEFAULT_SETTINGS: Settings = { examDate: '2027-01-29', dailyGoalXp: 40, sound: true, paperNudge: true }
 export const WARMUP_LIMIT = 8
 export const MIX_TARGET = 5
+export const SHORT_WARMUP_LIMIT = 4
+export const SHORT_MIX_TARGET = 3
 export const DAY_COUNT_THRESHOLD = 5
 
 export const emptyDay = (date: string): DayStats => ({ date, xp: 0, graded: 0, correct: 0, counted: false })

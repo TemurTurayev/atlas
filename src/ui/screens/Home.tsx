@@ -1,15 +1,44 @@
 import { GRAPH } from '../../core/graph'
+import { dayKey, daysBetween } from '../../core/time/day'
 import { Meter, Streak } from '../components/Meter'
 import { plural } from '../format'
 import { dueCount, frontier } from '../selectors'
 import { useAtlas } from '../store'
 
+/** A calm nudge after a gap, or a fresh-start note on Mondays and the first of the month. */
+function Banner({ daysAway, freshStart }: { daysAway: number; freshStart: boolean }) {
+  if (daysAway >= 2) {
+    return (
+      <p className="rounded-card border border-line bg-surface px-4 py-3 text-sm text-muted">
+        {daysAway} {plural(daysAway, 'день', 'дня', 'дней')} без Атласа. Пять минут сегодня — и ты снова в ритме.
+      </p>
+    )
+  }
+  if (freshStart) {
+    return (
+      <p className="rounded-card border border-line bg-surface px-4 py-3 text-sm text-muted">
+        Новая неделя — хороший момент задать темп.
+      </p>
+    )
+  }
+  return null
+}
+
 export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings') => void }) {
-  const { world, forecast, beginRun } = useAtlas()
+  const { world, forecast, beginRun, lastActiveDay } = useAtlas()
   if (!world || !forecast) return null
-  const due = dueCount(world, new Date())
+
+  const now = new Date()
+  const due = dueCount(world, now)
   const next = frontier(world, 3)
   const inProgress = world.run !== null && world.run.phase !== 'summary'
+  const daysAway = lastActiveDay !== null ? daysBetween(lastActiveDay, dayKey(now)) : 0
+  const freshStart = now.getDay() === 1 || now.getDate() === 1
+
+  const start = async (short: boolean) => {
+    await beginRun(short)
+    go('run')
+  }
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-6">
@@ -17,6 +46,8 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings') => void 
         <h1 className="text-2xl">Атлас</h1>
         <Streak days={world.streak.current} freezes={world.streak.freezes} />
       </header>
+
+      <Banner daysAway={daysAway} freshStart={freshStart} />
 
       <section className="rounded-card bg-surface border border-line p-5 space-y-4">
         <Meter label="Экзамен — прогноз" value={forecast.exam} markerAt={0.45} />
@@ -26,16 +57,24 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings') => void 
         </p>
       </section>
 
-      <button
-        type="button"
-        onClick={async () => {
-          await beginRun()
-          go('run')
-        }}
-        className="w-full py-4 rounded-card bg-accent text-bg text-lg font-medium hover:opacity-90"
-      >
-        {inProgress ? 'Продолжить забег' : 'Начать забег'}
-      </button>
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={() => start(false)}
+          className="w-full py-4 rounded-card bg-accent text-bg text-lg font-medium hover:opacity-90"
+        >
+          {inProgress ? 'Продолжить забег' : 'Начать забег'}
+        </button>
+        {!inProgress && (
+          <button
+            type="button"
+            onClick={() => start(true)}
+            className="w-full py-3 rounded-card border border-line text-muted hover:border-accent"
+          >
+            Короткая версия · 5 минут
+          </button>
+        )}
+      </div>
 
       <section className="space-y-2">
         <h2 className="text-sm text-muted">Дальше по карте</h2>

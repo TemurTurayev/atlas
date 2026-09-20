@@ -3,7 +3,7 @@ import { pickJumpTarget } from '../learner/jump'
 import { advanceLessonStep, startProgress, type SkillProgress } from '../learner/progress'
 import type { Tier } from '../templates/types'
 import {
-  MIX_TARGET, masteredSet, requireRun, withProgress, withRun, type EngineCtx, type Mode, type RunState, type Task, type World,
+  MIX_TARGET, SHORT_MIX_TARGET, masteredSet, requireRun, withProgress, withRun, type EngineCtx, type Mode, type RunState, type Task, type World,
 } from './world'
 
 type Step = { readonly kind: 'task'; readonly world: World; readonly task: Task } | { readonly kind: 'transition'; readonly world: World }
@@ -53,6 +53,7 @@ function pickNextSkill(world: World, run: RunState, ctx: EngineCtx, mastered: Re
 }
 
 function decideNew(world: World, run: RunState, ctx: EngineCtx): Step {
+  if (run.short && !run.activeSkill) return move(withRun(world, { ...run, phase: 'mix' }))
   if (run.activeSkill) {
     const p = world.progress[run.activeSkill]
     if (!p || p.phase === 'mastered') return move(withRun(world, { ...run, activeSkill: null }))
@@ -73,7 +74,8 @@ function decideNew(world: World, run: RunState, ctx: EngineCtx): Step {
 
 function decideMix(world: World, run: RunState, ctx: EngineCtx): Step {
   const pool = Object.values(world.progress).filter((p) => p.phase === 'mastered' && ctx.hasTemplate(p.skillId))
-  if (run.mixDone >= Math.min(MIX_TARGET, pool.length)) return move(withRun(world, { ...run, phase: 'summary' }))
+  const target = Math.min(run.short ? SHORT_MIX_TARGET : MIX_TARGET, pool.length)
+  if (run.mixDone >= target) return move(withRun(world, { ...run, phase: 'summary' }))
   const recent = [...pool].sort((a, b) => (b.masteredAt ?? 0) - (a.masteredAt ?? 0)).slice(0, 6).map((p) => p.skillId)
   const older = ctx.rng.shuffle(pool.map((p) => p.skillId).filter((id) => !recent.includes(id))).slice(0, 3)
   const all = [...recent, ...older]

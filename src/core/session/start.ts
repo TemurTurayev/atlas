@@ -3,7 +3,7 @@ import { lessonQuota, momentum } from '../learner/meta'
 import { isDue, retrievability } from '../scheduler/fsrs'
 import { rollover } from '../streak/streak'
 import { dayKey } from '../time/day'
-import { emptyDay, requireRun, WARMUP_LIMIT, withRun, type EngineCtx, type RunState, type World } from './world'
+import { emptyDay, requireRun, SHORT_WARMUP_LIMIT, WARMUP_LIMIT, withRun, type EngineCtx, type RunState, type World } from './world'
 
 /** Call when the app opens: rolls the day over, applies streak freezes, drops yesterday's run. */
 export function openApp(world: World, now: Date): World {
@@ -26,15 +26,21 @@ export function dueSkills(world: World, ctx: EngineCtx): string[] {
 }
 
 /** Starts today's run, or keeps the unfinished one. */
-export function startRun(world: World, ctx: EngineCtx): World {
+export interface RunOptions {
+  /** Five-minute version: due reviews plus a short mix, no new skills. */
+  readonly short?: boolean
+}
+
+export function startRun(world: World, ctx: EngineCtx, options: RunOptions = {}): World {
   const today = dayKey(ctx.now)
   if (world.run && world.run.date === today && world.run.phase !== 'summary') return world
-  const warmupQueue = dueSkills(world, ctx).slice(0, WARMUP_LIMIT)
+  const short = options.short === true
+  const warmupQueue = dueSkills(world, ctx).slice(0, short ? SHORT_WARMUP_LIMIT : WARMUP_LIMIT)
   const run: RunState = {
     date: today,
     startedAt: ctx.now.getTime(),
     forecastAtStart: computeForecast(ctx.graph, world.progress, ctx.now).exam,
-    phase: warmupQueue.length > 0 ? 'warmup' : 'new',
+    phase: warmupQueue.length > 0 ? 'warmup' : short ? 'mix' : 'new',
     warmupQueue,
     warmupIndex: 0,
     activeSkill: null,
@@ -45,6 +51,7 @@ export function startRun(world: World, ctx: EngineCtx): World {
     jumpDeclined: false,
     twin: null,
     mixDone: 0,
+    short,
     lastSkill: null,
     current: null,
   }
@@ -55,5 +62,5 @@ export function startRun(world: World, ctx: EngineCtx): World {
 export function continueRun(world: World): World {
   const run = requireRun(world)
   if (run.phase !== 'summary') return world
-  return withRun(world, { ...run, phase: 'new', lessonQuota: run.lessonsStarted.length + 1, mixDone: 0, jumpDeclined: false, current: null })
+  return withRun(world, { ...run, phase: 'new', short: false, lessonQuota: run.lessonsStarted.length + 1, mixDone: 0, jumpDeclined: false, current: null })
 }

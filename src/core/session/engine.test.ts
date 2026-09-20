@@ -221,3 +221,32 @@ describe('stats', () => {
     expect(() => nextTask(initialWorld(NOW), ctxAt())).toThrow()
   })
 })
+
+describe('short run (five minutes)', () => {
+  it('goes straight to the summary when there is nothing to review', () => {
+    const world = startRun(initialWorld(NOW), ctxAt(), { short: true })
+    expect(world.run).toMatchObject({ short: true, phase: 'mix' })
+    expect(peek(world).task).toEqual({ type: 'summary' })
+  })
+
+  it('reviews due skills and a short mix, but never starts a new skill', () => {
+    const card = newCard('good', new Date(2026, 8, 1), 120)
+    const world: World = {
+      ...initialWorld(NOW),
+      progress: { a: masteredWith('a', card), b: masteredWith('b', card) },
+    }
+    let w = startRun(world, ctxAt(), { short: true })
+    expect(w.run).toMatchObject({ short: true, phase: 'warmup', warmupQueue: ['a', 'b'] })
+    const modes: string[] = []
+    for (let i = 0; i < 8; i += 1) {
+      const { world: shown, task } = peek(w)
+      if (task.type === 'summary') break
+      if (task.type !== 'problem') throw new Error(`unexpected task ${task.type}`)
+      modes.push(task.mode)
+      w = submitAttempt(shown, RIGHT, ctxAt()).world
+    }
+    expect(modes).toEqual(['review', 'review', 'mix', 'mix'])
+    expect(peek(w).task).toEqual({ type: 'summary' })
+    expect(Object.keys(w.progress).sort()).toEqual(['a', 'b'])
+  })
+})

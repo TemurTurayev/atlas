@@ -42,12 +42,18 @@ export interface AtlasState {
   hintsUsed: number
   shownAt: number
   forecast: Forecast | null
+  /** Last day with at least one graded answer — drives the "come back" message. */
+  lastActiveDay: string | null
+  /** How many of the mixed block the learner predicted they would get right. */
+  mixPrediction: number | null
+  mixResults: { correct: number; total: number }
   init: () => Promise<void>
-  beginRun: () => Promise<void>
+  beginRun: (short?: boolean) => Promise<void>
   advance: () => Promise<void>
   submit: (answer: UserAnswer) => Promise<void>
   revealAnswer: () => Promise<void>
   useHint: () => void
+  setMixPrediction: (value: number) => void
   acknowledge: () => Promise<void>
   decideJump: (accept: boolean) => Promise<void>
   oneMore: () => Promise<void>
@@ -65,19 +71,29 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   hintsUsed: 0,
   shownAt: 0,
   forecast: null,
+  lastActiveDay: null,
+  mixPrediction: null,
+  mixResults: { correct: 0, total: 0 },
 
   async init() {
     const world = await loadWorld(db, new Date())
     persisted = world
-    set({ world, ready: true, forecast: computeForecast(GRAPH, world.progress, new Date()) })
+    const days = await db.days.toArray()
+    const active = days.filter((d) => d.graded > 0).map((d) => d.date).sort()
+    set({
+      world,
+      ready: true,
+      forecast: computeForecast(GRAPH, world.progress, new Date()),
+      lastActiveDay: active.length > 0 ? active[active.length - 1] : null,
+    })
   },
 
-  async beginRun() {
+  async beginRun(short = false) {
     const world = get().world
     if (!world) return
-    const started = startRun(openApp(world, new Date()), ctx())
+    const started = startRun(openApp(world, new Date()), ctx(), { short })
     await persist(started)
-    set({ world: started })
+    set({ world: started, mixPrediction: null, mixResults: { correct: 0, total: 0 } })
     await get().advance()
   },
 
@@ -118,6 +134,11 @@ export const useAtlas = create<AtlasState>((set, get) => ({
       at: Date.now(),
     })
     play(outcome.events.includes('mastered') ? 'mastered' : input.correct ? 'correct' : 'incorrect', world.settings.sound)
+    if (task.mode === 'mix' && !task.twin) {
+      const mix = get().mixResults
+      set({ mixResults: { correct: mix.correct + (input.correct ? 1 : 0), total: mix.total + 1 } })
+    }
+    set({ lastActiveDay: outcome.world.day.date })
     set({ world: outcome.world, result, events: outcome.events, forecast: computeForecast(GRAPH, outcome.world.progress, new Date()) })
   },
 
@@ -131,6 +152,10 @@ export const useAtlas = create<AtlasState>((set, get) => ({
 
   useHint() {
     set({ hintsUsed: get().hintsUsed + 1 })
+  },
+
+  setMixPrediction(value) {
+    set({ mixPrediction: value })
   },
 
   async acknowledge() {
