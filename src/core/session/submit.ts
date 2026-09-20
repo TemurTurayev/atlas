@@ -1,4 +1,5 @@
 import { jumpCredits } from '../learner/jump'
+import { applyResult } from '../mistakes/log'
 import { onExpressFailed, onExpressPassed, onJumpFailed, onJumpSucceeded, recordResult } from '../learner/meta'
 import { applyLearning, creditImplicit, toRepairLesson, type LearnerEvent, type SkillProgress } from '../learner/progress'
 import { repairCandidates } from '../learner/repair'
@@ -169,6 +170,18 @@ export function submitAttempt(world: World, input: AttemptInput, ctx: EngineCtx)
   const stats = recordStats(world, input, xp)
   const cleared = withRun(stats.world, { ...requireRun(stats.world), current: null, lastSkill: current.skillId })
   const handled = handleMode(cleared, current, input, ctx)
+  const mistakes = applyResult(
+    world.mistakes,
+    {
+      skillId: current.skillId,
+      seed: current.seed,
+      tier: current.tier,
+      correct: input.correct,
+      clean: input.correct && input.hintsUsed === 0,
+      wasMastered: world.progress[current.skillId]?.phase === 'mastered',
+    },
+    ctx.now.getTime(),
+  )
   const outcome: EngineEvent = input.correct ? 'correct' : 'incorrect'
-  return { world: handled.world, events: [outcome, ...stats.events, ...handled.events], xp }
+  return { world: { ...handled.world, mistakes }, events: [outcome, ...stats.events, ...handled.events], xp }
 }

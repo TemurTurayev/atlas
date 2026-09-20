@@ -1,4 +1,5 @@
 import type { ExamRecord, ExamState } from '../exam/types'
+import type { Mistake } from '../mistakes/types'
 import type { SkillGraph } from '../graph/graph'
 import { INITIAL_META, type LearnerMeta } from '../learner/meta'
 import type { SkillProgress } from '../learner/progress'
@@ -20,6 +21,8 @@ export type Task =
       readonly mode: Mode
       readonly faded: boolean
       readonly twin: boolean
+      /** Served because the skill is in the mistake log. */
+      readonly fromMistake?: boolean
     }
   | { readonly type: 'jump-offer'; readonly target: string }
   | { readonly type: 'summary' }
@@ -75,6 +78,8 @@ export interface World {
   /** The mock exam in progress, or the last one until its results are closed. */
   readonly exam: ExamState | null
   readonly examHistory: readonly ExamRecord[]
+  /** Misses on mastered skills, kept until they are fixed. */
+  readonly mistakes: readonly Mistake[]
   readonly settings: Settings
 }
 
@@ -104,6 +109,7 @@ export function initialWorld(now: Date): World {
     run: null,
     exam: null,
     examHistory: [],
+    mistakes: [],
     settings: DEFAULT_SETTINGS,
   }
 }

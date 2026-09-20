@@ -1,4 +1,5 @@
 import type { SkillProgress } from '../learner/progress'
+import { applyResult } from '../mistakes/log'
 import { reviewCard } from '../scheduler/fsrs'
 import { recordAnswers } from '../session/submit'
 import { daysToExam, type EngineCtx, type World } from '../session/world'
@@ -39,7 +40,16 @@ export function finishExam(world: World, ctx: EngineCtx, graded: readonly boolea
     (sum, q, i) => sum + (graded[i] ? Math.max(1, Math.round(ctx.expectedSeconds(q.skillId, q.tier) / 60)) : 0),
     0,
   )
-  const counted = recordAnswers({ ...world, progress }, graded, xp)
+  const mistakes = exam.questions.reduce(
+    (acc, q, i) =>
+      applyResult(
+        acc,
+        { skillId: q.skillId, seed: q.seed, tier: q.tier, correct: graded[i], clean: graded[i], wasMastered: true },
+        ctx.now.getTime(),
+      ),
+    world.mistakes,
+  )
+  const counted = recordAnswers({ ...world, progress, mistakes }, graded, xp)
   const summary = examSummary(graded)
   const record: ExamRecord = {
     date: dayKey(ctx.now),

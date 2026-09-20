@@ -22,6 +22,7 @@ const MODE_LABEL: Readonly<Record<string, string>> = {
   mix: 'Микс',
   jump: 'Прыжок',
   repair: 'Ремонт',
+  mistake: 'Работа над ошибками',
 }
 
 export function ModeBadge({ mode, tier }: { mode: string; tier?: number }) {

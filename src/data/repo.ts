@@ -6,7 +6,7 @@ import { INITIAL_STREAK } from '../core/streak/streak'
 import { dayKey } from '../core/time/day'
 import type { AtlasDb, AttemptLog, KvRow } from './db'
 
-const KV_KEYS = ['meta', 'streak', 'day', 'run', 'exam', 'examHistory', 'settings'] as const
+const KV_KEYS = ['meta', 'streak', 'day', 'run', 'exam', 'examHistory', 'mistakes', 'settings'] as const
 
 export interface ExportFile {
   readonly app: 'atlas'
@@ -29,6 +29,7 @@ export async function loadWorld(db: AtlasDb, now: Date): Promise<World> {
     run: (kv.run as World['run'] | undefined) ?? null,
     exam: (kv.exam as World['exam'] | undefined) ?? null,
     examHistory: (kv.examHistory as World['examHistory'] | undefined) ?? [],
+    mistakes: (kv.mistakes as World['mistakes'] | undefined) ?? [],
     settings: { ...DEFAULT_SETTINGS, ...((kv.settings as Partial<World['settings']> | undefined) ?? {}) },
   }
   return openApp(world, now)

@@ -35,7 +35,8 @@ export function startRun(world: World, ctx: EngineCtx, options: RunOptions = {})
   const today = dayKey(ctx.now)
   if (world.run && world.run.date === today && world.run.phase !== 'summary') return world
   const short = options.short === true
-  const warmupQueue = dueSkills(world, ctx).slice(0, short ? SHORT_WARMUP_LIMIT : WARMUP_LIMIT)
+  const open = world.mistakes.filter((m) => ctx.hasTemplate(m.skillId) && world.progress[m.skillId]?.phase === 'mastered').map((m) => m.skillId)
+  const warmupQueue = [...new Set([...open, ...dueSkills(world, ctx)])].slice(0, short ? SHORT_WARMUP_LIMIT : WARMUP_LIMIT)
   const run: RunState = {
     date: today,
     startedAt: ctx.now.getTime(),

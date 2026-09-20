@@ -48,7 +48,7 @@ function ExamCard({ world, go }: { world: World; go: (screen: 'exam') => void })
   )
 }
 
-export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam') => void }) {
+export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam' | 'mistakes') => void }) {
   const { world, forecast, beginRun, lastActiveDay } = useAtlas()
   if (!world || !forecast) return null
 
@@ -119,6 +119,11 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam')
         <button type="button" className="underline text-muted" onClick={() => go('settings')}>
           Настройки
         </button>
+        {world.mistakes.length > 0 && (
+          <button type="button" className="underline text-warn" onClick={() => go('mistakes')}>
+            Ошибки · {world.mistakes.length}
+          </button>
+        )}
       </nav>
     </div>
   )

@@ -182,7 +182,7 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
-      <PauseBar go={go} left={<ModeBadge mode={task.mode} tier={task.tier} />} />
+      <PauseBar go={go} left={<ModeBadge mode={task.fromMistake === true ? 'mistake' : task.mode} tier={task.tier} />} />
 
       <div className={card}>
         <div className="flex items-start justify-between gap-3">

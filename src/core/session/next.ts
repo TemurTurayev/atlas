@@ -1,4 +1,5 @@
 import { jumpAllowed } from '../learner/meta'
+import { markServed, mistakeFor } from '../mistakes/log'
 import { pickJumpTarget } from '../learner/jump'
 import { advanceLessonStep, startProgress, type SkillProgress } from '../learner/progress'
 import type { Tier } from '../templates/types'
@@ -11,8 +12,23 @@ type Step = { readonly kind: 'task'; readonly world: World; readonly task: Task 
 const show = (world: World, task: Task): Step => ({ kind: 'task', world, task })
 const move = (world: World): Step => ({ kind: 'transition', world })
 
-function problem(ctx: EngineCtx, skillId: string, tier: Tier, mode: Mode, opts: { faded?: boolean; twin?: boolean } = {}): Task {
-  return { type: 'problem', skillId, seed: ctx.rng.seed(), tier, mode, faded: opts.faded ?? false, twin: opts.twin ?? false }
+function problem(
+  ctx: EngineCtx,
+  skillId: string,
+  tier: Tier,
+  mode: Mode,
+  opts: { faded?: boolean; twin?: boolean; fromMistake?: boolean } = {},
+): Task {
+  return {
+    type: 'problem',
+    skillId,
+    seed: ctx.rng.seed(),
+    tier,
+    mode,
+    faded: opts.faded ?? false,
+    twin: opts.twin ?? false,
+    fromMistake: opts.fromMistake ?? false,
+  }
 }
 
 function decideWarmup(world: World, run: RunState, ctx: EngineCtx): Step {
@@ -20,8 +36,15 @@ function decideWarmup(world: World, run: RunState, ctx: EngineCtx): Step {
   const skillId = run.warmupQueue[run.warmupIndex]
   const p = world.progress[skillId]
   if (!p || p.phase !== 'mastered') return move(withRun(world, { ...run, warmupIndex: run.warmupIndex + 1 }))
+  const missed = mistakeFor(world.mistakes, skillId)
+  if (missed && !missed.served) {
+    // The very problem that was missed comes back once; a catalogue of mistakes that never
+    // returns is what makes ordinary error logs useless.
+    const task: Task = { type: 'problem', skillId, seed: missed.seed, tier: missed.tier, mode: 'review', faded: false, twin: false, fromMistake: true }
+    return show({ ...world, mistakes: markServed(world.mistakes, skillId) }, task)
+  }
   const tier: Tier = p.card && p.card.stability > 14 ? 3 : 2
-  return show(world, problem(ctx, skillId, tier, 'review'))
+  return show(world, problem(ctx, skillId, tier, 'review', { fromMistake: missed !== undefined }))
 }
 
 function activeSkillStep(world: World, p: SkillProgress, ctx: EngineCtx): Step {
