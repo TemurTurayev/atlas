@@ -5,6 +5,7 @@ import { GRAPH } from '../../core/graph'
 import { getTemplate } from '../../core/templates/registry'
 import { AnswerInput, emptyAnswer } from '../components/AnswerInput'
 import { ModeBadge } from '../components/Meter'
+import { Solution } from '../components/Solution'
 import { RichText, Tex } from '../components/Tex'
 import { formatPercent } from '../format'
 import { useAtlas } from '../store'
@@ -24,30 +25,19 @@ function PauseBar({ go, left }: { go: (screen: 'home') => void; left?: ReactNode
   )
 }
 
-function Steps({ steps }: { steps: readonly { ru: string; tex?: string }[] }) {
-  return (
-    <ol className="space-y-3">
-      {steps.map((step, i) => (
-        <li key={i} className="border-l-2 border-line pl-4">
-          <RichText text={step.ru} />
-          {step.tex && <Tex tex={step.tex} display />}
-        </li>
-      ))}
-    </ol>
-  )
-}
-
 export function Run({ go }: { go: (screen: 'home') => void }) {
   const {
-    world, task, problem, result, events, hintsUsed, forecast, mixPrediction, mixResults,
+    world, task, problem, result, events, hintsUsed, revealed, forecast, mixPrediction, mixResults,
     submit, revealAnswer, useHint, acknowledge, advance, decideJump, oneMore, setMixPrediction,
   } = useAtlas()
   const [answer, setAnswer] = useState<UserAnswer>({ kind: 'latex', latex: '' })
   const [showRu, setShowRu] = useState(false)
+  const [showSolution, setShowSolution] = useState(false)
 
   useEffect(() => {
     if (problem) setAnswer(emptyAnswer(problem.answer))
     setShowRu(false)
+    setShowSolution(false)
   }, [problem])
 
   if (!world || !task) return <div className="p-6 text-muted">Загрузка…</div>
@@ -143,7 +133,7 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
           <p className="text-lg">
             <RichText text={problem.statement.ru} />
           </p>
-          <Steps steps={problem.solution} />
+          <Solution problem={problem} />
           <p className="text-muted">
             Ответ: <Tex tex={answerToLatex(problem.answer)} />
           </p>
@@ -216,8 +206,15 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
             <button type="button" className={ghost} onClick={() => useHint()} disabled={hintsUsed >= problem.hints.length}>
               Подсказка
             </button>
-            <button type="button" className={ghost} onClick={() => revealAnswer()}>
-              Показать ответ
+            <button
+              type="button"
+              className={ghost}
+              onClick={() => {
+                setShowSolution(true)
+                void revealAnswer()
+              }}
+            >
+              Показать решение
             </button>
           </div>
         )}
@@ -236,20 +233,26 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
         {result?.status === 'correct' && <p className="text-good text-lg">Верно{result.note ? ` · ${result.note}` : ''}</p>}
         {result?.status === 'incorrect' && (
           <div className="space-y-2">
-            <p className="text-bad text-lg">Не сходится{result.diagnosis ? ` · ${result.diagnosis}` : ''}</p>
+            <p className="text-bad text-lg">
+              {revealed ? 'Решение показано' : `Не сходится${result.diagnosis ? ` · ${result.diagnosis}` : ''}`}
+            </p>
             <p className="text-muted">
               Правильный ответ: <Tex tex={answerToLatex(problem.answer)} />
             </p>
+            <p className="text-xs text-muted">Задача засчитана как нерешённая — похожая вернётся.</p>
           </div>
         )}
 
         {graded && (
-          <details className="border-t border-line pt-3" open={result?.status === 'incorrect'}>
-            <summary className="cursor-pointer text-muted">Разбор</summary>
-            <div className="mt-3">
-              <Steps steps={problem.solution} />
-            </div>
-          </details>
+          <div className="border-t border-line pt-3 space-y-3">
+            {showSolution || result?.status === 'incorrect' ? (
+              <Solution problem={problem} />
+            ) : (
+              <button type="button" className="text-sm text-accent underline" onClick={() => setShowSolution(true)}>
+                Показать решение
+              </button>
+            )}
+          </div>
         )}
       </div>
 

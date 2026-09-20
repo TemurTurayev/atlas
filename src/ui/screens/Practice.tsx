@@ -7,6 +7,7 @@ import { GRAPH } from '../../core/graph'
 import { generateProblem } from '../../core/templates/registry'
 import { TIERS, type Tier } from '../../core/templates/types'
 import { AnswerInput, emptyAnswer } from '../components/AnswerInput'
+import { Solution } from '../components/Solution'
 import { RichText, Tex } from '../components/Tex'
 
 const card = 'rounded-card bg-surface border border-line p-5 space-y-4'
@@ -26,6 +27,7 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
   const [hintsUsed, setHintsUsed] = useState(0)
   const [showRu, setShowRu] = useState(false)
   const [stats, setStats] = useState({ solved: 0, total: 0 })
+  const [showSolution, setShowSolution] = useState(false)
 
   const problem = useMemo(() => generateProblem(skillId, seed, tier), [skillId, seed, tier])
   const current = answer ?? emptyAnswer(problem.answer)
@@ -38,6 +40,7 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
     setResult(null)
     setHintsUsed(0)
     setShowRu(false)
+    setShowSolution(false)
   }
 
   const check = () => {
@@ -95,8 +98,15 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
             <button type="button" className={ghost} onClick={() => setHintsUsed(hintsUsed + 1)} disabled={hintsUsed >= problem.hints.length}>
               Подсказка
             </button>
-            <button type="button" className={ghost} onClick={() => setResult({ status: 'incorrect' })}>
-              Показать ответ
+            <button
+              type="button"
+              className={ghost}
+              onClick={() => {
+                setResult({ status: 'incorrect' })
+                setStats((st) => ({ ...st, total: st.total + 1 }))
+              }}
+            >
+              Показать решение
             </button>
           </div>
         )}
@@ -123,17 +133,15 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
         )}
 
         {graded && (
-          <details className="border-t border-line pt-3" open={result?.status === 'incorrect'}>
-            <summary className="cursor-pointer text-muted">Разбор</summary>
-            <ol className="space-y-3 mt-3">
-              {problem.solution.map((step, i) => (
-                <li key={i} className="border-l-2 border-line pl-4">
-                  <RichText text={step.ru} />
-                  {step.tex && <Tex tex={step.tex} display />}
-                </li>
-              ))}
-            </ol>
-          </details>
+          <div className="border-t border-line pt-3 space-y-3">
+            {showSolution || result?.status === 'incorrect' ? (
+              <Solution problem={problem} />
+            ) : (
+              <button type="button" className="text-sm text-accent underline" onClick={() => setShowSolution(true)}>
+                Показать решение
+              </button>
+            )}
+          </div>
         )}
       </div>
 

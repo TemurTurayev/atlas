@@ -56,6 +56,22 @@ function buildSystem(a1: number, b1: number, c1: number, a2: number, b2: number,
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
+    ...(b1 !== 0
+      ? {
+          alternative: {
+            title: 'Другой способ — подстановка',
+            steps: [
+              { ru: 'Выразим $y$ из первого уравнения:', tex: `y = \\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}` },
+              {
+                ru: 'Подставим это выражение во второе уравнение:',
+                tex: `${coefPrefix(a2)}x + ${coefPrefix(b2)}\\cdot\\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}} = ${c2}`,
+              },
+              { ru: `Умножим обе части на $${b1}$ и соберём подобные:`, tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
+              { ru: 'Вернём найденный $x$ в выражение для $y$:', tex: `y = ${yLatex}` },
+            ],
+          },
+        }
+      : {}),
   }
 }
 

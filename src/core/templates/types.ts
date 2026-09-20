@@ -50,6 +50,8 @@ export interface Problem {
   readonly solution: readonly SolutionStep[]
   /** Russian hints, from gentle to specific. */
   readonly hints: readonly string[]
+  /** A second way to solve the same problem, shown on request. */
+  readonly alternative?: { readonly title: string; readonly steps: readonly SolutionStep[] }
   /** Plain-text tip on how to type the answer. */
   readonly inputHint?: string
 }

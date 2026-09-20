@@ -40,6 +40,8 @@ export interface AtlasState {
   result: CheckResult | null
   events: readonly EngineEvent[]
   hintsUsed: number
+  /** True when the learner asked for the solution instead of answering. */
+  revealed: boolean
   shownAt: number
   forecast: Forecast | null
   /** Last day with at least one graded answer — drives the "come back" message. */
@@ -69,6 +71,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   result: null,
   events: [],
   hintsUsed: 0,
+  revealed: false,
   shownAt: 0,
   forecast: null,
   lastActiveDay: null,
@@ -108,7 +111,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
         : task.type === 'worked'
           ? generateProblem(task.skillId, task.seed, 1)
           : null
-    set({ world: shown, task, problem, result: null, events: [], hintsUsed: 0, shownAt: Date.now() })
+    set({ world: shown, task, problem, result: null, events: [], hintsUsed: 0, revealed: false, shownAt: Date.now() })
   },
 
   async submit(answer) {
@@ -143,11 +146,28 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   },
 
   async revealAnswer() {
-    const { world, task, shownAt, hintsUsed } = get()
-    if (!world || task?.type !== 'problem') return
-    const outcome = submitAttempt(world, { correct: false, hintsUsed, seconds: (Date.now() - shownAt) / 1000 }, ctx())
+    const { world, task, shownAt, hintsUsed, revealed } = get()
+    if (!world || task?.type !== 'problem' || revealed) return
+    const seconds = (Date.now() - shownAt) / 1000
+    const outcome = submitAttempt(world, { correct: false, hintsUsed, seconds }, ctx())
     await persist(outcome.world)
-    set({ world: outcome.world, result: { status: 'incorrect' }, events: outcome.events })
+    await logAttempt(db, {
+      skillId: task.skillId,
+      seed: task.seed,
+      tier: task.tier,
+      mode: task.mode,
+      correct: false,
+      hintsUsed,
+      seconds: Math.round(seconds),
+      answer: '(показано решение)',
+      at: Date.now(),
+    })
+    play('incorrect', world.settings.sound)
+    if (task.mode === 'mix' && !task.twin) {
+      const mix = get().mixResults
+      set({ mixResults: { ...mix, total: mix.total + 1 } })
+    }
+    set({ world: outcome.world, result: { status: 'incorrect' }, events: outcome.events, revealed: true, lastActiveDay: outcome.world.day.date })
   },
 
   useHint() {

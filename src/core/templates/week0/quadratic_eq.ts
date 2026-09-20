@@ -1,4 +1,4 @@
-import { paren } from '../../math/latex'
+import { linear, paren } from '../../math/latex'
 import { polyFromRoots, polyMul, polyToLatex, type Poly } from '../../math/poly'
 import { gcd, rat, ratToLatex } from '../../math/rational'
 import type { Rng } from '../../random/rng'
@@ -34,7 +34,12 @@ export function quadraticSteps(a: number, b: number, c: number): SolutionStep[] 
   ]
 }
 
-function build(poly: Poly, values: readonly string[], solution: readonly SolutionStep[]): Problem {
+function build(
+  poly: Poly,
+  values: readonly string[],
+  solution: readonly SolutionStep[],
+  alternative?: Problem['alternative'],
+): Problem {
   const f = polyToLatex(poly)
   return {
     statement: { en: `Determine the real zeros of $f(x) = ${f}$.`, ru: `Найди действительные нули функции $f(x) = ${f}$.` },
@@ -42,6 +47,19 @@ function build(poly: Poly, values: readonly string[], solution: readonly Solutio
     solution,
     hints: HINTS,
     inputHint: INPUT_HINT,
+    ...(alternative ? { alternative } : {}),
+  }
+}
+
+/** Vieta's formulas: for x² + bx + c the roots sum to −b and multiply to c. */
+function vietaAlternative(poly: Poly, r1: number, r2: number): Problem['alternative'] {
+  return {
+    title: 'Другой способ — теорема Виета (подбор корней)',
+    steps: [
+      { ru: 'Для приведённого $x^2+bx+c$ сумма корней равна $-b$, а произведение равно $c$.' },
+      { ru: `Ищем два числа с суммой $${r1 + r2}$ и произведением $${r1 * r2}$:`, tex: `x_1 = ${r1}, \\quad x_2 = ${r2}` },
+      { ru: 'Проверка — раскроем скобки:', tex: `\\left(${linear(1, -r1)}\\right)\\left(${linear(1, -r2)}\\right) = ${polyToLatex(poly)}` },
+    ],
   }
 }
 
@@ -49,7 +67,7 @@ function tier1(rng: Rng): Problem {
   const r1 = rng.int(-7, 7)
   const r2 = rng.intExcept(-7, 7, [r1])
   const poly = polyFromRoots(1, [r1, r2])
-  return build(poly, [String(r1), String(r2)], quadraticSteps(1, poly[1], poly[0]))
+  return build(poly, [String(r1), String(r2)], quadraticSteps(1, poly[1], poly[0]), vietaAlternative(poly, r1, r2))
 }
 
 function tier2(rng: Rng): Problem {

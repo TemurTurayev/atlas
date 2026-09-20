@@ -47,6 +47,13 @@ describe.each(entries)('template %s', (skillId, template) => {
       const texts = [p.statement.en, p.statement.ru, ...p.hints, ...p.solution.map((s) => s.ru)]
       texts.flatMap(mathSegments).forEach((tex) => expect(renders(tex), `seed ${seed}: ${tex}`).toBe(true))
       p.solution.forEach((s) => s.tex && expect(renders(s.tex), `seed ${seed}: ${s.tex}`).toBe(true))
+      if (p.alternative) {
+        expect(p.alternative.title.length).toBeGreaterThan(5)
+        p.alternative.steps.forEach((s) => {
+          mathSegments(s.ru).forEach((tex) => expect(renders(tex), `seed ${seed}: ${tex}`).toBe(true))
+          if (s.tex) expect(renders(s.tex), `seed ${seed}: ${s.tex}`).toBe(true)
+        })
+      }
     }
   })
 
