@@ -1,0 +1,168 @@
+import { joinTerms } from '../../math/latex'
+import type { Rng } from '../../random/rng'
+import type { Problem, SkillTemplate } from '../types'
+
+const theory = [
+  'Тригонометрия прямоугольного треугольника (right-triangle trigonometry): $\\sin\\theta=\\frac{\\text{противолежащий}}{\\text{гипотенуза}}$, $\\cos\\theta=\\frac{\\text{прилежащий}}{\\text{гипотенуза}}$, $\\tan\\theta=\\frac{\\text{противолежащий}}{\\text{прилежащий}}$.',
+  'Точные значения (exact values): $\\sin 30^\\circ=\\cos 60^\\circ=\\frac{1}{2}$; $\\sin 45^\\circ=\\cos 45^\\circ=\\frac{\\sqrt{2}}{2}$; $\\sin 60^\\circ=\\cos 30^\\circ=\\frac{\\sqrt{3}}{2}$.',
+  'Тангенс (tangent): $\\tan 30^\\circ=\\frac{1}{\\sqrt{3}}$, $\\tan 45^\\circ=1$, $\\tan 60^\\circ=\\sqrt{3}$.',
+  'Чтобы найти катет, умножь гипотенузу на синус или косинус нужного угла; чтобы найти угол — раздели противолежащий катет на прилежащий и сравни с табличным значением тангенса.',
+  'Типичные ошибки: перепутать противолежащий и прилежащий катет; забыть, что здесь углы — в градусах, а не в радианах.',
+].join('\n')
+
+type Angle = 30 | 45 | 60
+const ANGLES: readonly Angle[] = [30, 45, 60]
+
+const SIN_ROOT: Readonly<Record<Angle, number>> = { 30: 1, 45: 2, 60: 3 }
+const COS_ROOT: Readonly<Record<Angle, number>> = { 30: 3, 45: 2, 60: 1 }
+const EXACT_LATEX: Readonly<Record<Angle, { readonly sin: string; readonly cos: string }>> = {
+  30: { sin: '\\frac{1}{2}', cos: '\\frac{\\sqrt{3}}{2}' },
+  45: { sin: '\\frac{\\sqrt{2}}{2}', cos: '\\frac{\\sqrt{2}}{2}' },
+  60: { sin: '\\frac{\\sqrt{3}}{2}', cos: '\\frac{1}{2}' },
+}
+
+function sqrtCoefLatex(m: number, root: number): string {
+  if (root === 1) return String(m)
+  return m === 1 ? `\\sqrt{${root}}` : `${m}\\sqrt{${root}}`
+}
+
+function tier1(rng: Rng): Problem {
+  const angle = rng.pick(ANGLES)
+  const useSin = rng.chance(0.5)
+  const root = useSin ? SIN_ROOT[angle] : COS_ROOT[angle]
+  const m = rng.int(3, 9)
+  const hyp = 2 * m
+  const side = sqrtCoefLatex(m, root)
+  const exact = EXACT_LATEX[angle][useSin ? 'sin' : 'cos']
+  const whichPhrase = useSin ? 'opposite' : 'adjacent to'
+  const whichRu = useSin ? 'противолежащий' : 'прилежащий'
+  const letter = useSin ? 'a' : 'b'
+  return {
+    statement: {
+      en: `A right triangle has hypotenuse $${hyp}$ and an acute angle of $${angle}^\\circ$. Find the length of the side ${whichPhrase} this angle.`,
+      ru: `В прямоугольном треугольнике гипотенуза равна $${hyp}$, острый угол равен $${angle}^\\circ$. Найди ${whichRu} этому углу катет.`,
+    },
+    answer: { kind: 'number', value: side },
+    solution: [
+      { ru: `${useSin ? 'Синус' : 'Косинус'} угла:`, tex: `${useSin ? '\\sin' : '\\cos'} ${angle}^\\circ = ${exact}` },
+      { ru: 'Сторона равна гипотенузе, умноженной на это значение:', tex: `${letter} = ${hyp}\\cdot ${exact} = ${side}` },
+    ],
+    hints: [
+      'Вспомни точные значения синуса и косинуса для 30°, 45°, 60°.',
+      `${useSin ? 'Синус' : 'Косинус'} угла — это нужная сторона, делённая на гипотенузу; вырази нужную сторону.`,
+    ],
+    inputHint: 'Если ответ иррациональный, пиши через корень: 5\\sqrt{3}',
+  }
+}
+
+function tier2(rng: Rng): Problem {
+  const angle = rng.pick(ANGLES)
+  const k = rng.int(2, 9)
+  let adjacent: string
+  let opposite: string
+  if (angle === 45) {
+    adjacent = String(k)
+    opposite = String(k)
+  } else if (angle === 60) {
+    adjacent = String(k)
+    opposite = sqrtCoefLatex(k, 3)
+  } else {
+    adjacent = sqrtCoefLatex(k, 3)
+    opposite = String(k)
+  }
+  return {
+    statement: {
+      en: `A right triangle has legs $${adjacent}$ (adjacent to angle $\\theta$) and $${opposite}$ (opposite angle $\\theta$). Find $\\theta$ in degrees.`,
+      ru: `В прямоугольном треугольнике катеты равны $${adjacent}$ (прилежащий углу $\\theta$) и $${opposite}$ (противолежащий углу $\\theta$). Найди угол $\\theta$ в градусах.`,
+    },
+    answer: { kind: 'number', value: String(angle) },
+    solution: [
+      { ru: 'Тангенс угла — отношение противолежащего катета к прилежащему:', tex: `\\tan\\theta = \\frac{${opposite}}{${adjacent}}` },
+      { ru: 'Это табличное значение тангенса для угла:', tex: `\\theta = ${angle}^\\circ` },
+    ],
+    hints: [
+      '$\\tan\\theta = $ противолежащий $/$ прилежащий.',
+      'Сравни получившееся отношение с табличными значениями: $\\tan 30^\\circ=\\frac{1}{\\sqrt{3}}$, $\\tan 45^\\circ=1$, $\\tan 60^\\circ=\\sqrt{3}$.',
+    ],
+    inputHint: 'Ответ — число в градусах, например 45',
+  }
+}
+
+function ladderTree(rng: Rng): Problem {
+  const angle = rng.pick(ANGLES)
+  const m = rng.int(2, 6)
+  let d: number
+  let climb: string
+  if (angle === 30) {
+    d = 3 * m
+    climb = sqrtCoefLatex(m, 3)
+  } else if (angle === 60) {
+    d = m
+    climb = sqrtCoefLatex(m, 3)
+  } else {
+    d = m
+    climb = String(m)
+  }
+  const eye = rng.int(1, 3)
+  const total = angle === 45 ? String(eye + m) : joinTerms([String(eye), climb])
+  return {
+    statement: {
+      en: `A person whose eyes are $${eye}$ m above the ground stands $${d}$ m from a tree. The angle of elevation to the top of the tree is $${angle}^\\circ$. Find the height of the tree.`,
+      ru: `Глаза наблюдателя находятся на высоте $${eye}$ м, он стоит в $${d}$ м от дерева. Угол возвышения к вершине дерева равен $${angle}^\\circ$. Найди высоту дерева.`,
+    },
+    answer: { kind: 'number', value: total },
+    solution: [
+      { ru: 'Высота от уровня глаз до вершины:', tex: `h_1 = ${d}\\cdot\\tan ${angle}^\\circ = ${climb}` },
+      { ru: 'Прибавляем высоту наблюдателя до уровня глаз:', tex: `h = h_1 + ${eye} = ${total}` },
+    ],
+    hints: [
+      'Сначала найди высоту от уровня глаз до вершины: $h_1=d\\cdot\\tan\\theta$.',
+      'Не забудь прибавить рост наблюдателя до его глаз.',
+    ],
+    inputHint: 'Если в ответе есть корень, запиши его точно, например 2+3\\sqrt{3}',
+  }
+}
+
+function rampAngle(rng: Rng): Problem {
+  const angle = rng.pick(ANGLES)
+  const k = rng.int(2, 6)
+  let rise: string
+  let run: string
+  if (angle === 45) {
+    rise = String(k)
+    run = String(k)
+  } else if (angle === 60) {
+    rise = sqrtCoefLatex(k, 3)
+    run = String(k)
+  } else {
+    rise = String(k)
+    run = sqrtCoefLatex(k, 3)
+  }
+  return {
+    statement: {
+      en: `A wheelchair ramp rises $${rise}$ m over a horizontal run of $${run}$ m. Find the angle the ramp makes with the ground, in degrees.`,
+      ru: `Пандус поднимается на $${rise}$ м на горизонтальном участке $${run}$ м. Найди угол наклона пандуса к земле, в градусах.`,
+    },
+    answer: { kind: 'number', value: String(angle) },
+    solution: [
+      { ru: 'Тангенс угла наклона:', tex: `\\tan\\theta = \\frac{${rise}}{${run}}` },
+      { ru: 'Сравниваем с табличным значением:', tex: `\\theta = ${angle}^\\circ` },
+    ],
+    hints: [
+      'Угол наклона находится через тангенс: подъём, делённый на горизонтальное расстояние.',
+      'Сравни отношение с табличными значениями $\\tan 30^\\circ, \\tan 45^\\circ, \\tan 60^\\circ$.',
+    ],
+    inputHint: 'Ответ — число в градусах, например 60',
+  }
+}
+
+function tier3(rng: Rng): Problem {
+  return rng.chance(0.5) ? ladderTree(rng) : rampAngle(rng)
+}
+
+export const template: SkillTemplate = {
+  skillId: 'trig_triangle',
+  theory,
+  expectedSeconds: { 1: 45, 2: 90, 3: 170 },
+  generate: (rng, tier) => (tier === 1 ? tier1(rng) : tier === 2 ? tier2(rng) : tier3(rng)),
+}

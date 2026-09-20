@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+@import 'katex/dist/katex.min.css';
+
+@theme {
+  --color-bg: #0f1115;
+  --color-surface: #161a21;
+  --color-raised: #1d222b;
+  --color-line: #262c37;
+  --color-ink: #e7ecf3;
+  --color-muted: #96a1b3;
+  --color-accent: #4ea1ff;
+  --color-good: #3ecf8e;
+  --color-warn: #f2b544;
+  --color-bad: #ff6b6b;
+  --radius-card: 14px;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+math-field {
+  background: var(--color-raised);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 20px;
+  width: 100%;
+  display: block;
+}
+
+math-field:focus-within { border-color: var(--color-accent); outline: none; }
+.katex { font-size: 1.05em; }
