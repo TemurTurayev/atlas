@@ -25,10 +25,12 @@ export interface SubmitResult {
   readonly xp: number
 }
 
-interface Handled {
+export interface EngineUpdate {
   readonly world: World
   readonly events: readonly EngineEvent[]
 }
+
+type Handled = EngineUpdate
 
 const forward = (events: readonly LearnerEvent[]): EngineEvent[] =>
   events.filter((e): e is Exclude<LearnerEvent, 'repair-needed'> => e !== 'repair-needed')
@@ -46,19 +48,27 @@ function requireProgress(world: World, skillId: string): SkillProgress {
   return p
 }
 
-function recordStats(world: World, input: AttemptInput, xp: number): Handled {
-  const day = { ...world.day, xp: world.day.xp + xp, graded: world.day.graded + 1, correct: world.day.correct + (input.correct ? 1 : 0) }
+/** Adds graded answers to today's totals and counts the day once the threshold is crossed. */
+export function recordAnswers(world: World, outcomes: readonly boolean[], xp: number): EngineUpdate {
+  const day = {
+    ...world.day,
+    xp: world.day.xp + xp,
+    graded: world.day.graded + outcomes.length,
+    correct: world.day.correct + outcomes.filter(Boolean).length,
+  }
   const reaches = !day.counted && day.graded >= DAY_COUNT_THRESHOLD
   return {
     world: {
       ...world,
       day: reaches ? { ...day, counted: true } : day,
       streak: reaches ? countDay(world.streak, day.date) : world.streak,
-      meta: recordResult(world.meta, input.correct),
+      meta: outcomes.reduce((meta, correct) => recordResult(meta, correct), world.meta),
     },
     events: reaches ? ['day-counted'] : [],
   }
 }
+
+const recordStats = (world: World, input: AttemptInput, xp: number): Handled => recordAnswers(world, [input.correct], xp)
 
 function handleExpress(world: World, task: ProblemTask, input: AttemptInput, ctx: EngineCtx): Handled {
   const update = applyLearning(requireProgress(world, task.skillId), input, task.tier, ctx.now.getTime())

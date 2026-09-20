@@ -1,3 +1,4 @@
+import type { ExamRecord, ExamState } from '../exam/types'
 import type { SkillGraph } from '../graph/graph'
 import { INITIAL_META, type LearnerMeta } from '../learner/meta'
 import type { SkillProgress } from '../learner/progress'
@@ -71,6 +72,9 @@ export interface World {
   readonly streak: StreakState
   readonly day: DayStats
   readonly run: RunState | null
+  /** The mock exam in progress, or the last one until its results are closed. */
+  readonly exam: ExamState | null
+  readonly examHistory: readonly ExamRecord[]
   readonly settings: Settings
 }
 
@@ -92,7 +96,16 @@ export const DAY_COUNT_THRESHOLD = 5
 export const emptyDay = (date: string): DayStats => ({ date, xp: 0, graded: 0, correct: 0, counted: false })
 
 export function initialWorld(now: Date): World {
-  return { progress: {}, meta: INITIAL_META, streak: INITIAL_STREAK, day: emptyDay(dayKey(now)), run: null, settings: DEFAULT_SETTINGS }
+  return {
+    progress: {},
+    meta: INITIAL_META,
+    streak: INITIAL_STREAK,
+    day: emptyDay(dayKey(now)),
+    run: null,
+    exam: null,
+    examHistory: [],
+    settings: DEFAULT_SETTINGS,
+  }
 }
 
 export function requireRun(world: World): RunState {

@@ -30,6 +30,13 @@ export function referenceAnswer(spec: AnswerSpec): UserAnswer {
   }
 }
 
+/** What the learner typed, ready to render next to the reference answer. */
+export function userAnswerLatex(answer: UserAnswer, spec: AnswerSpec): string {
+  if (answer.kind === 'interval') return intervalLatex(answer.parts)
+  if (answer.kind === 'choice') return spec.kind === 'choice' ? (spec.options.find((o) => o.id === answer.id)?.label ?? answer.id) : answer.id
+  return answer.latex
+}
+
 function perturbIntervals(parts: readonly IntervalPart[]): IntervalPart[] {
   if (parts.length === 0) return [{ lo: '0', hi: '1', loClosed: true, hiClosed: true }]
   const [first, ...rest] = parts

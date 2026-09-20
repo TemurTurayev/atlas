@@ -1,5 +1,10 @@
 import { create } from 'zustand'
 import { checkAnswer, type CheckResult, type UserAnswer } from '../core/checker/check'
+import { buildExam } from '../core/exam/build'
+import { finishExam } from '../core/exam/finish'
+import { examSummary, gradeExam } from '../core/exam/grade'
+import { clearExam, saveExamProgress } from '../core/exam/state'
+import type { ExamState } from '../core/exam/types'
 import { computeForecast, type Forecast } from '../core/forecast/forecast'
 import { GRAPH } from '../core/graph'
 import { createRng } from '../core/random/rng'
@@ -15,6 +20,8 @@ import { play } from './sound'
 
 const db = new AtlasDb()
 let persisted: World | null = null
+/** The clock and the button can both fire at once; a paper is handed in once. */
+let handingIn = false
 
 const ctx = (): EngineCtx => ({
   graph: GRAPH,
@@ -31,6 +38,38 @@ async function persist(world: World): Promise<void> {
 
 const describeAnswer = (answer: UserAnswer): string =>
   answer.kind === 'latex' ? answer.latex : answer.kind === 'choice' ? answer.id : JSON.stringify(answer.parts)
+
+/** Grades the whole paper, schedules every tested skill and files the result. */
+async function handIn(
+  world: World,
+  exam: ExamState,
+  answers: Record<number, UserAnswer>,
+  apply: (patch: Partial<AtlasState>) => void,
+): Promise<void> {
+  const problems = exam.questions.map((q) => generateProblem(q.skillId, q.seed, q.tier))
+  const graded = gradeExam(problems, answers)
+  const next = finishExam(saveExamProgress(world, answers, exam.index), ctx(), graded)
+  await persist(next)
+  const at = Date.now()
+  const seconds = Math.round((at - exam.startedAt) / 1000 / Math.max(1, exam.questions.length))
+  await Promise.all(
+    exam.questions.map((q, i) =>
+      logAttempt(db, {
+        skillId: q.skillId,
+        seed: q.seed,
+        tier: q.tier,
+        mode: 'exam',
+        correct: graded[i],
+        hintsUsed: 0,
+        seconds,
+        answer: answers[i] ? describeAnswer(answers[i]) : '(пропущено)',
+        at,
+      }),
+    ),
+  )
+  play(examSummary(graded).passed ? 'mastered' : 'incorrect', world.settings.sound)
+  apply({ world: next, forecast: computeForecast(GRAPH, next.progress, new Date()), lastActiveDay: next.day.date })
+}
 
 export interface AtlasState {
   ready: boolean
@@ -49,6 +88,8 @@ export interface AtlasState {
   /** How many of the mixed block the learner predicted they would get right. */
   mixPrediction: number | null
   mixResults: { correct: number; total: number }
+  /** Working copy of the exam answers; written back to the world on every move between questions. */
+  examAnswers: Record<number, UserAnswer>
   init: () => Promise<void>
   beginRun: (short?: boolean) => Promise<void>
   advance: () => Promise<void>
@@ -59,6 +100,11 @@ export interface AtlasState {
   acknowledge: () => Promise<void>
   decideJump: (accept: boolean) => Promise<void>
   oneMore: () => Promise<void>
+  startExam: () => Promise<void>
+  setExamAnswer: (index: number, answer: UserAnswer) => void
+  goExamQuestion: (index: number) => Promise<void>
+  handInExam: () => Promise<void>
+  closeExam: () => Promise<void>
   updateSettings: (patch: Partial<World['settings']>) => Promise<void>
   replaceWorld: (world: World) => Promise<void>
 }
@@ -77,6 +123,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   lastActiveDay: null,
   mixPrediction: null,
   mixResults: { correct: 0, total: 0 },
+  examAnswers: {},
 
   async init() {
     const world = await loadWorld(db, new Date())
@@ -88,6 +135,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
       ready: true,
       forecast: computeForecast(GRAPH, world.progress, new Date()),
       lastActiveDay: active.length > 0 ? active[active.length - 1] : null,
+      examAnswers: { ...(world.exam?.answers ?? {}) },
     })
   },
 
@@ -203,6 +251,47 @@ export const useAtlas = create<AtlasState>((set, get) => ({
     await persist(next)
     set({ world: next })
     await get().advance()
+  },
+
+  async startExam() {
+    const world = get().world
+    if (!world) return
+    const opened = openApp(world, new Date())
+    const next: World = { ...opened, exam: buildExam(opened, ctx()) }
+    await persist(next)
+    set({ world: next, examAnswers: {} })
+  },
+
+  setExamAnswer(index, answer) {
+    set({ examAnswers: { ...get().examAnswers, [index]: answer } })
+  },
+
+  async goExamQuestion(index) {
+    const { world, examAnswers } = get()
+    if (!world?.exam || world.exam.finishedAt !== null) return
+    const next = saveExamProgress(world, examAnswers, index)
+    await persist(next)
+    set({ world: next })
+  },
+
+  async handInExam() {
+    const { world, examAnswers } = get()
+    const exam = world?.exam
+    if (!world || !exam || exam.finishedAt !== null || handingIn) return
+    handingIn = true
+    try {
+      await handIn(world, exam, examAnswers, set)
+    } finally {
+      handingIn = false
+    }
+  },
+
+  async closeExam() {
+    const world = get().world
+    if (!world) return
+    const next = clearExam(world)
+    await persist(next)
+    set({ world: next, examAnswers: {} })
   },
 
   async updateSettings(patch) {

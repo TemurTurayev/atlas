@@ -1,8 +1,10 @@
+import { EXAM_MIN_SKILLS } from '../../core/exam/build'
 import { GRAPH } from '../../core/graph'
+import type { World } from '../../core/session/world'
 import { dayKey, daysBetween } from '../../core/time/day'
 import { Meter, Streak } from '../components/Meter'
-import { plural } from '../format'
-import { dueCount, frontier } from '../selectors'
+import { formatPercent, plural } from '../format'
+import { dueCount, frontier, masteredCount } from '../selectors'
 import { useAtlas } from '../store'
 
 /** A calm nudge after a gap, or a fresh-start note on Mondays and the first of the month. */
@@ -24,7 +26,29 @@ function Banner({ daysAway, freshStart }: { daysAway: number; freshStart: boolea
   return null
 }
 
-export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings') => void }) {
+/** The mock exam: an unfinished paper first, then the last result. */
+function ExamCard({ world, go }: { world: World; go: (screen: 'exam') => void }) {
+  const exam = world.exam
+  const last = world.examHistory[world.examHistory.length - 1]
+  const ready = masteredCount(world) >= EXAM_MIN_SKILLS
+  if (!ready && !exam && !last) return null
+  const label = exam === null ? 'Пробный экзамен' : exam.finishedAt === null ? 'Вернуться к экзамену' : 'Посмотреть результаты'
+  const tone = exam && exam.finishedAt === null ? 'border-warn text-warn' : 'border-line text-muted hover:border-accent'
+  return (
+    <section className="space-y-2">
+      <button type="button" onClick={() => go('exam')} className={`w-full py-3 rounded-card border ${tone}`}>
+        {label}
+      </button>
+      {last && (
+        <p className="text-xs text-muted text-center">
+          Последняя работа: {last.correct} из {last.total} · {formatPercent(last.total === 0 ? 0 : last.correct / last.total)}
+        </p>
+      )}
+    </section>
+  )
+}
+
+export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam') => void }) {
   const { world, forecast, beginRun, lastActiveDay } = useAtlas()
   if (!world || !forecast) return null
 
@@ -75,6 +99,8 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings') => void 
           </button>
         )}
       </div>
+
+      <ExamCard world={world} go={go} />
 
       <section className="space-y-2">
         <h2 className="text-sm text-muted">Дальше по карте</h2>

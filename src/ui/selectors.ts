@@ -16,6 +16,11 @@ export function frontier(world: World, limit = 3): string[] {
     .slice(0, limit)
 }
 
+/** Mastered skills that can actually be asked about. */
+export function masteredCount(world: World): number {
+  return Object.values(world.progress).filter((p) => p.phase === 'mastered' && hasTemplate(p.skillId)).length
+}
+
 export function dueCount(world: World, now: Date): number {
   return Object.values(world.progress).filter((p) => p.phase === 'mastered' && p.card && hasTemplate(p.skillId) && isDue(p.card, now)).length
 }
