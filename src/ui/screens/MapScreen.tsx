@@ -29,7 +29,13 @@ const WEEK_TITLE: Readonly<Record<number, string>> = {
   14: 'Неделя 14 — термодинамика',
 }
 
-export function MapScreen({ go }: { go: (screen: 'home') => void }) {
+interface Props {
+  readonly go: (screen: 'home') => void
+  /** Opens targeted practice for one skill. */
+  readonly onPractice: (skillId: string) => void
+}
+
+export function MapScreen({ go, onPractice }: Props) {
   const world = useAtlas((state) => state.world)
   const [open, setOpen] = useState<string | null>(null)
   if (!world) return null
@@ -74,6 +80,15 @@ export function MapScreen({ go }: { go: (screen: 'home') => void }) {
                   ))
               ) : (
                 <p className="text-sm text-muted">Задачи по этой теме появятся на следующем этапе.</p>
+              )}
+              {hasTemplate(open) && (
+                <button
+                  type="button"
+                  className="mt-2 px-4 py-2 rounded-xl border border-accent text-accent text-sm hover:bg-raised"
+                  onClick={() => onPractice(open)}
+                >
+                  Потренировать
+                </button>
               )}
             </div>
           )}
