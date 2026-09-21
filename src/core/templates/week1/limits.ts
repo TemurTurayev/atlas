@@ -19,14 +19,11 @@ function tier1(rng: Rng): Problem {
   const factorMinus = linear(1, -c)
   const factorPlus = linear(1, c)
   return {
-    statement: {
-      en: `Find $\\displaystyle\\lim_{x\\to ${c}}\\frac{x^{2}-${c2}}{${factorMinus}}$.`,
-      ru: `Найди $\\displaystyle\\lim_{x\\to ${c}}\\frac{x^{2}-${c2}}{${factorMinus}}$.`,
-    },
+    statement: `Find $\\displaystyle\\lim_{x\\to ${c}}\\frac{x^{2}-${c2}}{${factorMinus}}$.`,
     answer: { kind: 'number', value: String(value) },
     solution: [
-      { ru: 'Числитель — разность квадратов, раскладываем на множители:', tex: `x^{2}-${c2} = \\left(${factorMinus}\\right)\\left(${factorPlus}\\right)` },
-      { ru: `Сокращаем общий множитель $${factorMinus}$ со знаменателем и подставляем $x=${c}$:`, tex: `\\lim_{x\\to ${c}} \\left(${factorPlus}\\right) = ${value}` },
+      { text: 'Числитель — разность квадратов, раскладываем на множители:', tex: `x^{2}-${c2} = \\left(${factorMinus}\\right)\\left(${factorPlus}\\right)` },
+      { text: `Сокращаем общий множитель $${factorMinus}$ со знаменателем и подставляем $x=${c}$:`, tex: `\\lim_{x\\to ${c}} \\left(${factorPlus}\\right) = ${value}` },
     ],
     hints: [
       'Числитель — разность квадратов; разложи его на два множителя.',
@@ -48,17 +45,14 @@ function tier2(rng: Rng): Problem {
   const denLatex = polyToLatex(denominator)
   const value = ratToLatex(rat(a, f))
   return {
-    statement: {
-      en: `Find $\\displaystyle\\lim_{x\\to\\infty}\\frac{${numLatex}}{${denLatex}}$.`,
-      ru: `Найди $\\displaystyle\\lim_{x\\to\\infty}\\frac{${numLatex}}{${denLatex}}$.`,
-    },
+    statement: `Find $\\displaystyle\\lim_{x\\to\\infty}\\frac{${numLatex}}{${denLatex}}$.`,
     answer: { kind: 'number', value },
     solution: [
       {
-        ru: 'Степени числителя и знаменателя равны — при $x\\to\\infty$ предел определяют только старшие коэффициенты:',
+        text: 'Степени числителя и знаменателя равны — при $x\\to\\infty$ предел определяют только старшие коэффициенты:',
         tex: `\\lim_{x\\to\\infty}\\frac{${numLatex}}{${denLatex}} = \\frac{${a}}{${f}}`,
       },
-      { ru: 'Вычисляем отношение старших коэффициентов:', tex: `\\frac{${a}}{${f}} = ${value}` },
+      { text: 'Вычисляем отношение старших коэффициентов:', tex: `\\frac{${a}}{${f}} = ${value}` },
     ],
     hints: [
       'Раздели числитель и знаменатель на $x$ в наибольшей встречающейся степени.',
@@ -72,18 +66,15 @@ function tier3(rng: Rng): Problem {
   const c2 = c * c
   const value = ratToLatex(rat(1, 2 * c))
   return {
-    statement: {
-      en: `Find $\\displaystyle\\lim_{x\\to ${c2}}\\frac{\\sqrt{x}-${c}}{x-${c2}}$.`,
-      ru: `Найди $\\displaystyle\\lim_{x\\to ${c2}}\\frac{\\sqrt{x}-${c}}{x-${c2}}$.`,
-    },
+    statement: `Find $\\displaystyle\\lim_{x\\to ${c2}}\\frac{\\sqrt{x}-${c}}{x-${c2}}$.`,
     answer: { kind: 'number', value },
     solution: [
       {
-        ru: `Домножаем числитель и знаменатель на сопряжённое выражение $\\sqrt{x}+${c}$:`,
+        text: `Домножаем числитель и знаменатель на сопряжённое выражение $\\sqrt{x}+${c}$:`,
         tex: `\\frac{\\sqrt{x}-${c}}{x-${c2}}\\cdot\\frac{\\sqrt{x}+${c}}{\\sqrt{x}+${c}} = \\frac{x-${c2}}{\\left(x-${c2}\\right)\\left(\\sqrt{x}+${c}\\right)}`,
       },
-      { ru: `Сокращаем общий множитель $x-${c2}$:`, tex: `= \\frac{1}{\\sqrt{x}+${c}}` },
-      { ru: `Подставляем $x=${c2}$:`, tex: `\\frac{1}{\\sqrt{${c2}}+${c}} = \\frac{1}{${2 * c}} = ${value}` },
+      { text: `Сокращаем общий множитель $x-${c2}$:`, tex: `= \\frac{1}{\\sqrt{x}+${c}}` },
+      { text: `Подставляем $x=${c2}$:`, tex: `\\frac{1}{\\sqrt{${c2}}+${c}} = \\frac{1}{${2 * c}} = ${value}` },
     ],
     hints: [
       'Домножь числитель и знаменатель на сопряжённое выражение, чтобы убрать корень.',

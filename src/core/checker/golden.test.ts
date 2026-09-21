@@ -56,11 +56,11 @@ describe('golden answer set', () => {
   })
 
   it('gives helpful set diagnostics', () => {
-    expect(checkAnswer(numberSet('2', '3'), latex('2'))).toEqual({ status: 'incorrect', diagnosis: 'Найдено 1 из 2' })
-    expect(checkAnswer(numberSet('2', '3'), latex('2,3,4'))).toEqual({ status: 'incorrect', diagnosis: 'Есть лишние значения' })
+    expect(checkAnswer(numberSet('2', '3'), latex('2'))).toEqual({ status: 'incorrect', diagnosis: 'Found 1 of 2' })
+    expect(checkAnswer(numberSet('2', '3'), latex('2,3,4'))).toEqual({ status: 'incorrect', diagnosis: 'Some extra values are in there' })
     expect(checkAnswer(interval(iv('2', '5', true)), { kind: 'interval', parts: [iv('2', '5')] })).toEqual({
       status: 'incorrect',
-      diagnosis: 'Концы верные — проверь скобки: ( не включает конец, [ включает',
+      diagnosis: 'The endpoints are right — check the brackets: ( excludes the endpoint, [ includes it',
     })
   })
 })

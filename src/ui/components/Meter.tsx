@@ -16,27 +16,27 @@ export function Meter({ label, value, markerAt, tone = 'accent' }: { label: stri
 }
 
 const MODE_LABEL: Readonly<Record<string, string>> = {
-  express: 'Экспресс',
-  lesson: 'Урок',
-  review: 'Повторение',
-  mix: 'Микс',
-  jump: 'Прыжок',
-  repair: 'Ремонт',
-  mistake: 'Работа над ошибками',
+  express: 'Express check',
+  lesson: 'Lesson',
+  review: 'Review',
+  mix: 'Mixed',
+  jump: 'Jump',
+  repair: 'Repair',
+  mistake: 'Fixing a mistake',
 }
 
 export function ModeBadge({ mode, tier }: { mode: string; tier?: number }) {
   return (
     <span className="text-xs px-2 py-1 rounded-lg bg-raised border border-line text-muted">
       {MODE_LABEL[mode] ?? mode}
-      {tier ? ` · ур. ${tier}` : ''}
+      {tier ? ` · level ${tier}` : ''}
     </span>
   )
 }
 
 export function Streak({ days, freezes }: { days: number; freezes: number }) {
   return (
-    <span className="text-sm text-warn" title={`заморозок: ${freezes}`}>
+    <span className="text-sm text-warn" title={`freezes: ${freezes}`}>
       🔥 {days}
     </span>
   )

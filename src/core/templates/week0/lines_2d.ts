@@ -44,14 +44,11 @@ function tier1(rng: Rng): Problem {
   const x2 = x1 + q
   const y2 = y1 + p
   return {
-    statement: {
-      en: `Find the slope of the line through $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
-      ru: `Найди наклон прямой, проходящей через точки $(${x1}, ${y1})$ и $(${x2}, ${y2})$.`,
-    },
+    statement: `Find the slope of the line through $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
     answer: { kind: 'number', value: ratToLatex(slope) },
     solution: [
-      { ru: 'Наклон через две точки:', tex: `k = \\frac{y_2-y_1}{x_2-x_1} = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}}` },
-      { ru: 'Вычисляем:', tex: `k = \\frac{${y2 - y1}}{${x2 - x1}} = ${ratToLatex(slope)}` },
+      { text: 'Наклон через две точки:', tex: `k = \\frac{y_2-y_1}{x_2-x_1} = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}}` },
+      { text: 'Вычисляем:', tex: `k = \\frac{${y2 - y1}}{${x2 - x1}} = ${ratToLatex(slope)}` },
     ],
     hints: TIER1_HINTS,
     inputHint: 'Дробь пиши через /, например 3/4 или -2/5',
@@ -67,15 +64,12 @@ function tier2(rng: Rng): Problem {
   const y1 = m * x1 + b
   const y2 = m * x2 + b
   return {
-    statement: {
-      en: `Find the equation, in the form $y = mx + b$, of the line through $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
-      ru: `Найди уравнение прямой вида $y = mx + b$, проходящей через точки $(${x1}, ${y1})$ и $(${x2}, ${y2})$.`,
-    },
+    statement: `Find the equation, in the form $y = mx + b$, of the line through $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
     answer: { kind: 'expression', value: linear(m, b), variables: ['x'] },
     solution: [
-      { ru: 'Наклон по двум точкам:', tex: `k = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}} = ${m}` },
-      { ru: 'Подставим точку в $y=kx+b$, чтобы найти $b$:', tex: `${y1} = ${m}\\cdot${paren(x1)} + b \\Rightarrow b = ${b}` },
-      { ru: 'Уравнение прямой:', tex: `y = ${linear(m, b)}` },
+      { text: 'Наклон по двум точкам:', tex: `k = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}} = ${m}` },
+      { text: 'Подставим точку в $y=kx+b$, чтобы найти $b$:', tex: `${y1} = ${m}\\cdot${paren(x1)} + b \\Rightarrow b = ${b}` },
+      { text: 'Уравнение прямой:', tex: `y = ${linear(m, b)}` },
     ],
     hints: TIER2_HINTS,
     inputHint: 'Введи уравнение как y=..., например y=2x-3',
@@ -92,23 +86,19 @@ function tier3(rng: Rng): Problem {
   const intercept = sub(rat(y0), mul(slope, rat(x0)))
   const value = ratLinearLatex(slope, intercept)
   const relation = perpendicular ? 'perpendicular to' : 'parallel to'
-  const relationRu = perpendicular ? 'перпендикулярна' : 'параллельна'
   const solution: Problem['solution'] = perpendicular
     ? [
-        { ru: `Наклон данной прямой $k=${m}$. Для перпендикулярной прямой наклон:`, tex: `k' = -\\frac{1}{k} = ${ratToLatex(slope)}` },
-        { ru: 'Подставим точку, чтобы найти $b$:', tex: `${y0} = ${ratToLatex(slope)}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
-        { ru: 'Уравнение прямой:', tex: `y = ${value}` },
+        { text: `Наклон данной прямой $k=${m}$. Для перпендикулярной прямой наклон:`, tex: `k' = -\\frac{1}{k} = ${ratToLatex(slope)}` },
+        { text: 'Подставим точку, чтобы найти $b$:', tex: `${y0} = ${ratToLatex(slope)}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
+        { text: 'Уравнение прямой:', tex: `y = ${value}` },
       ]
     : [
-        { ru: 'Параллельные прямые имеют одинаковый наклон:', tex: `k' = k = ${m}` },
-        { ru: 'Подставим точку, чтобы найти $b$:', tex: `${y0} = ${m}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
-        { ru: 'Уравнение прямой:', tex: `y = ${value}` },
+        { text: 'Параллельные прямые имеют одинаковый наклон:', tex: `k' = k = ${m}` },
+        { text: 'Подставим точку, чтобы найти $b$:', tex: `${y0} = ${m}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
+        { text: 'Уравнение прямой:', tex: `y = ${value}` },
       ]
   return {
-    statement: {
-      en: `The line $y = ${linear(m, c)}$ is given. Find the equation, in the form $y = mx + b$, of the line through $(${x0}, ${y0})$ that is ${relation} it.`,
-      ru: `Дана прямая $y = ${linear(m, c)}$. Найди уравнение прямой вида $y=mx+b$, которая проходит через точку $(${x0}, ${y0})$ и ${relationRu} данной.`,
-    },
+    statement: `The line $y = ${linear(m, c)}$ is given. Find the equation, in the form $y = mx + b$, of the line through $(${x0}, ${y0})$ that is ${relation} it.`,
     answer: { kind: 'expression', value, variables: ['x'] },
     solution,
     hints: TIER3_HINTS,

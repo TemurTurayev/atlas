@@ -21,16 +21,16 @@ const coprimeTo = (rng: Rng, a: number): number =>
 /** Discriminant walk-through for integer a, b, c whose discriminant is a perfect square or negative. */
 export function quadraticSteps(a: number, b: number, c: number): SolutionStep[] {
   const d = b * b - 4 * a * c
-  const dStep: SolutionStep = { ru: 'Дискриминант:', tex: `D = ${paren(b)}^2 - 4 \\cdot ${paren(a)} \\cdot ${paren(c)} = ${d}` }
-  if (d < 0) return [dStep, { ru: '$D < 0$, поэтому действительных корней нет.', tex: '\\emptyset' }]
+  const dStep: SolutionStep = { text: 'Дискриминант:', tex: `D = ${paren(b)}^2 - 4 \\cdot ${paren(a)} \\cdot ${paren(c)} = ${d}` }
+  if (d < 0) return [dStep, { text: '$D < 0$, поэтому действительных корней нет.', tex: '\\emptyset' }]
   if (d === 0) {
-    return [dStep, { ru: '$D = 0$ — один двойной корень:', tex: `x = \\frac{${-b}}{${2 * a}} = ${ratToLatex(rat(-b, 2 * a))}` }]
+    return [dStep, { text: '$D = 0$ — один двойной корень:', tex: `x = \\frac{${-b}}{${2 * a}} = ${ratToLatex(rat(-b, 2 * a))}` }]
   }
   const s = Math.round(Math.sqrt(d))
   return [
     dStep,
-    { ru: 'Два корня:', tex: `x_{1,2} = \\frac{${-b} \\pm ${s}}{${2 * a}}` },
-    { ru: 'Итого:', tex: `x_1 = ${ratToLatex(rat(-b + s, 2 * a))}, \\quad x_2 = ${ratToLatex(rat(-b - s, 2 * a))}` },
+    { text: 'Два корня:', tex: `x_{1,2} = \\frac{${-b} \\pm ${s}}{${2 * a}}` },
+    { text: 'Итого:', tex: `x_1 = ${ratToLatex(rat(-b + s, 2 * a))}, \\quad x_2 = ${ratToLatex(rat(-b - s, 2 * a))}` },
   ]
 }
 
@@ -42,7 +42,7 @@ function build(
 ): Problem {
   const f = polyToLatex(poly)
   return {
-    statement: { en: `Determine the real zeros of $f(x) = ${f}$.`, ru: `Найди действительные нули функции $f(x) = ${f}$.` },
+    statement: `Determine the real zeros of $f(x) = ${f}$.`,
     answer: { kind: 'numberSet', values },
     solution,
     hints: HINTS,
@@ -56,9 +56,9 @@ function vietaAlternative(poly: Poly, r1: number, r2: number): Problem['alternat
   return {
     title: 'Другой способ — теорема Виета (подбор корней)',
     steps: [
-      { ru: 'Для приведённого $x^2+bx+c$ сумма корней равна $-b$, а произведение равно $c$.' },
-      { ru: `Ищем два числа с суммой $${r1 + r2}$ и произведением $${r1 * r2}$:`, tex: `x_1 = ${r1}, \\quad x_2 = ${r2}` },
-      { ru: 'Проверка — раскроем скобки:', tex: `\\left(${linear(1, -r1)}\\right)\\left(${linear(1, -r2)}\\right) = ${polyToLatex(poly)}` },
+      { text: 'Для приведённого $x^2+bx+c$ сумма корней равна $-b$, а произведение равно $c$.' },
+      { text: `Ищем два числа с суммой $${r1 + r2}$ и произведением $${r1 * r2}$:`, tex: `x_1 = ${r1}, \\quad x_2 = ${r2}` },
+      { text: 'Проверка — раскроем скобки:', tex: `\\left(${linear(1, -r1)}\\right)\\left(${linear(1, -r2)}\\right) = ${polyToLatex(poly)}` },
     ],
   }
 }
@@ -95,9 +95,9 @@ function biquadratic(rng: Rng): Problem {
   const [p, q] = rng.shuffle([1, 2, 3, 4]).slice(0, 2)
   const poly = [p * p * q * q, 0, -(p * p + q * q), 0, 1]
   return build(poly, [String(p), String(-p), String(q), String(-q)], [
-    { ru: 'Замена $z = x^2$:', tex: `${polyToLatex([p * p * q * q, -(p * p + q * q), 1], 'z')} = 0` },
-    { ru: 'Корни по $z$ (оба положительны):', tex: `z_1 = ${p * p}, \\quad z_2 = ${q * q}` },
-    { ru: 'Обратная замена $x = \\pm\\sqrt{z}$:', tex: `x = \\pm ${p}, \\quad x = \\pm ${q}` },
+    { text: 'Замена $z = x^2$:', tex: `${polyToLatex([p * p * q * q, -(p * p + q * q), 1], 'z')} = 0` },
+    { text: 'Корни по $z$ (оба положительны):', tex: `z_1 = ${p * p}, \\quad z_2 = ${q * q}` },
+    { text: 'Обратная замена $x = \\pm\\sqrt{z}$:', tex: `x = \\pm ${p}, \\quad x = \\pm ${q}` },
   ])
 }
 
@@ -106,9 +106,9 @@ function biquadraticOneBranch(rng: Rng): Problem {
   const q = rng.int(1, 3)
   const poly = [-p * p * q * q, 0, q * q - p * p, 0, 1]
   return build(poly, [String(p), String(-p)], [
-    { ru: 'Замена $z = x^2$:', tex: `${polyToLatex([-p * p * q * q, q * q - p * p, 1], 'z')} = 0` },
-    { ru: 'Корни по $z$:', tex: `z_1 = ${p * p}, \\quad z_2 = ${-q * q}` },
-    { ru: '$z_2 < 0$ не даёт действительных $x$; из $z_1$:', tex: `x = \\pm ${p}` },
+    { text: 'Замена $z = x^2$:', tex: `${polyToLatex([-p * p * q * q, q * q - p * p, 1], 'z')} = 0` },
+    { text: 'Корни по $z$:', tex: `z_1 = ${p * p}, \\quad z_2 = ${-q * q}` },
+    { text: '$z_2 < 0$ не даёт действительных $x$; из $z_1$:', tex: `x = \\pm ${p}` },
   ])
 }
 
@@ -118,8 +118,8 @@ function cubicWithZero(rng: Rng): Problem {
   const r2 = rng.intExcept(-5, 5, [0, r1])
   const quad = polyFromRoots(a, [r1, r2])
   return build(polyMul(quad, [0, 1]), ['0', String(r1), String(r2)], [
-    { ru: 'Вынесем $x$ за скобки:', tex: `x\\left(${polyToLatex(quad)}\\right) = 0` },
-    { ru: 'Один корень $x = 0$; остальные — из квадратного уравнения:', tex: `${polyToLatex(quad)} = 0` },
+    { text: 'Вынесем $x$ за скобки:', tex: `x\\left(${polyToLatex(quad)}\\right) = 0` },
+    { text: 'Один корень $x = 0$; остальные — из квадратного уравнения:', tex: `${polyToLatex(quad)} = 0` },
     ...quadraticSteps(quad[2], quad[1], quad[0]),
   ])
 }

@@ -25,7 +25,7 @@ export function App() {
     setScreen('practice')
   }
 
-  if (!ready) return <div className="p-6 text-muted">Загрузка…</div>
+  if (!ready) return <div className="p-6 text-muted">Loading…</div>
   if (screen === 'run') return <Run go={setScreen} />
   if (screen === 'exam') return <Exam go={setScreen} />
   if (screen === 'mistakes') return <Mistakes go={setScreen} onPractice={startPractice} />

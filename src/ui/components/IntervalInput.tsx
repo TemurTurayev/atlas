@@ -23,7 +23,7 @@ export function IntervalInput({ parts, onChange, disabled = false }: Props) {
           {part.lo === null ? (
             <span className="text-muted w-24 text-center">−∞</span>
           ) : (
-            <input className={field} value={part.lo} disabled={disabled} onChange={(e) => patch(index, { lo: e.target.value })} aria-label="левый конец" />
+            <input className={field} value={part.lo} disabled={disabled} onChange={(e) => patch(index, { lo: e.target.value })} aria-label="left endpoint" />
           )}
           <button type="button" className={button} disabled={disabled} onClick={() => patch(index, { lo: part.lo === null ? '0' : null })}>
             −∞
@@ -32,7 +32,7 @@ export function IntervalInput({ parts, onChange, disabled = false }: Props) {
           {part.hi === null ? (
             <span className="text-muted w-24 text-center">+∞</span>
           ) : (
-            <input className={field} value={part.hi} disabled={disabled} onChange={(e) => patch(index, { hi: e.target.value })} aria-label="правый конец" />
+            <input className={field} value={part.hi} disabled={disabled} onChange={(e) => patch(index, { hi: e.target.value })} aria-label="right endpoint" />
           )}
           <button type="button" className={button} disabled={disabled} onClick={() => patch(index, { hi: part.hi === null ? '1' : null })}>
             +∞
@@ -41,7 +41,7 @@ export function IntervalInput({ parts, onChange, disabled = false }: Props) {
             {part.hi !== null && part.hiClosed ? ']' : ')'}
           </button>
           {parts.length > 1 && (
-            <button type="button" className={button} disabled={disabled} onClick={() => onChange(parts.filter((_, i) => i !== index))} aria-label="убрать интервал">
+            <button type="button" className={button} disabled={disabled} onClick={() => onChange(parts.filter((_, i) => i !== index))} aria-label="remove interval">
               ✕
             </button>
           )}
@@ -49,13 +49,13 @@ export function IntervalInput({ parts, onChange, disabled = false }: Props) {
       ))}
       <div className="flex gap-2">
         <button type="button" className={button} disabled={disabled} onClick={() => onChange([...parts, NEW_PART])}>
-          + ∪ интервал
+          + ∪ interval
         </button>
         <button type="button" className={button} disabled={disabled} onClick={() => onChange([])}>
-          ∅ пусто
+          ∅ empty
         </button>
       </div>
-      {parts.length === 0 && <p className="text-muted text-sm">Ответ: пустое множество</p>}
+      {parts.length === 0 && <p className="text-muted text-sm">Answer: the empty set</p>}
     </div>
   )
 }

@@ -21,7 +21,7 @@ export function ExamClock({ remainingMs }: { remainingMs: number }) {
   const seconds = Math.ceil(remainingMs / 1000)
   const low = remainingMs <= 5 * 60_000
   return (
-    <span className={`text-lg tabular-nums ${low ? 'text-warn' : 'text-ink'}`} aria-label="осталось времени">
+    <span className={`text-lg tabular-nums ${low ? 'text-warn' : 'text-ink'}`} aria-label="time remaining">
       {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}
     </span>
   )

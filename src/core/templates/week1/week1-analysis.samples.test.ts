@@ -30,7 +30,7 @@ describe('exp_fn', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('exp_fn').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /N\(t\) = (\d+)\\cdot (\d+)\^\{t\/(\d+)\}\$\. Find \$N\((\d+)\)/)
+      const m = requireMatch(p.statement, /N\(t\) = (\d+)\\cdot (\d+)\^\{t\/(\d+)\}\$\. Find \$N\((\d+)\)/)
       const [A, b, k, t] = m.slice(1).map(Number)
       const expected = A * b ** (t / k)
       expect(Number(p.answer.value), `seed ${seed}`).toBeCloseTo(expected, 9)
@@ -41,8 +41,8 @@ describe('exp_fn', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('exp_fn').generate(createRng(seed), 2)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const half = p.statement.en.match(/half-life of \$(\d+)\$ hours\. A sample starts at \$(\d+)\$ g\. Find the remaining mass after \$(\d+)\$ hours/)
-      const doubling = p.statement.en.match(/doubles every \$(\d+)\$ hours\. It starts with \$(\d+)\$ cells\. Find the population after \$(\d+)\$ hours/)
+      const half = p.statement.match(/half-life of \$(\d+)\$ hours\. A sample starts at \$(\d+)\$ g\. Find the remaining mass after \$(\d+)\$ hours/)
+      const doubling = p.statement.match(/doubles every \$(\d+)\$ hours\. It starts with \$(\d+)\$ cells\. Find the population after \$(\d+)\$ hours/)
       if (half) {
         const [h, M0, t] = half.slice(1).map(Number)
         expect(Number(p.answer.value), `seed ${seed}`).toBeCloseTo(M0 / 2 ** (t / h), 9)
@@ -50,7 +50,7 @@ describe('exp_fn', () => {
         const [d, P0, t] = doubling.slice(1).map(Number)
         expect(Number(p.answer.value), `seed ${seed}`).toBeCloseTo(P0 * 2 ** (t / d), 9)
       } else {
-        throw new Error(`unexpected statement: ${p.statement.en}`)
+        throw new Error(`unexpected statement: ${p.statement}`)
       }
     }
   })
@@ -59,7 +59,7 @@ describe('exp_fn', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('exp_fn').generate(createRng(seed), 3)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /C_0=(\d+)\$ mg\/L and \$k=([\d.]+)\$ per hour\. Find \$C\((\d+)\)/)
+      const m = requireMatch(p.statement, /C_0=(\d+)\$ mg\/L and \$k=([\d.]+)\$ per hour\. Find \$C\((\d+)\)/)
       const C0 = Number(m[1])
       const k = Number(m[2])
       const t = Number(m[3])
@@ -74,7 +74,7 @@ describe('log_laws', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('log_laws').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\\log(?:_\{(\d+)\})?\\left\((\d+)\\right\)/)
+      const m = requireMatch(p.statement, /\\log(?:_\{(\d+)\})?\\left\((\d+)\\right\)/)
       const base = m[1] ? Number(m[1]) : 10
       const N = Number(m[2])
       expect(base ** Number(p.answer.value), `seed ${seed}`).toBeCloseTo(N, 6)
@@ -85,7 +85,7 @@ describe('log_laws', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('log_laws').generate(createRng(seed), 2)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const lhs = lastMath(p.statement.en)
+      const lhs = lastMath(p.statement)
       const vars = { a: 2.5, b: 3.5 }
       expect(evaluate(lhs, vars), `seed ${seed}`).toBeCloseTo(evaluate(p.answer.value, vars), 9)
     }
@@ -95,7 +95,7 @@ describe('log_laws', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('log_laws').generate(createRng(seed), 3)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const lhs = lastMath(p.statement.en)
+      const lhs = lastMath(p.statement)
       const vars = { x: 2.5, y: 3.5 }
       expect(evaluate(lhs, vars), `seed ${seed}`).toBeCloseTo(evaluate(p.answer.value, vars), 9)
     }
@@ -107,7 +107,7 @@ describe('exp_log_eq', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('exp_log_eq').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\$(\d+)\^\{x\} = (\d+)\$/)
+      const m = requireMatch(p.statement, /\$(\d+)\^\{x\} = (\d+)\$/)
       const [b, N] = m.slice(1).map(Number)
       expect(b ** Number(p.answer.value), `seed ${seed}`).toBeCloseTo(N, 6)
     }
@@ -117,7 +117,7 @@ describe('exp_log_eq', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('exp_log_eq').generate(createRng(seed), 2)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\$(\d+)e\^\{([\d.]+)t\} = (\d+)\$/)
+      const m = requireMatch(p.statement, /\$(\d+)e\^\{([\d.]+)t\} = (\d+)\$/)
       const A = Number(m[1])
       const k = Number(m[2])
       const B = Number(m[3])
@@ -130,7 +130,7 @@ describe('exp_log_eq', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('exp_log_eq').generate(createRng(seed), 3)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\\log_\{(\d+)\}\(x-(\d+)\) \+ \\log_\{\d+\}\(x\+\d+\) = (\d+)\$/)
+      const m = requireMatch(p.statement, /\\log_\{(\d+)\}\(x-(\d+)\) \+ \\log_\{\d+\}\(x\+\d+\) = (\d+)\$/)
       const [b, pVal, c] = m.slice(1).map(Number)
       const expected = Math.sqrt(b ** c + pVal * pVal)
       expect(Number(p.answer.value), `seed ${seed}`).toBeCloseTo(expected, 9)
@@ -143,7 +143,7 @@ describe('trig_fns', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('trig_fns').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\\(sin|cos|tan)\\left\((.+)\\right\)\$\.$/)
+      const m = requireMatch(p.statement, /\\(sin|cos|tan)\\left\((.+)\\right\)\$\.$/)
       const fn = m[1] as 'sin' | 'cos' | 'tan'
       const angle = evaluate(m[2])
       const expected = Math[fn](angle)
@@ -155,7 +155,7 @@ describe('trig_fns', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('trig_fns').generate(createRng(seed), 2)
       if (p.answer.kind !== 'numberSet') throw new Error('expected numberSet')
-      const m = requireMatch(p.statement.en, /\\(sin|cos|tan) x = (.+)\$ for/)
+      const m = requireMatch(p.statement, /\\(sin|cos|tan) x = (.+)\$ for/)
       const fn = m[1] as 'sin' | 'cos' | 'tan'
       const target = evaluate(m[2])
       expect(p.answer.values.length, `seed ${seed}`).toBe(2)
@@ -172,7 +172,7 @@ describe('trig_fns', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('trig_fns').generate(createRng(seed), 3)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const lhs = lastMath(p.statement.en)
+      const lhs = lastMath(p.statement)
       expect(evaluate(lhs), `seed ${seed}`).toBeCloseTo(evaluate(p.answer.value), 9)
     }
   })
@@ -183,7 +183,7 @@ describe('limits', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('limits').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\\lim_\{x\\to (-?\d+)\}(.+)\$\.$/)
+      const m = requireMatch(p.statement, /\\lim_\{x\\to (-?\d+)\}(.+)\$\.$/)
       const c = Number(m[1])
       const near = evaluate(m[2], { x: c + 1e-4 })
       expect(near, `seed ${seed}`).toBeCloseTo(Number(p.answer.value), 2)
@@ -194,7 +194,7 @@ describe('limits', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('limits').generate(createRng(seed), 2)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\\lim_\{x\\to\\infty\}(.+)\$\.$/)
+      const m = requireMatch(p.statement, /\\lim_\{x\\to\\infty\}(.+)\$\.$/)
       const near = evaluate(m[1], { x: 1e6 })
       expect(near, `seed ${seed}`).toBeCloseTo(evaluate(p.answer.value), 3)
     }
@@ -204,7 +204,7 @@ describe('limits', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('limits').generate(createRng(seed), 3)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /\\lim_\{x\\to (\d+)\}(.+)\$\.$/)
+      const m = requireMatch(p.statement, /\\lim_\{x\\to (\d+)\}(.+)\$\.$/)
       const c2 = Number(m[1])
       const near = evaluate(m[2], { x: c2 + 1e-4 })
       expect(near, `seed ${seed}`).toBeCloseTo(evaluate(p.answer.value), 2)
@@ -217,7 +217,7 @@ describe('continuity', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('continuity').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /x\\le (-?\d+) \\\\ (.+), & x> -?\d+\\end\{cases\}/)
+      const m = requireMatch(p.statement, /x\\le (-?\d+) \\\\ (.+), & x> -?\d+\\end\{cases\}/)
       const c = Number(m[1])
       const rightAtC = evaluate(m[2], { x: c })
       expect(Number(p.answer.value), `seed ${seed}`).toBeCloseTo(rightAtC - c * c, 9)
@@ -228,7 +228,7 @@ describe('continuity', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('continuity').generate(createRng(seed), 2)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const m = requireMatch(p.statement.en, /f\(x\)=\\dfrac\{(.+)\}\{(.+)\}\$ discontinuous/)
+      const m = requireMatch(p.statement, /f\(x\)=\\dfrac\{(.+)\}\{(.+)\}\$ discontinuous/)
       const c = Number(p.answer.value)
       expect(evaluate(m[2], { x: c }), `seed ${seed} denominator root`).toBeCloseTo(0, 9)
       expect(Math.abs(evaluate(m[1], { x: c })), `seed ${seed} numerator nonzero`).toBeGreaterThan(0.5)
@@ -239,7 +239,7 @@ describe('continuity', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('continuity').generate(createRng(seed), 3)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const hole = p.statement.en.match(/f\(x\)=\\dfrac\{(.+)\}\{(.+)\}\$ is undefined at \$x=(-?\d+)\$/)
+      const hole = p.statement.match(/f\(x\)=\\dfrac\{(.+)\}\{(.+)\}\$ is undefined at \$x=(-?\d+)\$/)
       if (!hole) continue // the "two conditions" sub-type is covered by the harness's generic checker test
       const [numLatex, denLatex, pStr] = [hole[1], hole[2], hole[3]]
       const p0 = Number(pStr)

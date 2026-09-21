@@ -11,7 +11,7 @@ interface NumericPart {
   readonly hiClosed: boolean
 }
 
-const BRACKETS_HINT = 'Концы верные — проверь скобки: ( не включает конец, [ включает'
+const BRACKETS_HINT = 'The endpoints are right — check the brackets: ( excludes the endpoint, [ includes it'
 
 function endpoint(latex: string | null, side: 'lo' | 'hi'): number | null {
   if (latex === null) return side === 'lo' ? -Infinity : Infinity
@@ -52,7 +52,7 @@ export function mergeParts(parts: readonly NumericPart[]): NumericPart[] {
 
 export function checkInterval(reference: readonly IntervalPart[], answer: readonly IntervalPart[]): CheckResult {
   const user = toNumeric(answer)
-  if (!user) return malformed('Проверь концы: левый должен быть меньше правого, и оба — числа')
+  if (!user) return malformed('Check the endpoints: the left one must be smaller than the right one, and both must be numbers')
   const ref = toNumeric(reference)
   if (!ref) throw new Error('Invalid reference interval')
   const u = mergeParts(user)

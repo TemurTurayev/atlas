@@ -14,9 +14,9 @@ const HINTS_KMH = ['$1$ км/ч $=\\dfrac{1000\\text{ м}}{3600\\text{ с}}=\\df
 const HINTS_SMALL = ['Определи, во сколько раз отличаются единицы (степень десяти).', 'Умножь или раздели на этот коэффициент — смотри, куда нужно двигать запятую.']
 const HINTS_MED = ['Найди коэффициент перевода между единицами.', 'Умножь исходное значение на найденный коэффициент.']
 
-function build(en: string, ru: string, value: string, solution: Problem['solution'], hints: readonly string[]): Problem {
+function build(statement: string, value: string, solution: Problem['solution'], hints: readonly string[]): Problem {
   return {
-    statement: { en, ru },
+    statement,
     answer: { kind: 'number', value },
     solution,
     hints,
@@ -30,11 +30,10 @@ function tier1(rng: Rng): Problem {
   const value = rat(5 * k, 1)
   return build(
     `Convert $${kmh}$ km/h to m/s.`,
-    `Переведи $${kmh}$ км/ч в м/с.`,
     ratToLatex(value),
     [
-      { ru: 'Коэффициент перевода:', tex: `1 \\text{ км/ч} = \\frac{5}{18} \\text{ м/с}` },
-      { ru: 'Умножаем на скорость:', tex: `${kmh} \\cdot \\frac{5}{18} = ${ratToLatex(value)}` },
+      { text: 'Коэффициент перевода:', tex: `1 \\text{ км/ч} = \\frac{5}{18} \\text{ м/с}` },
+      { text: 'Умножаем на скорость:', tex: `${kmh} \\cdot \\frac{5}{18} = ${ratToLatex(value)}` },
     ],
     HINTS_KMH,
   )
@@ -49,11 +48,10 @@ function microToMilli(rng: Rng): Problem {
   const value = raw.replace(/0+$/, '').replace(/\.$/, '')
   return build(
     `Convert $${amountUl}$ µL to mL.`,
-    `Переведи $${amountUl}$ мкл в мл.`,
     value === '' ? '0' : value,
     [
-      { ru: 'В одном миллилитре $1000$ микролитров:', tex: '1 \\text{ мл} = 1000 \\text{ мкл}' },
-      { ru: 'Делим на 1000:', tex: `${amountUl} \\div 1000 = ${value}` },
+      { text: 'В одном миллилитре $1000$ микролитров:', tex: '1 \\text{ мл} = 1000 \\text{ мкл}' },
+      { text: 'Делим на 1000:', tex: `${amountUl} \\div 1000 = ${value}` },
     ],
     HINTS_SMALL,
   )
@@ -65,11 +63,10 @@ function gramsToMilligrams(rng: Rng): Problem {
   const value = j * 100
   return build(
     `Convert $${grams}$ g to mg.`,
-    `Переведи $${grams}$ г в мг.`,
     String(value),
     [
-      { ru: 'В одном грамме $1000$ миллиграммов:', tex: '1 \\text{ г} = 1000 \\text{ мг}' },
-      { ru: 'Умножаем на 1000:', tex: `${grams} \\cdot 1000 = ${value}` },
+      { text: 'В одном грамме $1000$ миллиграммов:', tex: '1 \\text{ г} = 1000 \\text{ мг}' },
+      { text: 'Умножаем на 1000:', tex: `${grams} \\cdot 1000 = ${value}` },
     ],
     HINTS_SMALL,
   )
@@ -85,11 +82,10 @@ function density(rng: Rng): Problem {
   const value = m * 10
   return build(
     `A substance has density $${d}$ g/cm³. Convert it to kg/m³.`,
-    `Плотность вещества $${d}$ г/см³. Переведи в кг/м³.`,
     String(value),
     [
-      { ru: 'Коэффициент перевода:', tex: '1 \\text{ г/см}^3 = 1000 \\text{ кг/м}^3' },
-      { ru: 'Умножаем на 1000:', tex: `${d} \\cdot 1000 = ${value}` },
+      { text: 'Коэффициент перевода:', tex: '1 \\text{ г/см}^3 = 1000 \\text{ кг/м}^3' },
+      { text: 'Умножаем на 1000:', tex: `${d} \\cdot 1000 = ${value}` },
     ],
     HINTS_MED,
   )
@@ -101,10 +97,9 @@ function dosePerKg(rng: Rng): Problem {
   const value = dose * weight
   return build(
     `A drug is dosed at $${dose}$ mg/kg. Find the total dose for a child weighing $${weight}$ kg.`,
-    `Лекарство дозируется как $${dose}$ мг/кг. Найди общую дозу для ребёнка массой $${weight}$ кг.`,
     String(value),
     [
-      { ru: 'Общая доза равна дозе на кг, умноженной на массу:', tex: `${dose} \\cdot ${weight} = ${value}` },
+      { text: 'Общая доза равна дозе на кг, умноженной на массу:', tex: `${dose} \\cdot ${weight} = ${value}` },
     ],
     HINTS_MED,
   )

@@ -9,7 +9,7 @@ import {
 import { advanceLessonStep, applyLearning, creditImplicit, startProgress, toRepairLesson, type SkillProgress } from './progress'
 import { repairCandidates } from './repair'
 
-const node = (id: string, prereqs: string[] = []): SkillNode => ({ id, week: 0, prereqs, title: { en: id, ru: id }, highYield: false })
+const node = (id: string, prereqs: string[] = []): SkillNode => ({ id, week: 0, prereqs, title: id, highYield: false })
 const CHAIN = buildGraph([node('a'), node('b', ['a']), node('c', ['b']), node('d', ['c']), node('e', ['d']), node('f', ['e'])])
 const clean = { correct: true, hintsUsed: 0 }
 const hinted = { correct: true, hintsUsed: 1 }

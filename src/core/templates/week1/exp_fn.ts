@@ -2,23 +2,23 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Показательная функция (exponential function): $f(t)=A\\cdot b^{t/k}$, где $A$ — начальное значение, $b$ — множитель роста/распада за один период длиной $k$.',
-  'Особое основание — число Эйлера $e\\approx 2.718$: $f(t)=A e^{kt}$; при $k>0$ — рост, при $k<0$ — распад (например, выведение лекарства из организма).',
-  'Если период назван «время удвоения» или «период полураспада», подставляй $b=2$, а прошедшее время удели на длину периода — получишь число периодов $n$.',
-  'Типичная ошибка: складывать проценты или периоды вместо перемножения множителей роста; $b^{n}$ — это умножение, не сложение.',
+  'Exponential function: $f(t)=A\\cdot b^{t/k}$, where $A$ is the initial value and $b$ is the growth/decay factor per period of length $k$.',
+  "A special base is Euler's number $e\\approx 2.718$: $f(t)=A e^{kt}$; growth when $k>0$, decay when $k<0$ (for example, drug elimination from the body).",
+  'If the period is called "doubling time" or "half-life", substitute $b=2$, and divide the elapsed time by the period length to get the number of periods $n$.',
+  'Common mistake: adding percentages or periods instead of multiplying growth factors; $b^{n}$ is multiplication, not addition.',
 ].join('\n')
 
 const HINTS_FORMULA = [
-  'Раздели показатель $t/k$, чтобы получить целое число периодов.',
-  'Возведи основание в эту степень и умножь на начальное значение $A$.',
+  'Divide the exponent $t/k$ to get a whole number of periods.',
+  'Raise the base to this power and multiply by the initial value $A$.',
 ]
 const HINTS_PERIOD = [
-  'Раздели прошедшее время на длину одного периода — получишь число периодов $n$.',
-  'Умножь (при росте) или раздели (при распаде) начальное значение на $2^{n}$.',
+  'Divide the elapsed time by the length of one period to get the number of periods $n$.',
+  'Multiply (for growth) or divide (for decay) the initial value by $2^{n}$.',
 ]
 const HINTS_CLEARANCE = [
-  'Подставь данные значения $t$ и $k$ в показатель степени.',
-  'Вычисли $e^{-kt}$ и умножь на $C_0$; ответ округли до сотых.',
+  'Substitute the given values of $t$ and $k$ into the exponent.',
+  'Compute $e^{-kt}$ and multiply by $C_0$; round the answer to two decimal places.',
 ]
 
 function tier1(rng: Rng): Problem {
@@ -30,14 +30,11 @@ function tier1(rng: Rng): Problem {
   const value = A * b ** m
   const formula = `${A}\\cdot ${b}^{t/${k}}`
   return {
-    statement: {
-      en: `A population is modeled by $N(t) = ${formula}$. Find $N(${t})$.`,
-      ru: `Численность популяции моделируется функцией $N(t) = ${formula}$. Найди $N(${t})$.`,
-    },
+    statement: `A population is modeled by $N(t) = ${formula}$. Find $N(${t})$.`,
     answer: { kind: 'number', value: String(value) },
     solution: [
-      { ru: `Подставляем $t=${t}$: показатель степени равен $t/${k}=${m}$.`, tex: `N(${t}) = ${A}\\cdot ${b}^{${t}/${k}} = ${A}\\cdot ${b}^{${m}}` },
-      { ru: 'Вычисляем степень и умножаем:', tex: `${A}\\cdot ${b ** m} = ${value}` },
+      { text: `Substitute $t=${t}$: the exponent equals $t/${k}=${m}$.`, tex: `N(${t}) = ${A}\\cdot ${b}^{${t}/${k}} = ${A}\\cdot ${b}^{${m}}` },
+      { text: 'Compute the power and multiply:', tex: `${A}\\cdot ${b ** m} = ${value}` },
     ],
     hints: HINTS_FORMULA,
   }
@@ -50,14 +47,11 @@ function halfLife(rng: Rng): Problem {
   const M0 = R * 2 ** n
   const t = n * h
   return {
-    statement: {
-      en: `A radioactive isotope has a half-life of $${h}$ hours. A sample starts at $${M0}$ g. Find the remaining mass after $${t}$ hours.`,
-      ru: `Период полураспада радиоактивного изотопа равен $${h}$ часов. Образец имеет начальную массу $${M0}$ г. Найди оставшуюся массу через $${t}$ часов.`,
-    },
+    statement: `A radioactive isotope has a half-life of $${h}$ hours. A sample starts at $${M0}$ g. Find the remaining mass after $${t}$ hours.`,
     answer: { kind: 'number', value: String(R) },
     solution: [
-      { ru: `За $${t}$ часов проходит $\\frac{${t}}{${h}}=${n}$ периодов полураспада.` },
-      { ru: 'Каждый период масса делится пополам:', tex: `${M0} \\div 2^{${n}} = ${R}` },
+      { text: `In $${t}$ hours, $\\frac{${t}}{${h}}=${n}$ half-lives pass.` },
+      { text: 'Each period, the mass is halved:', tex: `${M0} \\div 2^{${n}} = ${R}` },
     ],
     hints: HINTS_PERIOD,
   }
@@ -70,14 +64,11 @@ function doubling(rng: Rng): Problem {
   const t = n * d
   const value = P0 * 2 ** n
   return {
-    statement: {
-      en: `A bacteria colony doubles every $${d}$ hours. It starts with $${P0}$ cells. Find the population after $${t}$ hours.`,
-      ru: `Колония бактерий удваивается каждые $${d}$ часов. Начальная численность — $${P0}$ клеток. Найди численность через $${t}$ часов.`,
-    },
+    statement: `A bacteria colony doubles every $${d}$ hours. It starts with $${P0}$ cells. Find the population after $${t}$ hours.`,
     answer: { kind: 'number', value: String(value) },
     solution: [
-      { ru: `За $${t}$ часов проходит $\\frac{${t}}{${d}}=${n}$ периодов удвоения.` },
-      { ru: 'Каждый период численность удваивается:', tex: `${P0} \\cdot 2^{${n}} = ${value}` },
+      { text: `In $${t}$ hours, $\\frac{${t}}{${d}}=${n}$ doubling periods pass.` },
+      { text: 'Each period, the population doubles:', tex: `${P0} \\cdot 2^{${n}} = ${value}` },
     ],
     hints: HINTS_PERIOD,
   }
@@ -102,17 +93,14 @@ function tier3(rng: Rng): Problem {
   const value = `${C0}e^{-${expLatex}}`
   const numeric = C0 * Math.exp((-kTenths * t) / 10)
   return {
-    statement: {
-      en: `A drug concentration follows $C(t) = C_0 e^{-kt}$ with $C_0=${C0}$ mg/L and $k=${kLatex}$ per hour. Find $C(${t})$, in mg/L (round to 2 decimal places).`,
-      ru: `Концентрация препарата подчиняется закону $C(t) = C_0 e^{-kt}$, где $C_0=${C0}$ мг/л, $k=${kLatex}$ ч$^{-1}$. Найди $C(${t})$ в мг/л (округли до сотых).`,
-    },
+    statement: `A drug concentration follows $C(t) = C_0 e^{-kt}$ with $C_0=${C0}$ mg/L and $k=${kLatex}$ per hour. Find $C(${t})$, in mg/L (round to 2 decimal places).`,
     answer: { kind: 'number', value },
     solution: [
-      { ru: `Подставляем $C_0=${C0}$, $k=${kLatex}$, $t=${t}$:`, tex: `C(${t}) = ${C0} e^{-${kLatex}\\cdot ${t}} = ${C0} e^{-${expLatex}}` },
-      { ru: 'Вычисляем на калькуляторе:', tex: `\\approx ${numeric.toFixed(2)}` },
+      { text: `Substitute $C_0=${C0}$, $k=${kLatex}$, $t=${t}$:`, tex: `C(${t}) = ${C0} e^{-${kLatex}\\cdot ${t}} = ${C0} e^{-${expLatex}}` },
+      { text: 'Compute with a calculator:', tex: `\\approx ${numeric.toFixed(2)}` },
     ],
     hints: HINTS_CLEARANCE,
-    inputHint: 'Ответ — десятичное число, например 12.34 (округли до сотых)',
+    inputHint: 'The answer is a decimal number, e.g. 12.34 (round to two decimal places)',
   }
 }
 

@@ -37,7 +37,7 @@ describe('product_powerset', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('product_powerset').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const n = Number(requireMatch(mathSegments(p.statement.en)[0], /\|A\| = (\d+)/)[1])
+      const n = Number(requireMatch(mathSegments(p.statement)[0], /\|A\| = (\d+)/)[1])
       expect(Number(p.answer.value), `seed ${seed}`).toBe(2 ** n)
     }
   })
@@ -47,7 +47,7 @@ describe('product_powerset', () => {
       const p = getTemplate('product_powerset').generate(createRng(seed), 2)
       if (p.answer.kind !== 'choice') throw new Error('expected choice')
       const answer = p.answer
-      const [a, b] = requireMatch(mathSegments(p.statement.en)[0], /\\\{(\d+), (\d+)\\\}/).slice(1, 3).map(Number)
+      const [a, b] = requireMatch(mathSegments(p.statement)[0], /\\\{(\d+), (\d+)\\\}/).slice(1, 3).map(Number)
       const realPowerset = new Set([`\\emptyset`, `\\{${a}\\}`, `\\{${b}\\}`, `\\{${a}, ${b}\\}`])
       const strip = (label: string): string => label.replace(/^\$|\$$/g, '')
       const wrongOption = answer.options.find((o) => o.id === answer.correctId)
@@ -63,7 +63,7 @@ describe('product_powerset', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('product_powerset').generate(createRng(seed), 3)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const segs = mathSegments(p.statement.en)
+      const segs = mathSegments(p.statement)
       const setA = requireMatch(segs[0], /\\\{([^}]*)\\\}/)[1].split(',').map(Number)
       const setB = requireMatch(segs[1], /\\\{([^}]*)\\\}/)[1].split(',').map(Number)
       const product = setA.length * setB.length
@@ -78,7 +78,7 @@ describe('functions', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('functions').generate(createRng(seed), tier)
       if (p.answer.kind !== 'interval') throw new Error('expected interval')
-      const formula = lastMath(p.statement.en).replace(/^f\(x\) = /, '')
+      const formula = lastMath(p.statement).replace(/^f\(x\) = /, '')
       const first = p.answer.parts[0]
       const lo = Number(first.lo)
       expect(isDefinedAt(formula, lo + 0.5), `seed ${seed}`).toBe(true)
@@ -94,9 +94,9 @@ describe('functions', () => {
     for (let seed = 1; seed <= 80; seed += 1) {
       const p = getTemplate('functions').generate(createRng(seed), 3)
       if (p.answer.kind !== 'interval') throw new Error('expected interval')
-      const formula = lastMath(p.statement.en).replace(/^f\(x\) = /, '')
+      const formula = lastMath(p.statement).replace(/^f\(x\) = /, '')
       const part = p.answer.parts[0]
-      if (p.statement.en.includes('range')) {
+      if (p.statement.includes('range')) {
         const e = parseLatex(formula)
         if (!e) throw new Error(`cannot parse ${formula}`)
         const values: number[] = []
@@ -154,7 +154,7 @@ describe('composition', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('composition').generate(createRng(seed), tier)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const segs = mathSegments(p.statement.en)
+      const segs = mathSegments(p.statement)
       const order = requireMatch(segs[segs.length - 1], /^\(([^)]+)\)\(x\)$/)[1].split('\\circ').map((s) => s.trim())
       const defs: Record<string, Expr> = {}
       segs.slice(0, -1).forEach((seg) => {
@@ -187,7 +187,7 @@ describe('inverse_fn', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('inverse_fn').generate(createRng(seed), tier)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const fFormula = requireMatch(mathSegments(p.statement.en)[0], /^f\(x\) = (.+)$/)[1]
+      const fFormula = requireMatch(mathSegments(p.statement)[0], /^f\(x\) = (.+)$/)[1]
       const fExpr = parseLatex(fFormula)
       const inverseExpr = parseLatex(p.answer.value)
       if (!fExpr || !inverseExpr) throw new Error('cannot parse formulas')
@@ -207,7 +207,7 @@ describe('transformations', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('transformations').generate(createRng(seed), tier)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const segs = mathSegments(p.statement.en)
+      const segs = mathSegments(p.statement)
       const baseExpr = parseLatex(requireMatch(segs[0], /^f\(x\) = (.+)$/)[1])
       const answerExpr = parseLatex(p.answer.value)
       if (!baseExpr || !answerExpr) throw new Error('cannot parse formulas')
@@ -244,7 +244,7 @@ describe('transformations', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('transformations').generate(createRng(seed), 3)
       if (p.answer.kind !== 'choice') throw new Error('expected choice')
-      const formulaRaw = mathSegments(p.statement.en).pop()
+      const formulaRaw = mathSegments(p.statement).pop()
       if (!formulaRaw) throw new Error('no formula segment')
       const formulaClean = formulaRaw.replace(/\\left|\\right/g, '')
       const m = requireMatch(formulaClean, /^(-?\d*)f\((.*)\)$/)
@@ -267,7 +267,7 @@ describe('polynomials', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('polynomials').generate(createRng(seed), tier)
       if (p.answer.kind !== 'numberSet') throw new Error('expected numberSet')
-      const f = lastMath(p.statement.en).replace(/^f\(x\) = /, '')
+      const f = lastMath(p.statement).replace(/^f\(x\) = /, '')
       p.answer.values.forEach((v) => {
         expect(Math.abs(evaluate(f, { x: evaluate(v) })), `seed ${seed} root ${v}`).toBeLessThan(1e-9)
       })

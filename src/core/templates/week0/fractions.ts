@@ -3,17 +3,17 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Дробь (fraction) $\\frac{a}{b}$: $a$ — числитель, $b$ — знаменатель.',
-  'Сложение/вычитание: приведи к общему знаменателю (НОК знаменателей), затем работай с числителями.',
-  'Деление на дробь — умножение на обратную: $\\dfrac{a}{b} \\div \\dfrac{c}{d} = \\dfrac{a}{b}\\cdot\\dfrac{d}{c}$.',
-  'В составной дроби сначала упрости числитель и знаменатель по отдельности, потом раздели их.',
-  'Типичные ошибки: складывать числители и знаменатели напрямую без общего знаменателя; забыть перевернуть вторую дробь при делении.',
+  'Fraction $\\frac{a}{b}$: $a$ is the numerator, $b$ is the denominator.',
+  'Addition/subtraction: rewrite over a common denominator (the LCM of the denominators), then work with the numerators.',
+  'Dividing by a fraction is the same as multiplying by its reciprocal: $\\dfrac{a}{b} \\div \\dfrac{c}{d} = \\dfrac{a}{b}\\cdot\\dfrac{d}{c}$.',
+  'In a compound fraction, first simplify the numerator and the denominator separately, then divide them.',
+  'Common mistakes: adding numerators and denominators directly without a common denominator; forgetting to flip the second fraction when dividing.',
 ].join('\n')
 
-const HINTS_ADD = ['Найди общий знаменатель (НОК знаменателей).', 'Переведи обе дроби к общему знаменателю, сложи числители, сократи результат.']
-const HINTS_MIXED = ['Сначала выполни деление — переверни вторую дробь и умножь.', 'После этого приведи обе дроби к общему знаменателю и вычти.']
-const HINTS_COMPOUND = ['Сначала посчитай сумму в числителе, приведя её к общему знаменателю.', 'Раздели получившуюся дробь на дробь в знаменателе — умножь на обратную.']
-const INPUT_HINT = 'Ответ — дробь, например 7/20, или целое число'
+const HINTS_ADD = ['Find the common denominator (the LCM of the denominators).', 'Rewrite both fractions over the common denominator, add the numerators, and simplify the result.']
+const HINTS_MIXED = ['First do the division — flip the second fraction and multiply.', 'Then rewrite both fractions over a common denominator and subtract.']
+const HINTS_COMPOUND = ['First compute the sum in the numerator, rewriting it over a common denominator.', 'Divide the resulting fraction by the fraction in the denominator — multiply by its reciprocal.']
+const INPUT_HINT = 'The answer is a fraction, e.g. 7/20, or a whole number'
 
 function fracLatex(r: Rational): string {
   return r.n < 0 ? `-\\frac{${-r.n}}{${r.d}}` : `\\frac{${r.n}}{${r.d}}`
@@ -21,7 +21,7 @@ function fracLatex(r: Rational): string {
 
 function problem(equation: string, value: Rational, solution: Problem['solution'], hints: readonly string[]): Problem {
   return {
-    statement: { en: `Compute: $${equation}$`, ru: `Вычисли: $${equation}$` },
+    statement: `Compute: $${equation}$`,
     answer: { kind: 'number', value: ratToLatex(value) },
     solution,
     hints,
@@ -45,9 +45,9 @@ function tier1(rng: Rng): Problem {
     equation,
     value,
     [
-      { ru: `Общий знаменатель — НОК$(${b},${d}) = ${l}$:`, tex: `\\frac{${a}}{${b}} = \\frac{${na}}{${l}}, \\quad \\frac{${c}}{${d}} = \\frac{${nc}}{${l}}` },
-      { ru: 'Складываем числители:', tex: `\\frac{${na}}{${l}} + \\frac{${nc}}{${l}} = \\frac{${na + nc}}{${l}}` },
-      { ru: 'Сокращаем, если возможно:', tex: `= ${ratToLatex(value)}` },
+      { text: `The common denominator is LCM$(${b},${d}) = ${l}$:`, tex: `\\frac{${a}}{${b}} = \\frac{${na}}{${l}}, \\quad \\frac{${c}}{${d}} = \\frac{${nc}}{${l}}` },
+      { text: 'Add the numerators:', tex: `\\frac{${na}}{${l}} + \\frac{${nc}}{${l}} = \\frac{${na + nc}}{${l}}` },
+      { text: 'Simplify if possible:', tex: `= ${ratToLatex(value)}` },
     ],
     HINTS_ADD,
   )
@@ -67,8 +67,8 @@ function tier2(rng: Rng): Problem {
     equation,
     value,
     [
-      { ru: 'Деление на дробь — умножение на обратную:', tex: `\\frac{${c}}{${d}} \\div \\frac{${e}}{${f}} = \\frac{${c}}{${d}} \\cdot \\frac{${f}}{${e}} = ${fracLatex(divPart)}` },
-      { ru: 'Приводим к общему знаменателю и вычитаем:', tex: `\\frac{${a}}{${b}} - ${fracLatex(divPart)} = ${ratToLatex(value)}` },
+      { text: 'Dividing by a fraction is multiplying by its reciprocal:', tex: `\\frac{${c}}{${d}} \\div \\frac{${e}}{${f}} = \\frac{${c}}{${d}} \\cdot \\frac{${f}}{${e}} = ${fracLatex(divPart)}` },
+      { text: 'Rewrite over a common denominator and subtract:', tex: `\\frac{${a}}{${b}} - ${fracLatex(divPart)} = ${ratToLatex(value)}` },
     ],
     HINTS_MIXED,
   )
@@ -88,8 +88,8 @@ function tier3(rng: Rng): Problem {
     equation,
     value,
     [
-      { ru: 'Сначала сложим дроби в числителе:', tex: `\\frac{${a}}{${b}} + \\frac{${c}}{${d}} = ${fracLatex(sum)}` },
-      { ru: 'Разделить на дробь — умножить на обратную:', tex: `${fracLatex(sum)} \\div \\frac{${e}}{${f}} = ${fracLatex(sum)} \\cdot \\frac{${f}}{${e}} = ${ratToLatex(value)}` },
+      { text: 'First add the fractions in the numerator:', tex: `\\frac{${a}}{${b}} + \\frac{${c}}{${d}} = ${fracLatex(sum)}` },
+      { text: 'Dividing by a fraction is multiplying by its reciprocal:', tex: `${fracLatex(sum)} \\div \\frac{${e}}{${f}} = ${fracLatex(sum)} \\cdot \\frac{${f}}{${e}} = ${ratToLatex(value)}` },
     ],
     HINTS_COMPOUND,
   )

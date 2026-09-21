@@ -36,7 +36,7 @@ describe('int_neg', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('int_neg').generate(createRng(seed), tier)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const raw = evaluate(lastMath(p.statement.en))
+      const raw = evaluate(lastMath(p.statement))
       closeEnough(raw, evaluate(p.answer.value), seed, 'int_neg')
     }
   })
@@ -47,7 +47,7 @@ describe('order_ops', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('order_ops').generate(createRng(seed), tier)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const raw = evaluate(lastMath(p.statement.en))
+      const raw = evaluate(lastMath(p.statement))
       closeEnough(raw, evaluate(p.answer.value), seed, 'order_ops')
     }
   })
@@ -58,7 +58,7 @@ describe('fractions', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('fractions').generate(createRng(seed), tier)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const raw = evaluate(lastMath(p.statement.en))
+      const raw = evaluate(lastMath(p.statement))
       closeEnough(raw, evaluate(p.answer.value), seed, 'fractions')
     }
   })
@@ -69,7 +69,7 @@ describe('percent_ratio', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('percent_ratio').generate(createRng(seed), 2)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const [, oldText, newText] = requireMatch(p.statement.en, /changes from \$(-?\d+(?:\.\d+)?)\$ to \$(-?\d+(?:\.\d+)?)\$/)
+      const [, oldText, newText] = requireMatch(p.statement, /changes from \$(-?\d+(?:\.\d+)?)\$ to \$(-?\d+(?:\.\d+)?)\$/)
       const oldValue = Number(oldText)
       const newValue = Number(newText)
       const change = evaluate(p.answer.value)
@@ -86,7 +86,7 @@ describe('powers', () => {
       const p = getTemplate('powers').generate(createRng(seed), tier)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
       const point = Object.fromEntries(p.answer.variables.map((v) => [v, SAMPLE_POINT[v]]))
-      const original = evaluate(lastMath(p.statement.en), point)
+      const original = evaluate(lastMath(p.statement), point)
       const simplified = evaluate(p.answer.value, point)
       closeEnough(original, simplified, seed, `powers tier${tier}`)
     }
@@ -98,7 +98,7 @@ describe('roots', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('roots').generate(createRng(seed), tier)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const raw = evaluate(lastMath(p.statement.en))
+      const raw = evaluate(lastMath(p.statement))
       closeEnough(raw, evaluate(p.answer.value), seed, 'roots')
     }
   })
@@ -109,7 +109,7 @@ describe('sci_notation', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('sci_notation').generate(createRng(seed), tier)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const raw = evaluate(lastMath(p.statement.en))
+      const raw = evaluate(lastMath(p.statement))
       closeEnough(raw, evaluate(p.answer.value), seed, 'sci_notation')
     }
   })
@@ -120,7 +120,7 @@ describe('units', () => {
     for (let seed = 1; seed <= SEEDS; seed += 1) {
       const p = getTemplate('units').generate(createRng(seed), 1)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const [, kmhText] = requireMatch(p.statement.en, /Convert \$(-?\d+(?:\.\d+)?)\$ km\/h to m\/s/)
+      const [, kmhText] = requireMatch(p.statement, /Convert \$(-?\d+(?:\.\d+)?)\$ km\/h to m\/s/)
       const kmh = Number(kmhText)
       closeEnough(evaluate(p.answer.value) * 18, kmh * 5, seed, 'units tier1')
     }
@@ -131,11 +131,11 @@ describe('units', () => {
       const p = getTemplate('units').generate(createRng(seed), 2)
       if (p.answer.kind !== 'number') throw new Error('expected number')
       const answer = evaluate(p.answer.value)
-      if (p.statement.en.includes('µL')) {
-        const [, ulText] = requireMatch(p.statement.en, /Convert \$(-?\d+(?:\.\d+)?)\$ µL to mL/)
+      if (p.statement.includes('µL')) {
+        const [, ulText] = requireMatch(p.statement, /Convert \$(-?\d+(?:\.\d+)?)\$ µL to mL/)
         closeEnough(answer * 1000, Number(ulText), seed, 'units tier2 µL→mL')
       } else {
-        const [, gText] = requireMatch(p.statement.en, /Convert \$(-?\d+(?:\.\d+)?)\$ g to mg/)
+        const [, gText] = requireMatch(p.statement, /Convert \$(-?\d+(?:\.\d+)?)\$ g to mg/)
         closeEnough(answer, Number(gText) * 1000, seed, 'units tier2 g→mg')
       }
     }
@@ -146,11 +146,11 @@ describe('units', () => {
       const p = getTemplate('units').generate(createRng(seed), 3)
       if (p.answer.kind !== 'number') throw new Error('expected number')
       const answer = evaluate(p.answer.value)
-      if (p.statement.en.includes('density')) {
-        const [, dText] = requireMatch(p.statement.en, /density \$(-?\d+(?:\.\d+)?)\$ g\/cm/)
+      if (p.statement.includes('density')) {
+        const [, dText] = requireMatch(p.statement, /density \$(-?\d+(?:\.\d+)?)\$ g\/cm/)
         closeEnough(answer, Number(dText) * 1000, seed, 'units tier3 density')
       } else {
-        const [, doseText, weightText] = requireMatch(p.statement.en, /dosed at \$(-?\d+(?:\.\d+)?)\$ mg\/kg.*weighing \$(-?\d+(?:\.\d+)?)\$ kg/)
+        const [, doseText, weightText] = requireMatch(p.statement, /dosed at \$(-?\d+(?:\.\d+)?)\$ mg\/kg.*weighing \$(-?\d+(?:\.\d+)?)\$ kg/)
         closeEnough(answer, Number(doseText) * Number(weightText), seed, 'units tier3 dose')
       }
     }

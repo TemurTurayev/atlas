@@ -31,7 +31,7 @@ describe('algebra_expr', () => {
     for (let seed = 1; seed <= 40; seed += 1) {
       const p = getTemplate('algebra_expr').generate(createRng(seed), 1)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const original = firstMath(p.statement.en)
+      const original = firstMath(p.statement)
       const answerValue = p.answer.value
       const points = [
         { x: 2, y: 3 },
@@ -49,7 +49,7 @@ describe('expand', () => {
     for (let seed = 1; seed <= 40; seed += 1) {
       const p = getTemplate('expand').generate(createRng(seed), 1)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const original = firstMath(p.statement.en)
+      const original = firstMath(p.statement)
       const answerValue = p.answer.value
       ;[2, -3, 5].forEach((x) => {
         expect(evalAt(original, { x }), `seed ${seed}`).toBeCloseTo(evalAt(answerValue, { x }), 9)
@@ -63,7 +63,7 @@ describe('alg_fractions', () => {
     for (let seed = 1; seed <= 40; seed += 1) {
       const p = getTemplate('alg_fractions').generate(createRng(seed), 2)
       if (p.answer.kind !== 'expression') throw new Error('expected expression')
-      const original = firstMath(p.statement.en)
+      const original = firstMath(p.statement)
       // x = 50 is far from x = 0 and any b in [-8, 8], so both original and simplified form are defined.
       expect(evalAt(original, { x: 50 }), `seed ${seed}`).toBeCloseTo(evalAt(p.answer.value, { x: 50 }), 6)
     }
@@ -95,7 +95,7 @@ describe('sim_eq_2x2', () => {
       if (p.answer.kind !== 'finiteSet') throw new Error('expected finiteSet')
       expect(p.answer.elements.length).toBe(1)
       const [x, y] = parsePair(p.answer.elements[0])
-      const [eq1, eq2] = mathSegments(p.statement.en)
+      const [eq1, eq2] = mathSegments(p.statement)
       ;[eq1, eq2].forEach((eq) => {
         const [lhs, rhs] = eq.split('=')
         expect(evalAt(lhs, { x, y }), `seed ${seed} tier ${tier}: ${eq}`).toBeCloseTo(Number(rhs), 6)
@@ -116,7 +116,7 @@ describe('inequalities', () => {
     for (let seed = 1; seed <= 40; seed += 1) {
       const p = getTemplate('inequalities').generate(createRng(seed), 1)
       if (p.answer.kind !== 'interval') throw new Error('expected interval')
-      const [lhsLatex, dir, rhsLatex] = firstMath(p.statement.en).split(' ')
+      const [lhsLatex, dir, rhsLatex] = firstMath(p.statement).split(' ')
       const rhsVal = Number(rhsLatex)
       const part = p.answer.parts[0]
       const [insideX, outsideX] = part.hi !== null ? [Number(part.hi) - 1, Number(part.hi) + 1] : [Number(part.lo) + 1, Number(part.lo) - 1]
@@ -132,7 +132,7 @@ describe('sigma_notation', () => {
     for (let seed = 1; seed <= 40; seed += 1) {
       const p = getTemplate('sigma_notation').generate(createRng(seed), tier)
       if (p.answer.kind !== 'number') throw new Error('expected number')
-      const seg = firstMath(p.statement.en)
+      const seg = firstMath(p.statement)
       let expected: number
       if (tier === 1) {
         const m = seg.match(/\\sum_\{i=1\}\^\{(\d+)\}\s*i\^\{2\}/)

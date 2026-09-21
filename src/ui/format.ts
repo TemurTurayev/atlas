@@ -17,11 +17,10 @@ export function splitMath(text: string): TextPart[] {
 
 export const formatPercent = (value: number): string => `${Math.round(value * 100)}%`
 
-/** Russian plural: plural(2, 'навык', 'навыка', 'навыков') → 'навыка'. */
-export function plural(n: number, one: string, few: string, many: string): string {
-  const mod10 = n % 10
-  const mod100 = n % 100
-  if (mod10 === 1 && mod100 !== 11) return one
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few
-  return many
+/** plural(2, 'skill') → 'skills'; pass `many` for irregulars. */
+export function plural(n: number, one: string, many = `${one}s`): string {
+  return n === 1 ? one : many
 }
+
+/** countOf(3, 'skill') → '3 skills'. */
+export const countOf = (n: number, one: string, many = `${one}s`): string => `${n} ${plural(n, one, many)}`

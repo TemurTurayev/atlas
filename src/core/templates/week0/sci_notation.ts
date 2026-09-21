@@ -2,17 +2,17 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Научная запись числа (scientific notation): $a\\times10^{n}$, где $1\\le a<10$.',
-  'Умножение: перемножь мантиссы, показатели степени сложи: $10^{m}\\cdot10^{n}=10^{m+n}$.',
-  'Деление: раздели мантиссы, показатели степени вычти: $10^{m}\\div10^{n}=10^{m-n}$.',
-  'Сложение и вычитание: сначала приведи числа к одному порядку (показателю степени), потом складывай мантиссы.',
-  'Типичные ошибки: складывать показатели степени при сложении чисел; забыть перенести множитель $10$ при выравнивании порядков.',
+  'Scientific notation: $a\\times10^{n}$, where $1\\le a<10$.',
+  'Multiplication: multiply the mantissas, add the exponents: $10^{m}\\cdot10^{n}=10^{m+n}$.',
+  'Division: divide the mantissas, subtract the exponents: $10^{m}\\div10^{n}=10^{m-n}$.',
+  'Addition and subtraction: first bring the numbers to the same order of magnitude (exponent), then add the mantissas.',
+  'Common mistakes: adding the exponents when adding numbers instead of aligning them; forgetting to carry the factor of $10$ when aligning orders of magnitude.',
 ].join('\n')
 
-const HINTS_MUL = ['Перемножь мантиссы отдельно от степеней десяти.', 'Показатели степени при умножении складываются.']
-const HINTS_DIV = ['Раздели мантиссы отдельно от степеней десяти.', 'Показатели степени при делении вычитаются.']
-const HINTS_SUM = ['Приведи оба числа к одинаковому показателю степени 10.', 'После выравнивания порядков просто сложи мантиссы.']
-const INPUT_HINT = 'Ответ — число, можно в виде a*10^n или обычной десятичной дробью'
+const HINTS_MUL = ['Multiply the mantissas separately from the powers of ten.', 'When multiplying, the exponents add.']
+const HINTS_DIV = ['Divide the mantissas separately from the powers of ten.', 'When dividing, the exponents subtract.']
+const HINTS_SUM = ['Bring both numbers to the same power of 10.', 'After aligning the orders of magnitude, just add the mantissas.']
+const INPUT_HINT = 'The answer is a number; give it as a*10^n or as a plain decimal'
 
 function trimZeros(s: string): string {
   if (!s.includes('.')) return s
@@ -22,7 +22,7 @@ function trimZeros(s: string): string {
 
 function build(equation: string, value: string, solution: Problem['solution'], hints: readonly string[]): Problem {
   return {
-    statement: { en: `Compute: $${equation}$. Give the answer in scientific notation.`, ru: `Вычисли: $${equation}$. Ответ дай в научной записи.` },
+    statement: `Compute: $${equation}$. Give the answer in scientific notation.`,
     answer: { kind: 'number', value },
     solution,
     hints,
@@ -40,9 +40,9 @@ function tier1(rng: Rng): Problem {
   const equation = `\\left(${c1}\\times10^{${e1}}\\right)\\left(${c2}\\times10^{${e2}}\\right)`
   const value = `${mantissa}\\times10^{${exponent}}`
   return build(equation, value, [
-    { ru: 'Перемножаем мантиссы:', tex: `${c1}\\cdot${c2} = ${mantissa}` },
-    { ru: 'Складываем показатели степени:', tex: `10^{${e1}}\\cdot10^{${e2}} = 10^{${exponent}}` },
-    { ru: 'Итог:', tex: `${mantissa}\\times10^{${exponent}}` },
+    { text: 'Multiply the mantissas:', tex: `${c1}\\cdot${c2} = ${mantissa}` },
+    { text: 'Add the exponents:', tex: `10^{${e1}}\\cdot10^{${e2}} = 10^{${exponent}}` },
+    { text: 'Result:', tex: `${mantissa}\\times10^{${exponent}}` },
   ], HINTS_MUL)
 }
 
@@ -58,9 +58,9 @@ function tier2(rng: Rng): Problem {
   const equation = `\\dfrac{${c1Str}\\times10^{${e1}}}{${c2Str}\\times10^{${e2}}}`
   const value = `${r}\\times10^{${exponent}}`
   return build(equation, value, [
-    { ru: 'Делим мантиссы:', tex: `${c1Str} \\div ${c2Str} = ${r}` },
-    { ru: 'Вычитаем показатели степени:', tex: `10^{${e1}}\\div10^{${e2}} = 10^{${exponent}}` },
-    { ru: 'Итог:', tex: `${r}\\times10^{${exponent}}` },
+    { text: 'Divide the mantissas:', tex: `${c1Str} \\div ${c2Str} = ${r}` },
+    { text: 'Subtract the exponents:', tex: `10^{${e1}}\\div10^{${e2}} = 10^{${exponent}}` },
+    { text: 'Result:', tex: `${r}\\times10^{${exponent}}` },
   ], HINTS_DIV)
 }
 
@@ -75,9 +75,9 @@ function tier3(rng: Rng): Problem {
   const decimalValue = trimZeros((sumMantissa / 10 ** scale).toFixed(scale))
   const equation = `${c1Str}\\times10^{${e1}} + ${c2}\\times10^{${e2}}`
   return build(equation, decimalValue, [
-    { ru: `Приводим первое слагаемое к порядку $10^{${e2}}$:`, tex: `${c1Str}\\times10^{${e1}} = ${x}\\times10^{${e2}}` },
-    { ru: 'Складываем мантиссы одного порядка:', tex: `${x}\\times10^{${e2}} + ${c2}\\times10^{${e2}} = ${sumMantissa}\\times10^{${e2}}` },
-    { ru: 'Переводим в десятичную запись:', tex: `${sumMantissa}\\times10^{${e2}} = ${decimalValue}` },
+    { text: `Bring the first term to the order $10^{${e2}}$:`, tex: `${c1Str}\\times10^{${e1}} = ${x}\\times10^{${e2}}` },
+    { text: 'Add the mantissas of the same order:', tex: `${x}\\times10^{${e2}} + ${c2}\\times10^{${e2}} = ${sumMantissa}\\times10^{${e2}}` },
+    { text: 'Convert to decimal notation:', tex: `${sumMantissa}\\times10^{${e2}} = ${decimalValue}` },
   ], HINTS_SUM)
 }
 

@@ -32,7 +32,7 @@ describe('linear_eq', () => {
       if (p.answer.kind !== 'number') throw new Error('expected number')
       const x = Number(p.answer.value)
       expect(Number.isInteger(x)).toBe(true)
-      const [lhs, rhs] = lastMath(p.statement.en).split('=')
+      const [lhs, rhs] = lastMath(p.statement).split('=')
       expect(evaluate(lhs, x)).toBeCloseTo(evaluate(rhs, x), 9)
     }
   })
@@ -43,7 +43,7 @@ describe('quadratic_eq', () => {
     for (let seed = 1; seed <= 60; seed += 1) {
       const p = getTemplate('quadratic_eq').generate(createRng(seed), tier)
       if (p.answer.kind !== 'numberSet') throw new Error('expected numberSet')
-      const f = lastMath(p.statement.en).replace('f(x) =', '').trim()
+      const f = lastMath(p.statement).replace('f(x) =', '').trim()
       p.answer.values.forEach((v) => {
         expect(Math.abs(evaluate(f, constant(v))), `seed ${seed} root ${v}`).toBeLessThan(1e-9)
       })
@@ -65,7 +65,7 @@ describe('factor', () => {
   it.each(TIERS)('tier %i: the expanded statement itself is not accepted', (tier) => {
     for (let seed = 1; seed <= 30; seed += 1) {
       const p = getTemplate('factor').generate(createRng(seed), tier)
-      const expanded = lastMath(p.statement.en)
+      const expanded = lastMath(p.statement)
       expect(checkAnswer(p.answer, { kind: 'latex', latex: expanded }).status, `seed ${seed}`).toBe('malformed')
     }
   })

@@ -3,11 +3,11 @@ import type { Rng } from '../../random/rng'
 import type { ChoiceOption, Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Вершинная форма параболы (vertex form): $y=(x-h)^2+k$ — вершина в точке $(h,k)$.',
-  'Разложенная форма (factored form): $y=a(x-r_1)(x-r_2)$ — нули функции (x-intercepts) в точках $x=r_1$ и $x=r_2$.',
-  'Знак коэффициента $a$ определяет направление ветвей: $a>0$ — вверх, $a<0$ — вниз.',
-  'Чтобы найти нули, реши $y=0$: произведение равно нулю, если один из множителей равен нулю.',
-  'Типичная ошибка: перепутать знак $h$ внутри скобки $(x-h)$ — вершина смещена в сторону, противоположную знаку внутри скобки.',
+  'Vertex form of a parabola: $y=(x-h)^2+k$ — the vertex is at the point $(h,k)$.',
+  'Factored form: $y=a(x-r_1)(x-r_2)$ — the x-intercepts are at $x=r_1$ and $x=r_2$.',
+  'The sign of the coefficient $a$ determines the direction the parabola opens: $a>0$ upward, $a<0$ downward.',
+  'To find the zeros, solve $y=0$: a product is zero when one of its factors is zero.',
+  'Common mistake: mixing up the sign of $h$ inside the bracket $(x-h)$ — the vertex is shifted in the direction opposite to the sign inside the bracket.',
 ].join('\n')
 
 function factorBracket(r: number): string {
@@ -23,17 +23,14 @@ function tier1(rng: Rng): Problem {
   const k = rng.int(-8, 8)
   const eq = joinTerms([`\\left(${linear(1, -h)}\\right)^2`, String(k)])
   return {
-    statement: {
-      en: `Find the vertex of the parabola $y = ${eq}$.`,
-      ru: `Найди вершину параболы $y = ${eq}$.`,
-    },
+    statement: `Find the vertex of the parabola $y = ${eq}$.`,
     answer: { kind: 'finiteSet', elements: [`(${h},${k})`] },
     solution: [
-      { ru: 'Парабола в вершинной форме $y=(x-h)^2+k$ имеет вершину $(h,k)$:', tex: `h=${h}, \\quad k=${k}` },
-      { ru: 'Вершина:', tex: `(${h}, ${k})` },
+      { text: 'A parabola in vertex form $y=(x-h)^2+k$ has vertex $(h,k)$:', tex: `h=${h}, \\quad k=${k}` },
+      { text: 'Vertex:', tex: `(${h}, ${k})` },
     ],
-    hints: ['Сравни уравнение с вершинной формой $y=(x-h)^2+k$.', 'Вершина параболы — это точка $(h, k)$.'],
-    inputHint: 'Ответ — пара (x, y), например (2,-3)',
+    hints: ['Compare the equation with the vertex form $y=(x-h)^2+k$.', 'The vertex of the parabola is the point $(h, k)$.'],
+    inputHint: 'The answer is a pair (x, y), e.g. (2,-3)',
   }
 }
 
@@ -46,33 +43,27 @@ function tier2(rng: Rng): Problem {
     const [lo, hi] = r1 < r2 ? [r1, r2] : [r2, r1]
     const eq = `${aPrefix}${factorBracket(r1)}${factorBracket(r2)}`
     return {
-      statement: {
-        en: `Find the x-intercepts of the parabola $y = ${eq}$.`,
-        ru: `Найди точки пересечения параболы $y = ${eq}$ с осью $x$.`,
-      },
+      statement: `Find the x-intercepts of the parabola $y = ${eq}$.`,
       answer: { kind: 'numberSet', values: [String(lo), String(hi)] },
       solution: [
-        { ru: 'На оси $x$ значение $y=0$:', tex: `${eq} = 0` },
-        { ru: 'Произведение равно нулю, если один из множителей равен нулю:', tex: `x = ${r1}, \\quad x = ${r2}` },
+        { text: 'On the x-axis, $y=0$:', tex: `${eq} = 0` },
+        { text: 'A product is zero when one of its factors is zero:', tex: `x = ${r1}, \\quad x = ${r2}` },
       ],
-      hints: ['Пересечение с осью $x$ — это точки, где $y=0$.', 'Произведение равно нулю, если хотя бы один множитель равен нулю.'],
-      inputHint: 'Перечисли корни через запятую, например -2, 3',
+      hints: ['The x-intercepts are the points where $y=0$.', 'A product is zero when at least one factor is zero.'],
+      inputHint: 'List the roots separated by commas, e.g. -2, 3',
     }
   }
   const r = rng.intExcept(-7, 7, [0])
   const eq = `${aPrefix}${factorBracket(r)}^2`
   return {
-    statement: {
-      en: `Find the x-intercepts of the parabola $y = ${eq}$.`,
-      ru: `Найди точки пересечения параболы $y = ${eq}$ с осью $x$.`,
-    },
+    statement: `Find the x-intercepts of the parabola $y = ${eq}$.`,
     answer: { kind: 'numberSet', values: [String(r)] },
     solution: [
-      { ru: 'На оси $x$ значение $y=0$:', tex: `${eq} = 0` },
-      { ru: 'Множитель повторяется дважды — корень один (двойной):', tex: `x = ${r}` },
+      { text: 'On the x-axis, $y=0$:', tex: `${eq} = 0` },
+      { text: 'The factor repeats twice — there is one (double) root:', tex: `x = ${r}` },
     ],
-    hints: ['Пересечение с осью $x$ — это точки, где $y=0$.', 'Здесь множитель повторяется дважды — корень только один.'],
-    inputHint: 'Если корень один, укажи только его: например 3',
+    hints: ['The x-intercepts are the points where $y=0$.', 'Here the factor repeats twice — there is only one root.'],
+    inputHint: 'If there is only one root, enter just that: e.g. 3',
   }
 }
 
@@ -96,18 +87,15 @@ function tier3(rng: Rng): Problem {
     { id: 'flip-k', label: describeParabola(a, h, flip(k)) },
   ])
   return {
-    statement: {
-      en: `Which statement correctly describes the graph of $y = ${eq}$?`,
-      ru: `Какое утверждение верно описывает график $y = ${eq}$?`,
-    },
+    statement: `Which statement correctly describes the graph of $y = ${eq}$?`,
     answer: { kind: 'choice', options, correctId: 'correct' },
     solution: [
-      { ru: `Знак коэффициента при скобке определяет направление ветвей: ${a > 0 ? 'вверх' : 'вниз'}.` },
-      { ru: 'Вершина параболы $y=a(x-h)^2+k$ — точка $(h,k)$:', tex: `(${h}, ${k})` },
+      { text: `The sign of the coefficient in front of the bracket determines the direction the parabola opens: ${a > 0 ? 'upward' : 'downward'}.` },
+      { text: 'The vertex of the parabola $y=a(x-h)^2+k$ is the point $(h,k)$:', tex: `(${h}, ${k})` },
     ],
     hints: [
-      'Знак $a$ перед скобкой определяет, куда направлены ветви параболы.',
-      'В форме $y=a(x-h)^2+k$ вершина — точка $(h,k)$: обрати внимание на знаки внутри скобки.',
+      'The sign of $a$ in front of the bracket determines which way the parabola opens.',
+      'In the form $y=a(x-h)^2+k$, the vertex is the point $(h,k)$: pay attention to the signs inside the bracket.',
     ],
   }
 }

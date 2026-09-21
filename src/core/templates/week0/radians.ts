@@ -34,14 +34,11 @@ function tier1(rng: Rng): Problem {
   const theta = rat(deg, 180)
   const value = piFractionLatex(theta)
   return {
-    statement: {
-      en: `Convert $${deg}^\\circ$ to radians. Leave $\\pi$ exact.`,
-      ru: `Переведи $${deg}^\\circ$ в радианы. Оставь $\\pi$ в точном виде.`,
-    },
+    statement: `Convert $${deg}^\\circ$ to radians. Leave $\\pi$ exact.`,
     answer: { kind: 'number', value },
     solution: [
-      { ru: 'Умножаем на $\\frac{\\pi}{180}$:', tex: `${deg}^\\circ = ${deg}\\cdot\\frac{\\pi}{180} = \\frac{${deg}\\pi}{180}` },
-      { ru: 'Сокращаем дробь:', tex: `\\frac{${deg}\\pi}{180} = ${value}` },
+      { text: 'Умножаем на $\\frac{\\pi}{180}$:', tex: `${deg}^\\circ = ${deg}\\cdot\\frac{\\pi}{180} = \\frac{${deg}\\pi}{180}` },
+      { text: 'Сокращаем дробь:', tex: `\\frac{${deg}\\pi}{180} = ${value}` },
     ],
     hints: HINTS_DEG_TO_RAD,
     inputHint: 'Ответ с π, например 3\\pi/4',
@@ -53,12 +50,9 @@ function tier2(rng: Rng): Problem {
   const theta = rat(deg, 180)
   const rad = piFractionLatex(theta)
   return {
-    statement: {
-      en: `Convert $${rad}$ radians to degrees.`,
-      ru: `Переведи $${rad}$ радиан в градусы.`,
-    },
+    statement: `Convert $${rad}$ radians to degrees.`,
     answer: { kind: 'number', value: String(deg) },
-    solution: [{ ru: 'Умножаем на $\\frac{180}{\\pi}$:', tex: `${rad}\\cdot\\frac{180}{\\pi} = ${deg}^\\circ` }],
+    solution: [{ text: 'Умножаем на $\\frac{180}{\\pi}$:', tex: `${rad}\\cdot\\frac{180}{\\pi} = ${deg}^\\circ` }],
     hints: HINTS_RAD_TO_DEG,
     inputHint: 'Ответ в градусах, например 150',
   }
@@ -73,12 +67,9 @@ function tier3(rng: Rng): Problem {
     const arc = rat(r * theta.n, theta.d)
     const value = piFractionLatex(arc)
     return {
-      statement: {
-        en: `A sector has radius $${r}$ and central angle $${thetaLatex}$ rad. Find the arc length. Leave $\\pi$ exact.`,
-        ru: `Сектор круга имеет радиус $${r}$ и центральный угол $${thetaLatex}$ рад. Найди длину дуги. Оставь $\\pi$ в точном виде.`,
-      },
+      statement: `A sector has radius $${r}$ and central angle $${thetaLatex}$ rad. Find the arc length. Leave $\\pi$ exact.`,
       answer: { kind: 'number', value },
-      solution: [{ ru: 'Длина дуги:', tex: `s = r\\theta = ${r}\\cdot ${thetaLatex} = ${value}` }],
+      solution: [{ text: 'Длина дуги:', tex: `s = r\\theta = ${r}\\cdot ${thetaLatex} = ${value}` }],
       hints: ['Формула длины дуги: $s=r\\theta$, угол — в радианах.', 'Умножь радиус на угол, не переводя $\\pi$ в десятичную дробь.'],
       inputHint: 'Ответ с π, например 3\\pi',
     }
@@ -86,12 +77,9 @@ function tier3(rng: Rng): Problem {
   const area = rat(r * r * theta.n, 2 * theta.d)
   const value = piFractionLatex(area)
   return {
-    statement: {
-      en: `A sector has radius $${r}$ and central angle $${thetaLatex}$ rad. Find the area of the sector. Leave $\\pi$ exact.`,
-      ru: `Сектор круга имеет радиус $${r}$ и центральный угол $${thetaLatex}$ рад. Найди площадь сектора. Оставь $\\pi$ в точном виде.`,
-    },
+    statement: `A sector has radius $${r}$ and central angle $${thetaLatex}$ rad. Find the area of the sector. Leave $\\pi$ exact.`,
     answer: { kind: 'number', value },
-    solution: [{ ru: 'Площадь сектора:', tex: `S = \\frac{1}{2}r^2\\theta = \\frac{1}{2}\\cdot ${r}^2\\cdot ${thetaLatex} = ${value}` }],
+    solution: [{ text: 'Площадь сектора:', tex: `S = \\frac{1}{2}r^2\\theta = \\frac{1}{2}\\cdot ${r}^2\\cdot ${thetaLatex} = ${value}` }],
     hints: ['Формула площади сектора: $S=\\frac{1}{2}r^2\\theta$, угол — в радианах.', 'Сначала возведи радиус в квадрат, потом умножь на угол и на $\\frac{1}{2}$.'],
     inputHint: 'Ответ с π, например 6\\pi',
   }

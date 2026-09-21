@@ -2,11 +2,11 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Показательное уравнение (exponential equation): если $b^{x}=b^{y}$ при $b>0,\\ b\\ne1$, то $x=y$ — приравнивай показатели.',
-  'Если основания разные, логарифмируй обе части: из $Ae^{kt}=B$ следует $t=\\dfrac{1}{k}\\ln\\dfrac{B}{A}$.',
-  'Логарифмическое уравнение (logarithmic equation): собери логарифмы в один по свойствам, затем перейди к показательной форме $\\log_b N=c \\iff N=b^{c}$.',
-  'После решения логарифмического уравнения проверяй, что аргументы логарифмов остаются положительными — посторонние корни отбрасываются.',
-  'Типичная ошибка: забыть про область допустимых значений и оставить корень, при котором выражение под логарифмом отрицательно.',
+  'Exponential equation: if $b^{x}=b^{y}$ with $b>0,\\ b\\ne1$, then $x=y$ — equate the exponents.',
+  'If the bases are different, take the logarithm of both sides: from $Ae^{kt}=B$ it follows that $t=\\dfrac{1}{k}\\ln\\dfrac{B}{A}$.',
+  'Logarithmic equation: combine the logarithms into one using the log laws, then switch to exponential form $\\log_b N=c \\iff N=b^{c}$.',
+  'After solving a logarithmic equation, check that the arguments of the logarithms stay positive — extraneous roots are discarded.',
+  'Common mistake: forgetting the domain of validity and keeping a root for which the expression under the logarithm is negative.',
 ].join('\n')
 
 function tier1(rng: Rng): Problem {
@@ -14,11 +14,11 @@ function tier1(rng: Rng): Problem {
   const m = rng.int(2, 5)
   const N = b ** m
   return {
-    statement: { en: `Solve for $x$: $${b}^{x} = ${N}$.`, ru: `Реши уравнение относительно $x$: $${b}^{x} = ${N}$.` },
+    statement: `Solve for $x$: $${b}^{x} = ${N}$.`,
     answer: { kind: 'number', value: String(m) },
     solution: [
-      { ru: 'Записываем правую часть как степень того же основания:', tex: `${N} = ${b}^{${m}}` },
-      { ru: 'Основания равны, значит равны и показатели:', tex: `x = ${m}` },
+      { text: 'Записываем правую часть как степень того же основания:', tex: `${N} = ${b}^{${m}}` },
+      { text: 'Основания равны, значит равны и показатели:', tex: `x = ${m}` },
     ],
     hints: ['Представь правую часть как степень основания $b$.', 'Если $b^{x}=b^{m}$, то $x=m$.'],
   }
@@ -37,15 +37,12 @@ function tier2(rng: Rng): Problem {
   const R = rng.intExcept(2, 9, [1])
   const B = A * R
   return {
-    statement: {
-      en: `Solve for $t$: $${A}e^{${kLatex}t} = ${B}$.`,
-      ru: `Реши уравнение относительно $t$: $${A}e^{${kLatex}t} = ${B}$.`,
-    },
+    statement: `Solve for $t$: $${A}e^{${kLatex}t} = ${B}$.`,
     answer: { kind: 'number', value: `${n}\\ln ${R}` },
     solution: [
-      { ru: 'Делим обе части на коэффициент перед экспонентой:', tex: `e^{${kLatex}t} = \\frac{${B}}{${A}} = ${R}` },
-      { ru: 'Берём натуральный логарифм от обеих частей:', tex: `${kLatex}t = \\ln ${R}` },
-      { ru: 'Выражаем $t$:', tex: `t = \\frac{\\ln ${R}}{${kLatex}} = ${n}\\ln ${R}` },
+      { text: 'Делим обе части на коэффициент перед экспонентой:', tex: `e^{${kLatex}t} = \\frac{${B}}{${A}} = ${R}` },
+      { text: 'Берём натуральный логарифм от обеих частей:', tex: `${kLatex}t = \\ln ${R}` },
+      { text: 'Выражаем $t$:', tex: `t = \\frac{\\ln ${R}}{${kLatex}} = ${n}\\ln ${R}` },
     ],
     hints: [
       'Раздели обе части уравнения на коэффициент перед экспонентой.',
@@ -77,15 +74,12 @@ function tier3(rng: Rng): Problem {
   const { b, p, x0, c } = rng.pick(CASES)
   const bc = b ** c
   return {
-    statement: {
-      en: `Solve for $x$ (assume $x>${p}$): $\\log_{${b}}(x-${p}) + \\log_{${b}}(x+${p}) = ${c}$.`,
-      ru: `Реши уравнение относительно $x$ (считай $x>${p}$): $\\log_{${b}}(x-${p}) + \\log_{${b}}(x+${p}) = ${c}$.`,
-    },
+    statement: `Solve for $x$ (assume $x>${p}$): $\\log_{${b}}(x-${p}) + \\log_{${b}}(x+${p}) = ${c}$.`,
     answer: { kind: 'number', value: String(x0) },
     solution: [
-      { ru: 'Сумма логарифмов одного основания — это логарифм произведения:', tex: `\\log_{${b}}\\left((x-${p})(x+${p})\\right) = ${c}` },
-      { ru: 'Переходим к показательной форме:', tex: `(x-${p})(x+${p}) = ${b}^{${c}} = ${bc}` },
-      { ru: `Раскрываем разность квадратов и решаем (берём положительный корень, т.к. $x>${p}$):`, tex: `x^{2} - ${p * p} = ${bc} \\ \\Rightarrow\\ x^{2} = ${p * p + bc} \\ \\Rightarrow\\ x = ${x0}` },
+      { text: 'Сумма логарифмов одного основания — это логарифм произведения:', tex: `\\log_{${b}}\\left((x-${p})(x+${p})\\right) = ${c}` },
+      { text: 'Переходим к показательной форме:', tex: `(x-${p})(x+${p}) = ${b}^{${c}} = ${bc}` },
+      { text: `Раскрываем разность квадратов и решаем (берём положительный корень, т.к. $x>${p}$):`, tex: `x^{2} - ${p * p} = ${bc} \\ \\Rightarrow\\ x^{2} = ${p * p + bc} \\ \\Rightarrow\\ x = ${x0}` },
     ],
     hints: [
       'Объедини сумму логарифмов в один: $\\log_b A+\\log_b B=\\log_b(AB)$.',

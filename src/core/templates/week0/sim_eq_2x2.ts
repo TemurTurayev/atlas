@@ -44,15 +44,15 @@ function buildSystem(a1: number, b1: number, c1: number, a2: number, b2: number,
   const xLatex = ratToLatex(x)
   const yLatex = ratToLatex(y)
   return {
-    statement: { en: `Solve the system: $${eq1}$, $${eq2}$`, ru: `Реши систему: $${eq1}$, $${eq2}$` },
+    statement: `Solve the system: $${eq1}$, $${eq2}$`,
     answer: { kind: 'finiteSet', elements: [`(${xLatex},${yLatex})`] },
     solution: [
       {
-        ru: `Умножим первое уравнение на $${b2}$, второе — на $${b1}$, чтобы коэффициенты при $y$ совпали:`,
+        text: `Умножим первое уравнение на $${b2}$, второе — на $${b1}$, чтобы коэффициенты при $y$ совпали:`,
         tex: `${a1 * b2}x+${b1 * b2}y=${c1 * b2}, \\quad ${a2 * b1}x+${b1 * b2}y=${c2 * b1}`,
       },
-      { ru: 'Вычтем второе уравнение из первого — $y$ сократится:', tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
-      { ru: 'Подставим найденный $x$ в любое из уравнений и найдём $y$:', tex: `y = ${yLatex}` },
+      { text: 'Вычтем второе уравнение из первого — $y$ сократится:', tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
+      { text: 'Подставим найденный $x$ в любое из уравнений и найдём $y$:', tex: `y = ${yLatex}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -61,13 +61,13 @@ function buildSystem(a1: number, b1: number, c1: number, a2: number, b2: number,
           alternative: {
             title: 'Другой способ — подстановка',
             steps: [
-              { ru: 'Выразим $y$ из первого уравнения:', tex: `y = \\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}` },
+              { text: 'Выразим $y$ из первого уравнения:', tex: `y = \\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}` },
               {
-                ru: 'Подставим это выражение во второе уравнение:',
+                text: 'Подставим это выражение во второе уравнение:',
                 tex: `${coefPrefix(a2)}x + ${coefPrefix(b2)}\\cdot\\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}} = ${c2}`,
               },
-              { ru: `Умножим обе части на $${b1}$ и соберём подобные:`, tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
-              { ru: 'Вернём найденный $x$ в выражение для $y$:', tex: `y = ${yLatex}` },
+              { text: `Умножим обе части на $${b1}$ и соберём подобные:`, tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
+              { text: 'Вернём найденный $x$ в выражение для $y$:', tex: `y = ${yLatex}` },
             ],
           },
         }

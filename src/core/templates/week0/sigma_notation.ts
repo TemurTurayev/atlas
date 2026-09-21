@@ -20,11 +20,11 @@ function tier1(rng: Rng): Problem {
   const sum = terms.reduce((s, t) => s + t, 0)
   const statement = `\\sum_{i=1}^{${n}} i^{2}`
   return {
-    statement: { en: `Evaluate $${statement}$.`, ru: `Вычисли $${statement}$.` },
+    statement: `Evaluate $${statement}$.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { ru: 'Распишем слагаемые:', tex: `${terms.map((_, i) => `${i + 1}^{2}`).join('+')} = ${terms.join('+')}` },
-      { ru: 'Сложим:', tex: `${sum}` },
+      { text: 'Распишем слагаемые:', tex: `${terms.map((_, i) => `${i + 1}^{2}`).join('+')} = ${terms.join('+')}` },
+      { text: 'Сложим:', tex: `${sum}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -37,11 +37,11 @@ function tier2(rng: Rng): Problem {
   const sum = terms.reduce((s, t) => s + t, 0)
   const statement = `\\sum_{k=0}^{${n}} (2k+1)`
   return {
-    statement: { en: `Evaluate $${statement}$.`, ru: `Вычисли $${statement}$.` },
+    statement: `Evaluate $${statement}$.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { ru: `Распишем слагаемые при $k=0,1,\\dots,${n}$:`, tex: `${terms.join('+')}` },
-      { ru: 'Сложим:', tex: `${sum}` },
+      { text: `Распишем слагаемые при $k=0,1,\\dots,${n}$:`, tex: `${terms.join('+')}` },
+      { text: 'Сложим:', tex: `${sum}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -53,14 +53,11 @@ function bigSumBranch(rng: Rng): Problem {
   const sum = (n * (n + 1)) / 2
   const statement = `\\sum_{i=1}^{${n}} i`
   return {
-    statement: {
-      en: `Evaluate $${statement}$ using the formula for the sum of the first $n$ natural numbers.`,
-      ru: `Вычисли $${statement}$, используя формулу суммы первых $n$ натуральных чисел.`,
-    },
+    statement: `Evaluate $${statement}$ using the formula for the sum of the first $n$ natural numbers.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { ru: 'Формула суммы первых $n$ натуральных чисел:', tex: '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}' },
-      { ru: `Подставим $n=${n}$:`, tex: `\\frac{${n}\\cdot ${n + 1}}{2} = ${sum}` },
+      { text: 'Формула суммы первых $n$ натуральных чисел:', tex: '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}' },
+      { text: `Подставим $n=${n}$:`, tex: `\\frac{${n}\\cdot ${n + 1}}{2} = ${sum}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -75,15 +72,15 @@ function shiftedBranch(rng: Rng): Problem {
   for (let i = k; i <= upper; i += 1) sum += i
   const statement = `\\sum_{i=${k}}^{${upper}} i`
   return {
-    statement: { en: `Evaluate $${statement}$.`, ru: `Вычисли $${statement}$.` },
+    statement: `Evaluate $${statement}$.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
       {
-        ru: 'Это сумма подряд идущих целых чисел — используем формулу суммы арифметической прогрессии:',
+        text: 'Это сумма подряд идущих целых чисел — используем формулу суммы арифметической прогрессии:',
         tex: `\\sum_{i=${k}}^{${upper}} i = \\frac{(${k}+${upper})\\cdot ${count}}{2}`,
       },
       {
-        ru: 'Проверим через разность двух сумм от единицы:',
+        text: 'Проверим через разность двух сумм от единицы:',
         tex: `\\sum_{i=1}^{${upper}} i - \\sum_{i=1}^{${k - 1}} i = \\frac{${upper}\\cdot ${upper + 1}}{2} - \\frac{${k - 1}\\cdot ${k}}{2} = ${sum}`,
       },
     ],

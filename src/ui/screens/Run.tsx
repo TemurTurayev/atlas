@@ -7,7 +7,7 @@ import { AnswerInput, emptyAnswer } from '../components/AnswerInput'
 import { ModeBadge } from '../components/Meter'
 import { Solution } from '../components/Solution'
 import { RichText, Tex } from '../components/Tex'
-import { formatPercent } from '../format'
+import { countOf, formatPercent } from '../format'
 import { useAtlas } from '../store'
 
 const card = 'rounded-card bg-surface border border-line p-5 space-y-4'
@@ -19,7 +19,7 @@ function PauseBar({ go, left }: { go: (screen: 'home') => void; left?: ReactNode
     <div className="flex items-center justify-between">
       <div>{left}</div>
       <button type="button" className="text-sm text-muted underline" onClick={() => go('home')}>
-        Пауза
+        Pause
       </button>
     </div>
   )
@@ -31,51 +31,49 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
     submit, revealAnswer, useHint, acknowledge, advance, decideJump, oneMore, setMixPrediction,
   } = useAtlas()
   const [answer, setAnswer] = useState<UserAnswer>({ kind: 'latex', latex: '' })
-  const [showRu, setShowRu] = useState(false)
   const [showSolution, setShowSolution] = useState(false)
 
   useEffect(() => {
     if (problem) setAnswer(emptyAnswer(problem.answer))
-    setShowRu(false)
     setShowSolution(false)
   }, [problem])
 
-  if (!world || !task) return <div className="p-6 text-muted">Загрузка…</div>
+  if (!world || !task) return <div className="p-6 text-muted">Loading…</div>
 
   if (task.type === 'summary') {
     const since = world.run?.startedAt ?? 0
     const mastered = Object.values(world.progress).filter((p) => p.masteredAt !== null && p.masteredAt >= since).length
     return (
       <div className="mx-auto max-w-2xl p-5 space-y-5">
-        <h2 className="text-xl">Забег окончен</h2>
+        <h2 className="text-xl">Run complete</h2>
         <div className={card}>
-          <p>Освоено навыков за забег: {mastered}</p>
+          <p>Skills mastered this run: {mastered}</p>
           <p>
-            XP сегодня: {world.day.xp} / {world.settings.dailyGoalXp}
+            XP today: {world.day.xp} / {world.settings.dailyGoalXp}
           </p>
-          <p>Серия: {world.streak.current} дн.</p>
+          <p>Streak: {countOf(world.streak.current, 'day')}</p>
           {forecast && world.run && (
             <p>
-              Прогноз на экзамене: {formatPercent(forecast.exam)}{' '}
+              Exam forecast: {formatPercent(forecast.exam)}{' '}
               <span className="text-muted">
                 ({forecast.exam >= world.run.forecastAtStart ? '+' : ''}
-                {((forecast.exam - world.run.forecastAtStart) * 100).toFixed(1)} п.п. за забег)
+                {((forecast.exam - world.run.forecastAtStart) * 100).toFixed(1)} points this run)
               </span>
             </p>
           )}
           {mixPrediction !== null && mixResults.total > 0 && (
             <p>
-              Микс: предсказал {mixPrediction}, решил {mixResults.correct} из {mixResults.total}
-              {mixPrediction === mixResults.correct ? ' — точная оценка себя' : ''}
+              Mixed block: you predicted {mixPrediction}, you got {mixResults.correct} of {mixResults.total}
+              {mixPrediction === mixResults.correct ? ' — you read yourself exactly right' : ''}
             </p>
           )}
         </div>
         <div className="flex gap-3">
           <button type="button" className={primary} onClick={() => oneMore()}>
-            Ещё навык
+            One more skill
           </button>
           <button type="button" className={ghost} onClick={() => go('home')}>
-            На главную
+            Home
           </button>
         </div>
       </div>
@@ -87,17 +85,17 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
       <div className="mx-auto max-w-2xl p-5 space-y-5">
         <PauseBar go={go} />
         <div className={card}>
-          <h2 className="text-xl">Прыжок вперёд?</h2>
+          <h2 className="text-xl">Jump ahead?</h2>
           <p className="text-muted">
-            Три темы подряд ты закрыл с первого раза. Можно сразу проверить «{GRAPH.node(task.target).title.ru}»: решишь две задачи — всё,
-            что ведёт к этой теме, зачтётся.
+            Three topics in a row on the first try. You can go straight to “{GRAPH.node(task.target).title}”: solve two problems and
+            everything leading up to it counts as done.
           </p>
           <div className="flex gap-3">
             <button type="button" className={primary} onClick={() => decideJump(true)}>
-              Прыгаем
+              Let's jump
             </button>
             <button type="button" className={ghost} onClick={() => decideJump(false)}>
-              Лучше по порядку
+              Keep the order
             </button>
           </div>
         </div>
@@ -108,7 +106,7 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
   if (task.type === 'theory') {
     return (
       <div className="mx-auto max-w-2xl p-5 space-y-5">
-        <PauseBar go={go} left={<h2 className="text-xl">{GRAPH.node(task.skillId).title.ru}</h2>} />
+        <PauseBar go={go} left={<h2 className="text-xl">{GRAPH.node(task.skillId).title}</h2>} />
         <div className={card}>
           {getTemplate(task.skillId)
             .theory.split('\n')
@@ -119,7 +117,7 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
             ))}
         </div>
         <button type="button" className={primary} onClick={() => acknowledge()}>
-          Понятно
+          Got it
         </button>
       </div>
     )
@@ -128,18 +126,18 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
   if (task.type === 'worked' && problem) {
     return (
       <div className="mx-auto max-w-2xl p-5 space-y-5">
-        <PauseBar go={go} left={<h2 className="text-xl">Разбор примера</h2>} />
+        <PauseBar go={go} left={<h2 className="text-xl">Worked example</h2>} />
         <div className={card}>
           <p className="text-lg">
-            <RichText text={problem.statement.ru} />
+            <RichText text={problem.statement} />
           </p>
           <Solution problem={problem} />
           <p className="text-muted">
-            Ответ: <Tex tex={answerToLatex(problem.answer)} />
+            Answer: <Tex tex={answerToLatex(problem.answer)} />
           </p>
         </div>
         <button type="button" className={primary} onClick={() => acknowledge()}>
-          Теперь сам
+          Your turn
         </button>
       </div>
     )
@@ -156,10 +154,10 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
       <div className="mx-auto max-w-2xl p-5 space-y-5">
         <PauseBar go={go} />
         <div className={card}>
-          <h2 className="text-xl">Сколько решишь верно?</h2>
+          <h2 className="text-xl">How many will you get right?</h2>
           <p className="text-muted">
-            Дальше {mixTarget} задач вперемешку по пройденному. Оцени себя до начала — это тренирует чувствовать, что ты знаешь, а что
-            только кажется знакомым.
+            Next come {mixTarget} problems mixed from what you have learned. Call it before you start — it trains the feel for what you
+            really know versus what only looks familiar.
           </p>
           <div className="flex flex-wrap gap-2">
             {Array.from({ length: mixTarget + 1 }, (_, n) => (
@@ -187,24 +185,21 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
       <div className={card}>
         <div className="flex items-start justify-between gap-3">
           <p className="text-lg leading-relaxed">
-            <RichText text={showRu ? problem.statement.ru : problem.statement.en} />
+            <RichText text={problem.statement} />
           </p>
-          <button type="button" className="text-xs text-muted border border-line rounded-lg px-2 py-1" onClick={() => setShowRu(!showRu)}>
-            {showRu ? 'EN' : 'RU'}
-          </button>
         </div>
 
         <AnswerInput spec={problem.answer} answer={answer} onChange={setAnswer} onSubmit={() => submit(answer)} disabled={graded} />
         {problem.inputHint && !graded && <p className="text-xs text-muted">{problem.inputHint}</p>}
-        {onPaper && !graded && <p className="text-xs text-warn">Реши на бумаге, потом введи ответ — на экзамене будет так же.</p>}
+        {onPaper && !graded && <p className="text-xs text-warn">Work it out on paper, then type the answer — the exam will be the same.</p>}
 
         {!graded && (
           <div className="flex flex-wrap gap-3">
             <button type="button" className={primary} onClick={() => submit(answer)}>
-              Проверить
+              Check
             </button>
             <button type="button" className={ghost} onClick={() => useHint()} disabled={hintsUsed >= problem.hints.length}>
-              Подсказка
+              Hint
             </button>
             <button
               type="button"
@@ -214,7 +209,7 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
                 void revealAnswer()
               }}
             >
-              Показать решение
+              Show the solution
             </button>
           </div>
         )}
@@ -230,16 +225,16 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
         )}
 
         {result?.status === 'malformed' && <p className="text-warn">{result.message}</p>}
-        {result?.status === 'correct' && <p className="text-good text-lg">Верно{result.note ? ` · ${result.note}` : ''}</p>}
+        {result?.status === 'correct' && <p className="text-good text-lg">Correct{result.note ? ` · ${result.note}` : ''}</p>}
         {result?.status === 'incorrect' && (
           <div className="space-y-2">
             <p className="text-bad text-lg">
-              {revealed ? 'Решение показано' : `Не сходится${result.diagnosis ? ` · ${result.diagnosis}` : ''}`}
+              {revealed ? 'Solution shown' : `Not quite${result.diagnosis ? ` · ${result.diagnosis}` : ''}`}
             </p>
             <p className="text-muted">
-              Правильный ответ: <Tex tex={answerToLatex(problem.answer)} />
+              Correct answer: <Tex tex={answerToLatex(problem.answer)} />
             </p>
-            <p className="text-xs text-muted">Задача засчитана как нерешённая — похожая вернётся.</p>
+            <p className="text-xs text-muted">Counted as unsolved — a similar problem will come back.</p>
           </div>
         )}
 
@@ -249,19 +244,19 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
               <Solution problem={problem} />
             ) : (
               <button type="button" className="text-sm text-accent underline" onClick={() => setShowSolution(true)}>
-                Показать решение
+                Show the solution
               </button>
             )}
           </div>
         )}
       </div>
 
-      {events.includes('mastered') && <p className="text-good">Навык освоен ⚡</p>}
-      {events.includes('repair-failed') && <p className="text-warn">Возвращаемся к основе — починим и пойдём дальше</p>}
+      {events.includes('mastered') && <p className="text-good">Skill mastered ⚡</p>}
+      {events.includes('repair-failed') && <p className="text-warn">Back to the foundation — we fix it and move on</p>}
 
       {graded && (
         <button type="button" className={primary} onClick={() => advance()}>
-          Дальше
+          Next
         </button>
       )}
     </div>

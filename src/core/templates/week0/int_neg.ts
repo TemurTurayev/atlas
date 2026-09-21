@@ -15,7 +15,7 @@ const INPUT_HINT = 'Введи целое число, например -7'
 
 function problem(equation: string, value: number, solution: Problem['solution'], hints: readonly string[] = HINTS_BASIC): Problem {
   return {
-    statement: { en: `Evaluate: $${equation}$`, ru: `Вычисли: $${equation}$` },
+    statement: `Evaluate: $${equation}$`,
     answer: { kind: 'number', value: String(value) },
     solution,
     hints,
@@ -31,8 +31,8 @@ function tier1(rng: Rng): Problem {
   const value = a - product
   const equation = `${a} - ${paren(b)} \\cdot ${c}`
   return problem(equation, value, [
-    { ru: 'Сначала умножение:', tex: `${paren(b)} \\cdot ${c} = ${product}` },
-    { ru: `Вычесть $${product}$ — значит прибавить $${-product}$:`, tex: `${a} - \\left(${product}\\right) = ${a} + ${-product} = ${value}` },
+    { text: 'Сначала умножение:', tex: `${paren(b)} \\cdot ${c} = ${product}` },
+    { text: `Вычесть $${product}$ — значит прибавить $${-product}$:`, tex: `${a} - \\left(${product}\\right) = ${a} + ${-product} = ${value}` },
   ])
 }
 
@@ -48,9 +48,9 @@ function tier2(rng: Rng): Problem {
     equation,
     value,
     [
-      { ru: 'Сначала умножение:', tex: `${paren(p3)} \\cdot ${p4} = ${product}` },
-      { ru: `Вычесть отрицательное $${p2}$ — значит прибавить $${-p2}$:`, tex: `${p1} - \\left(${p2}\\right) = ${p1 - p2}` },
-      { ru: 'Складываем всё по порядку слева направо:', tex: `${p1 - p2} + \\left(${product}\\right) = ${value}` },
+      { text: 'Сначала умножение:', tex: `${paren(p3)} \\cdot ${p4} = ${product}` },
+      { text: `Вычесть отрицательное $${p2}$ — значит прибавить $${-p2}$:`, tex: `${p1} - \\left(${p2}\\right) = ${p1 - p2}` },
+      { text: 'Складываем всё по порядку слева направо:', tex: `${p1 - p2} + \\left(${product}\\right) = ${value}` },
     ],
     ['Умножение выполняется раньше сложения и вычитания.', 'Дальше складывай и вычитай слева направо, следя за знаком каждого слагаемого.'],
   )
@@ -69,9 +69,9 @@ function tier3(rng: Rng): Problem {
     equation,
     value,
     [
-      { ru: `Возводим $${a}$ в степень $${p}$ (${p % 2 === 0 ? 'чётная степень — результат положителен' : 'нечётная степень — знак сохраняется'}):`, tex: `${paren(a)}^{${p}} = ${ap}` },
-      { ru: `Возводим $${b}$ в степень $${q}$:`, tex: `${paren(b)}^{${q}} = ${bq}` },
-      { ru: 'Вычитаем:', tex: `${ap} - \\left(${bq}\\right) = ${value}` },
+      { text: `Возводим $${a}$ в степень $${p}$ (${p % 2 === 0 ? 'чётная степень — результат положителен' : 'нечётная степень — знак сохраняется'}):`, tex: `${paren(a)}^{${p}} = ${ap}` },
+      { text: `Возводим $${b}$ в степень $${q}$:`, tex: `${paren(b)}^{${q}} = ${bq}` },
+      { text: 'Вычитаем:', tex: `${ap} - \\left(${bq}\\right) = ${value}` },
     ],
     [
       'Чётная степень отрицательного числа даёт положительный результат, нечётная — отрицательный.',

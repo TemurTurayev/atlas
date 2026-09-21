@@ -9,9 +9,9 @@ const fake = (skillId: string): SkillTemplate => ({
   theory: 'x',
   expectedSeconds: { 1: 1, 2: 1, 3: 1 },
   generate: () => ({
-    statement: { en: 'e', ru: 'r' },
+    statement: 'e',
     answer: { kind: 'number', value: '1' },
-    solution: [{ ru: 's' }],
+    solution: [{ text: 's' }],
     hints: ['h'],
   }),
 })

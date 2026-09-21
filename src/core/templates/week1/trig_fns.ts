@@ -3,11 +3,11 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Единичная окружность (unit circle): для угла $\\theta$ точка на окружности — $(\\cos\\theta, \\sin\\theta)$; $\\tan\\theta=\\frac{\\sin\\theta}{\\cos\\theta}$.',
-  'Точные значения (exact values) для опорных углов: $\\sin\\frac{\\pi}{6}=\\frac12$, $\\sin\\frac{\\pi}{4}=\\frac{\\sqrt2}{2}$, $\\sin\\frac{\\pi}{3}=\\frac{\\sqrt3}{2}$; аналогично для косинуса в обратном порядке.',
-  'Формулы двойного угла (double-angle identities): $\\sin2\\alpha=2\\sin\\alpha\\cos\\alpha$; $\\cos2\\alpha=2\\cos^{2}\\alpha-1=1-2\\sin^{2}\\alpha$.',
-  'Решая $\\sin x=k$ или $\\cos x=k$ на $[0,2\\pi)$, сначала найди опорный угол (reference angle), затем определи, в каких четвертях функция имеет нужный знак.',
-  'Типичная ошибка: находить только один корень уравнения и забывать про второй, симметричный ему в соседней четверти.',
+  'Unit circle: for angle $\\theta$, the point on the circle is $(\\cos\\theta, \\sin\\theta)$; $\\tan\\theta=\\frac{\\sin\\theta}{\\cos\\theta}$.',
+  'Exact values for reference angles: $\\sin\\frac{\\pi}{6}=\\frac12$, $\\sin\\frac{\\pi}{4}=\\frac{\\sqrt2}{2}$, $\\sin\\frac{\\pi}{3}=\\frac{\\sqrt3}{2}$; the cosine values are the same list in reverse order.',
+  'Double-angle identities: $\\sin2\\alpha=2\\sin\\alpha\\cos\\alpha$; $\\cos2\\alpha=2\\cos^{2}\\alpha-1=1-2\\sin^{2}\\alpha$.',
+  'When solving $\\sin x=k$ or $\\cos x=k$ on $[0,2\\pi)$, first find the reference angle, then determine in which quadrants the function has the required sign.',
+  'Common mistake: finding only one root of the equation and forgetting the second one, symmetric to it in the neighboring quadrant.',
 ].join('\n')
 
 interface AngleEntry {
@@ -59,14 +59,14 @@ function tier1(rng: Rng): Problem {
   const value = entry[fn] as string
   const expr = `\\${fn}\\left(${angleLatex}\\right)`
   return {
-    statement: { en: `Find the exact value of $${expr}$.`, ru: `Найди точное значение $${expr}$.` },
+    statement: `Find the exact value of $${expr}$.`,
     answer: { kind: 'number', value },
-    solution: [{ ru: 'Точное значение по таблице единичной окружности:', tex: `${expr} = ${value}` }],
+    solution: [{ text: 'Exact value from the unit circle table:', tex: `${expr} = ${value}` }],
     hints: [
-      'Вспомни таблицу точных значений на единичной окружности для стандартных углов.',
-      'Определи четверть угла — от неё зависит знак значения.',
+      'Recall the table of exact values on the unit circle for standard angles.',
+      'Determine the quadrant of the angle — it determines the sign of the value.',
     ],
-    inputHint: 'Если ответ иррациональный, пиши через корень: sqrt(3)/2 (не десятичной дробью)',
+    inputHint: 'If the answer is irrational, write it with a radical: sqrt(3)/2 (not as a decimal)',
   }
 }
 
@@ -79,9 +79,9 @@ const EXACT_VALUE: Readonly<Record<Fn, Readonly<Record<number, string>>>> = {
 }
 
 const QUADRANT_TEXT: Readonly<Record<Fn, Readonly<Record<'pos' | 'neg', string>>>> = {
-  sin: { pos: 'синус положителен в I и II четвертях', neg: 'синус отрицателен в III и IV четвертях' },
-  cos: { pos: 'косинус положителен в I и IV четвертях', neg: 'косинус отрицателен во II и III четвертях' },
-  tan: { pos: 'тангенс положителен в I и III четвертях', neg: 'тангенс отрицателен во II и IV четвертях' },
+  sin: { pos: 'sine is positive in quadrants I and II', neg: 'sine is negative in quadrants III and IV' },
+  cos: { pos: 'cosine is positive in quadrants I and IV', neg: 'cosine is negative in quadrants II and III' },
+  tan: { pos: 'tangent is positive in quadrants I and III', neg: 'tangent is negative in quadrants II and IV' },
 }
 
 function equationSolutions(fn: Fn, alpha: Rational, positive: boolean): readonly [Rational, Rational] {
@@ -102,21 +102,18 @@ function tier2(rng: Rng): Problem {
   const sorted = toNumber(s1) <= toNumber(s2) ? [s1, s2] : [s2, s1]
   const values = sorted.map(piLatex)
   return {
-    statement: {
-      en: `Solve $\\${fn} x = ${kLatex}$ for $x \\in [0, 2\\pi)$.`,
-      ru: `Реши уравнение $\\${fn} x = ${kLatex}$ для $x \\in [0, 2\\pi)$.`,
-    },
+    statement: `Solve $\\${fn} x = ${kLatex}$ for $x \\in [0, 2\\pi)$.`,
     answer: { kind: 'numberSet', values },
     solution: [
-      { ru: 'Опорный угол (reference angle) — угол первой четверти с тем же по модулю значением функции:', tex: `${piLatex(alpha)}` },
-      { ru: `${QUADRANT_TEXT[fn][positive ? 'pos' : 'neg']}.` },
-      { ru: 'Решения на $[0,2\\pi)$:', tex: `x = ${values[0]}, \\ x = ${values[1]}` },
+      { text: 'Reference angle: the first-quadrant angle with the same absolute value of the function:', tex: `${piLatex(alpha)}` },
+      { text: `${QUADRANT_TEXT[fn][positive ? 'pos' : 'neg']}.` },
+      { text: 'Solutions on $[0,2\\pi)$:', tex: `x = ${values[0]}, \\ x = ${values[1]}` },
     ],
     hints: [
-      'Найди опорный угол — угол в первой четверти с тем же по модулю значением функции.',
-      'Определи, в каких четвертях функция имеет нужный знак, и построй решения через опорный угол.',
+      'Find the reference angle — the angle in the first quadrant with the same absolute value of the function.',
+      'Determine in which quadrants the function has the required sign, and build the solutions from the reference angle.',
     ],
-    inputHint: 'Собери оба решения через запятую, например pi/6, 5pi/6',
+    inputHint: 'List both solutions separated by a comma, e.g. pi/6, 5pi/6',
   }
 }
 
@@ -129,20 +126,17 @@ function doubleSin(rng: Rng): Problem {
   const doubledLatex = piLatex(rat(doubled.num, doubled.den))
   const expr = `2\\sin\\left(${a}\\right)\\cos\\left(${a}\\right)`
   return {
-    statement: {
-      en: `Simplify using a double-angle identity and give the exact value: $${expr}$.`,
-      ru: `Упрости с помощью формулы двойного угла и найди точное значение: $${expr}$.`,
-    },
+    statement: `Simplify using a double-angle identity and give the exact value: $${expr}$.`,
     answer: { kind: 'number', value: doubled.sin },
     solution: [
-      { ru: 'Применяем формулу синуса двойного угла:', tex: `${expr} = \\sin\\left(2\\cdot ${a}\\right) = \\sin\\left(${doubledLatex}\\right)` },
-      { ru: 'Смотрим точное значение по таблице:', tex: `\\sin\\left(${doubledLatex}\\right) = ${doubled.sin}` },
+      { text: 'Apply the double-angle formula for sine:', tex: `${expr} = \\sin\\left(2\\cdot ${a}\\right) = \\sin\\left(${doubledLatex}\\right)` },
+      { text: 'Look up the exact value in the table:', tex: `\\sin\\left(${doubledLatex}\\right) = ${doubled.sin}` },
     ],
     hints: [
-      'Узнай формулу: $2\\sin\\alpha\\cos\\alpha=\\sin2\\alpha$.',
-      'Сначала вычисли удвоенный угол, затем найди его точное значение по таблице.',
+      'Recall the formula: $2\\sin\\alpha\\cos\\alpha=\\sin2\\alpha$.',
+      'First compute the doubled angle, then find its exact value in the table.',
     ],
-    inputHint: 'Если ответ иррациональный, пиши через корень, например sqrt(3)/2',
+    inputHint: 'If the answer is irrational, write it with a radical, e.g. sqrt(3)/2',
   }
 }
 
@@ -156,20 +150,17 @@ function doubleCos(rng: Rng): Problem {
   const expr = useCosForm ? `2\\cos^{2}\\left(${a}\\right) - 1` : `1 - 2\\sin^{2}\\left(${a}\\right)`
   const identityTex = useCosForm ? `2\\cos^{2}\\left(${a}\\right) - 1 = \\cos\\left(2\\cdot ${a}\\right)` : `1 - 2\\sin^{2}\\left(${a}\\right) = \\cos\\left(2\\cdot ${a}\\right)`
   return {
-    statement: {
-      en: `Simplify using a double-angle identity and give the exact value: $${expr}$.`,
-      ru: `Упрости с помощью формулы двойного угла и найди точное значение: $${expr}$.`,
-    },
+    statement: `Simplify using a double-angle identity and give the exact value: $${expr}$.`,
     answer: { kind: 'number', value: doubled.cos },
     solution: [
-      { ru: `Используем, что $\\cos\\left(${a}\\right)=${entry.cos}$, $\\sin\\left(${a}\\right)=${entry.sin}$, и формулу косинуса двойного угла:`, tex: identityTex },
-      { ru: 'Смотрим точное значение по таблице:', tex: `\\cos\\left(${doubledLatex}\\right) = ${doubled.cos}` },
+      { text: `Use $\\cos\\left(${a}\\right)=${entry.cos}$, $\\sin\\left(${a}\\right)=${entry.sin}$, and the double-angle formula for cosine:`, tex: identityTex },
+      { text: 'Look up the exact value in the table:', tex: `\\cos\\left(${doubledLatex}\\right) = ${doubled.cos}` },
     ],
     hints: [
-      'Узнай формулу: $\\cos2\\alpha=2\\cos^{2}\\alpha-1=1-2\\sin^{2}\\alpha$.',
-      'Сначала вычисли удвоенный угол, затем найди его точное значение по таблице.',
+      'Recall the formula: $\\cos2\\alpha=2\\cos^{2}\\alpha-1=1-2\\sin^{2}\\alpha$.',
+      'First compute the doubled angle, then find its exact value in the table.',
     ],
-    inputHint: 'Если ответ иррациональный, пиши через корень, например -1/2',
+    inputHint: 'If the answer is irrational, write it with a radical, e.g. -1/2',
   }
 }
 

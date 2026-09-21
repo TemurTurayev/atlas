@@ -4,11 +4,11 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Функция непрерывна (continuous) в точке $x=c$, если $\\lim_{x\\to c}f(x)$ существует и равен $f(c)$ — график не разрывается.',
-  'Для кусочной функции непрерывность в точке стыка означает, что обе формулы дают одно и то же значение в этой точке.',
-  'Точки разрыва рациональной функции — это нули знаменателя. Если множитель, дающий ноль, сокращается с числителем — разрыв устранимый (removable), иначе — неустранимый (полюс).',
-  'Устранимый разрыв (removable discontinuity) можно «убрать», доопределив функцию в этой точке значением предела.',
-  'Типичная ошибка: подставлять точку стыка только в одну из формул кусочной функции и забывать приравнять её ко второй.',
+  'A function is continuous at a point $x=c$ if $\\lim_{x\\to c}f(x)$ exists and equals $f(c)$ — the graph has no break.',
+  'For a piecewise function, continuity at a junction point means both formulas give the same value there.',
+  'The discontinuities of a rational function are the zeros of the denominator. If the factor causing the zero cancels with the numerator, the discontinuity is removable; otherwise it is non-removable (a pole).',
+  'A removable discontinuity can be "removed" by defining the function at that point to equal the limit.',
+  'Common mistake: substituting the junction point into only one formula of a piecewise function and forgetting to set it equal to the other.',
 ].join('\n')
 
 function tier1(rng: Rng): Problem {
@@ -20,17 +20,14 @@ function tier1(rng: Rng): Problem {
   const rightLatex = linear(m, k)
   const statementCore = `f(x)=\\begin{cases}x^{2}+a, & x\\le ${c} \\\\ ${rightLatex}, & x> ${c}\\end{cases}`
   return {
-    statement: {
-      en: `The function $${statementCore}$ is continuous everywhere. Find $a$.`,
-      ru: `Функция $${statementCore}$ непрерывна всюду. Найди $a$.`,
-    },
+    statement: `The function $${statementCore}$ is continuous everywhere. Find $a$.`,
     answer: { kind: 'number', value: String(a) },
     solution: [
-      { ru: 'В точке стыка обе формулы должны давать одно и то же значение.' },
-      { ru: `Правая часть в точке $x=${c}$ равна:`, tex: `${m}\\cdot ${c} + ${k} = ${rhsAtC}` },
-      { ru: 'Приравниваем левую часть к этому числу и находим $a$:', tex: `${c}^{2}+a = ${rhsAtC} \\ \\Rightarrow\\ a = ${rhsAtC} - ${c * c} = ${a}` },
+      { text: 'At the junction point, both formulas must give the same value.' },
+      { text: `The right-hand piece at $x=${c}$ equals:`, tex: `${m}\\cdot ${c} + ${k} = ${rhsAtC}` },
+      { text: 'Set the left-hand piece equal to this number and solve for $a$:', tex: `${c}^{2}+a = ${rhsAtC} \\ \\Rightarrow\\ a = ${rhsAtC} - ${c * c} = ${a}` },
     ],
-    hints: ['В точке стыка кусков значения обеих формул должны совпадать.', `Подставь $x=${c}$ в обе части и приравняй их.`],
+    hints: ['At the junction point, the values of both pieces must match.', `Substitute $x=${c}$ into both pieces and set them equal.`],
   }
 }
 
@@ -41,16 +38,13 @@ function tier2(rng: Rng): Problem {
   const numLatex = polyToLatex(numerator)
   const denLatex = linear(1, -c)
   return {
-    statement: {
-      en: `For which $x$ is $f(x)=\\dfrac{${numLatex}}{${denLatex}}$ discontinuous?`,
-      ru: `При каком $x$ функция $f(x)=\\dfrac{${numLatex}}{${denLatex}}$ разрывна?`,
-    },
+    statement: `For which $x$ is $f(x)=\\dfrac{${numLatex}}{${denLatex}}$ discontinuous?`,
     answer: { kind: 'number', value: String(c) },
     solution: [
-      { ru: 'Функция не определена там, где знаменатель равен нулю:', tex: `${denLatex} = 0 \\ \\Rightarrow\\ x = ${c}` },
-      { ru: `Числитель в этой точке равен $${polyEval(numerator, c)}\\ne 0$ — множитель не сокращается, значит это неустранимый разрыв.` },
+      { text: 'The function is undefined where the denominator equals zero:', tex: `${denLatex} = 0 \\ \\Rightarrow\\ x = ${c}` },
+      { text: `The numerator at this point equals $${polyEval(numerator, c)}\\ne 0$ — the factor does not cancel, so this is a non-removable discontinuity.` },
     ],
-    hints: ['Область определения дроби исключает нули знаменателя.', 'Приравняй знаменатель к нулю и реши уравнение.'],
+    hints: ['The domain of the fraction excludes the zeros of the denominator.', 'Set the denominator equal to zero and solve.'],
   }
 }
 
@@ -62,21 +56,18 @@ function removableHole(rng: Rng): Problem {
   const denLatex = linear(1, -p)
   const value = p - q
   return {
-    statement: {
-      en: `The function $f(x)=\\dfrac{${numLatex}}{${denLatex}}$ is undefined at $x=${p}$. What value should be assigned to $f(${p})$ to make $f$ continuous there?`,
-      ru: `Функция $f(x)=\\dfrac{${numLatex}}{${denLatex}}$ не определена в точке $x=${p}$. Какое значение нужно присвоить $f(${p})$, чтобы функция стала непрерывной в этой точке?`,
-    },
+    statement: `The function $f(x)=\\dfrac{${numLatex}}{${denLatex}}$ is undefined at $x=${p}$. What value should be assigned to $f(${p})$ to make $f$ continuous there?`,
     answer: { kind: 'number', value: String(value) },
     solution: [
       {
-        ru: 'Раскладываем числитель на множители — один из них совпадает со знаменателем:',
+        text: 'Factor the numerator — one factor matches the denominator:',
         tex: `\\frac{${numLatex}}{${denLatex}} = \\frac{\\left(x-${p}\\right)\\left(x-${q}\\right)}{x-${p}} = x-${q} \\quad (x\\ne ${p})`,
       },
-      { ru: `Подставляем точку разрыва в сокращённое выражение:`, tex: `f(${p}) = ${p}-${q} = ${value}` },
+      { text: `Substitute the discontinuity point into the simplified expression:`, tex: `f(${p}) = ${p}-${q} = ${value}` },
     ],
     hints: [
-      'Разложи числитель на множители — один из них должен совпасть со знаменателем.',
-      'Сократи общий множитель и подставь точку разрыва в оставшееся выражение.',
+      'Factor the numerator — one factor should match the denominator.',
+      'Cancel the common factor and substitute the discontinuity point into the remaining expression.',
     ],
   }
 }
@@ -91,21 +82,18 @@ function twoConditions(rng: Rng): Problem {
   const b = k * (p - 1)
   const statementCore = `f(x)=\\begin{cases}ax-b, & x<${p} \\\\ ${m}, & ${p}\\le x<${q} \\\\ bx+a, & x\\ge ${q}\\end{cases}`
   return {
-    statement: {
-      en: `Suppose $f$ is continuous everywhere: $${statementCore}$. Find $a$.`,
-      ru: `Пусть $f$ непрерывна всюду: $${statementCore}$. Найди $a$.`,
-    },
+    statement: `Suppose $f$ is continuous everywhere: $${statementCore}$. Find $a$.`,
     answer: { kind: 'number', value: String(a) },
     solution: [
-      { ru: `Стыковка в точке $x=${p}$ даёт первое уравнение:`, tex: `a\\cdot ${p} - b = ${m}` },
-      { ru: `Стыковка в точке $x=${q}$ даёт второе уравнение:`, tex: `b\\cdot ${q} + a = ${m}` },
-      { ru: 'Решаем систему двух уравнений с двумя неизвестными:', tex: `a = ${a}, \\quad b = ${b}` },
+      { text: `Matching at $x=${p}$ gives the first equation:`, tex: `a\\cdot ${p} - b = ${m}` },
+      { text: `Matching at $x=${q}$ gives the second equation:`, tex: `b\\cdot ${q} + a = ${m}` },
+      { text: 'Solve the system of two equations in two unknowns:', tex: `a = ${a}, \\quad b = ${b}` },
     ],
     hints: [
-      'Условие непрерывности в каждой точке стыка даёт одно уравнение относительно $a$ и $b$.',
-      'Запиши оба уравнения и реши систему подстановкой или сложением.',
+      'The continuity condition at each junction point gives one equation in $a$ and $b$.',
+      'Write both equations and solve the system by substitution or elimination.',
     ],
-    inputHint: 'Введи значение a (не b)',
+    inputHint: 'Enter the value of a (not b)',
   }
 }
 

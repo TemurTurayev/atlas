@@ -7,7 +7,7 @@ function Steps({ steps }: { steps: readonly SolutionStep[] }) {
     <ol className="space-y-3">
       {steps.map((step, i) => (
         <li key={i} className="border-l-2 border-line pl-4">
-          <RichText text={step.ru} />
+          <RichText text={step.text} />
           {step.tex && <Tex tex={step.tex} display />}
         </li>
       ))}
@@ -29,7 +29,7 @@ export function Solution({ problem }: { problem: Problem }) {
           </div>
         ) : (
           <button type="button" className="text-sm text-accent underline" onClick={() => setShowAlternative(true)}>
-            Другой способ
+            Another method
           </button>
         ))}
     </div>

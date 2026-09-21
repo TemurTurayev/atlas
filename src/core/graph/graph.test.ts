@@ -7,7 +7,7 @@ const node = (id: string, week: number, prereqs: string[] = []): SkillNode => ({
   id,
   week,
   prereqs,
-  title: { en: id, ru: id },
+  title: id,
   highYield: false,
 })
 
@@ -16,8 +16,8 @@ describe('skill graph data', () => {
     expect(NODES).toHaveLength(125)
     expect(new Set(NODES.map((n) => n.id)).size).toBe(125)
     NODES.forEach((n) => {
-      expect(n.title.en.length).toBeGreaterThan(2)
-      expect(n.title.ru.length).toBeGreaterThan(2)
+      expect(n.title.length).toBeGreaterThan(2)
+      expect(n.title.length).toBeGreaterThan(2)
     })
   })
 

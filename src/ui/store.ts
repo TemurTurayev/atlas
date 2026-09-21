@@ -62,7 +62,7 @@ async function handIn(
         correct: graded[i],
         hintsUsed: 0,
         seconds,
-        answer: answers[i] ? describeAnswer(answers[i]) : '(пропущено)',
+        answer: answers[i] ? describeAnswer(answers[i]) : '(left blank)',
         at,
       }),
     ),
@@ -207,7 +207,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
       correct: false,
       hintsUsed,
       seconds: Math.round(seconds),
-      answer: '(показано решение)',
+      answer: '(solution shown)',
       at: Date.now(),
     })
     play('incorrect', world.settings.sound)

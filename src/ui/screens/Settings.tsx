@@ -18,7 +18,7 @@ export function Settings({ go }: { go: (screen: 'home') => void }) {
     link.download = `atlas-backup-${new Date().toISOString().slice(0, 10)}.json`
     link.click()
     URL.revokeObjectURL(url)
-    setMessage('Резервная копия сохранена')
+    setMessage('Backup saved')
   }
 
   const upload = async (file: File | undefined) => {
@@ -26,24 +26,24 @@ export function Settings({ go }: { go: (screen: 'home') => void }) {
     try {
       await importAll(db, await file.text())
       await replaceWorld(await loadWorld(db, new Date()))
-      setMessage('Прогресс восстановлен')
+      setMessage('Progress restored')
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Не удалось прочитать файл')
+      setMessage(error instanceof Error ? error.message : 'Could not read the file')
     }
   }
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl">Настройки</h1>
+        <h1 className="text-xl">Settings</h1>
         <button type="button" className="text-sm text-muted underline" onClick={() => go('home')}>
-          Назад
+          Back
         </button>
       </div>
 
       <div className={row}>
         <label className="block text-sm text-muted" htmlFor="exam-date">
-          Дата экзамена
+          Exam date
         </label>
         <input
           id="exam-date"
@@ -52,12 +52,12 @@ export function Settings({ go }: { go: (screen: 'home') => void }) {
           onChange={(e) => updateSettings({ examDate: e.target.value })}
           className="bg-raised border border-line rounded-lg px-3 py-2"
         />
-        <p className="text-xs text-muted">Чем ближе экзамен, тем чаще приложение возвращает пройденное.</p>
+        <p className="text-xs text-muted">The closer the exam, the more often the app brings old material back.</p>
       </div>
 
       <div className={row}>
         <label className="block text-sm text-muted" htmlFor="goal">
-          Цель в день (XP ≈ минуты)
+          Daily goal (XP ≈ minutes)
         </label>
         <input
           id="goal"
@@ -73,22 +73,22 @@ export function Settings({ go }: { go: (screen: 'home') => void }) {
       <div className={row}>
         <label className="flex items-center gap-3">
           <input type="checkbox" checked={world.settings.sound} onChange={(e) => updateSettings({ sound: e.target.checked })} />
-          <span>Звуки</span>
+          <span>Sounds</span>
         </label>
         <label className="flex items-center gap-3">
           <input type="checkbox" checked={world.settings.paperNudge} onChange={(e) => updateSettings({ paperNudge: e.target.checked })} />
-          <span>Напоминать решать многошаговые задачи на бумаге</span>
+          <span>Remind me to work multi-step problems on paper</span>
         </label>
       </div>
 
       <div className={row}>
-        <p className="text-sm text-muted">Прогресс хранится только на этом устройстве. Раз в неделю делай копию.</p>
+        <p className="text-sm text-muted">Progress is stored on this device only. Make a backup once a week.</p>
         <div className="flex flex-wrap gap-3">
           <button type="button" className={button} onClick={download}>
-            Сохранить копию
+            Save a backup
           </button>
           <label className={`${button} cursor-pointer`}>
-            Восстановить из копии
+            Restore from a backup
             <input type="file" accept="application/json" className="hidden" onChange={(e) => upload(e.target.files?.[0])} />
           </label>
         </div>

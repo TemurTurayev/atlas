@@ -40,18 +40,18 @@ function nonInjectiveCandidates(rng: Rng, count: number): readonly { readonly la
   })
 }
 
-function buildChoice(rng: Rng, en: string, ru: string, distractorCount: number, correct: { readonly label: string; readonly explanation: string }): Problem {
+function buildChoice(rng: Rng, statement: string, distractorCount: number, correct: { readonly label: string; readonly explanation: string }): Problem {
   const wrong = nonInjectiveCandidates(rng, distractorCount)
   const options: readonly ChoiceOption[] = rng.shuffle([
     { id: 'correct', label: correct.label },
     ...wrong.map((w, i) => ({ id: `wrong-${i}`, label: w.label })),
   ])
   return {
-    statement: { en, ru },
+    statement,
     answer: { kind: 'choice', options, correctId: 'correct' },
     solution: [
-      { ru: `Верный ответ: ${correct.explanation}.` },
-      { ru: `Остальные варианты не инъективны: ${wrong.map((w) => w.explanation).join('; ')}.` },
+      { text: `Верный ответ: ${correct.explanation}.` },
+      { text: `Остальные варианты не инъективны: ${wrong.map((w) => w.explanation).join('; ')}.` },
     ],
     hints: HINTS,
   }
@@ -60,23 +60,20 @@ function buildChoice(rng: Rng, en: string, ru: string, distractorCount: number, 
 function tier1(rng: Rng): Problem {
   const correct = injectiveCandidate(rng)
   const en = 'Which of the following functions is injective (one-to-one) on $\\mathbb{R}$?'
-  const ru = 'Какая из следующих функций инъективна (взаимно однозначна) на $\\mathbb{R}$?'
-  return buildChoice(rng, en, ru, 3, correct)
+  return buildChoice(rng, en, 3, correct)
 }
 
 function tier2(rng: Rng): Problem {
   const correct = injectiveCandidate(rng)
   const formula = correct.label.replace(/\$/g, '')
   const en = `Is $f(x) = ${formula}$ injective on $\\mathbb{R}$? Choose the option below that matches this function.`
-  const ru = `Инъективна ли функция $f(x) = ${formula}$ на $\\mathbb{R}$? Выбери вариант, который ей соответствует.`
-  return buildChoice(rng, en, ru, 3, correct)
+  return buildChoice(rng, en, 3, correct)
 }
 
 function tier3(rng: Rng): Problem {
   const correct = injectiveCandidate(rng)
   const reciprocalShift = rng.int(-4, 4)
   const question = 'Which of the following functions is a bijection $\\mathbb{R} \\to \\mathbb{R}$?'
-  const questionRu = 'Какая из следующих функций является биекцией $\\mathbb{R} \\to \\mathbb{R}$?'
   const wrong = nonInjectiveCandidates(rng, 2)
   const reciprocal = {
     label: `$\\dfrac{1}{${linear(1, -reciprocalShift)}}$`,
@@ -89,11 +86,11 @@ function tier3(rng: Rng): Problem {
     { id: 'wrong-2', label: reciprocal.label },
   ])
   return {
-    statement: { en: question, ru: questionRu },
+    statement: question,
     answer: { kind: 'choice', options, correctId: 'correct' },
     solution: [
-      { ru: `Верный ответ: ${correct.explanation}, а на всём $\\mathbb{R}$ такая функция ещё и сюръективна.` },
-      { ru: `Остальные не подходят: ${wrong.map((w) => w.explanation).join('; ')}; ${reciprocal.explanation}.` },
+      { text: `Верный ответ: ${correct.explanation}, а на всём $\\mathbb{R}$ такая функция ещё и сюръективна.` },
+      { text: `Остальные не подходят: ${wrong.map((w) => w.explanation).join('; ')}; ${reciprocal.explanation}.` },
     ],
     hints: [...HINTS, 'Проверь, что функция вообще определена для каждого $x \\in \\mathbb{R}$ — иначе это не функция $\\mathbb{R} \\to \\mathbb{R}$.'],
   }

@@ -4,18 +4,18 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Алгебраическая дробь (algebraic fraction) — отношение многочленов $\\dfrac{P(x)}{Q(x)}$.',
-  'Область определения (domain) исключает значения $x$, при которых знаменатель равен нулю.',
-  'Чтобы сократить дробь, разложи числитель и знаменатель на множители и убери общие.',
-  'Чтобы сложить дроби с разными знаменателями, приведи их к общему знаменателю (common denominator).',
-  'Типичная ошибка: сокращать отдельные слагаемые вместо общих множителей.',
+  'Algebraic fraction: a ratio of polynomials $\\dfrac{P(x)}{Q(x)}$.',
+  'The domain excludes values of $x$ that make the denominator zero.',
+  'To simplify a fraction, factor the numerator and denominator and cancel the common factors.',
+  'To add fractions with different denominators, rewrite them over a common denominator.',
+  'Common mistake: canceling individual terms instead of common factors.',
 ].join('\n')
 
 const HINTS = [
-  'Разложи числитель и знаменатель на множители, прежде чем сокращать.',
-  'При сложении/вычитании дробей приведи их к общему знаменателю.',
+  'Factor the numerator and denominator before canceling.',
+  'When adding or subtracting fractions, rewrite them over a common denominator.',
 ]
-const INPUT_HINT = 'Введи дробь через /, например (x-1)/x'
+const INPUT_HINT = 'Enter the fraction using /, e.g. (x-1)/x'
 const DOMAIN = { x: [1.5, 4] as const }
 
 function tier1(rng: Rng): Problem {
@@ -23,11 +23,11 @@ function tier1(rng: Rng): Problem {
   const numerator: Poly = [-(b * b), 0, 1]
   const statement = `\\frac{${polyToLatex(numerator)}}{${linear(1, b)}}`
   return {
-    statement: { en: `Simplify: $${statement}$`, ru: `Упрости: $${statement}$` },
+    statement: `Simplify: $${statement}$`,
     answer: { kind: 'expression', value: linear(1, -b), variables: ['x'], domain: DOMAIN },
     solution: [
-      { ru: 'Разложим числитель как разность квадратов:', tex: `${polyToLatex(numerator)} = ${linear(1, -b)}\\left(${linear(1, b)}\\right)` },
-      { ru: 'Сократим общий множитель:', tex: `\\frac{${linear(1, -b)}\\left(${linear(1, b)}\\right)}{${linear(1, b)}} = ${linear(1, -b)}` },
+      { text: 'Factor the numerator as a difference of squares:', tex: `${polyToLatex(numerator)} = ${linear(1, -b)}\\left(${linear(1, b)}\\right)` },
+      { text: 'Cancel the common factor:', tex: `\\frac{${linear(1, -b)}\\left(${linear(1, b)}\\right)}{${linear(1, b)}} = ${linear(1, -b)}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -41,11 +41,11 @@ function tier2(rng: Rng): Problem {
   const statement = `\\frac{${polyToLatex(numerator)}}{${polyToLatex(denominator)}}`
   const answer = `\\frac{${linear(1, -b)}}{x}`
   return {
-    statement: { en: `Simplify: $${statement}$`, ru: `Упрости: $${statement}$` },
+    statement: `Simplify: $${statement}$`,
     answer: { kind: 'expression', value: answer, variables: ['x'], domain: DOMAIN },
     solution: [
-      { ru: 'Разложим числитель и знаменатель на множители:', tex: `\\frac{\\left(${linear(1, -b)}\\right)\\left(${linear(1, b)}\\right)}{x\\left(${linear(1, b)}\\right)}` },
-      { ru: 'Сократим общий множитель:', tex: answer },
+      { text: 'Factor the numerator and denominator:', tex: `\\frac{\\left(${linear(1, -b)}\\right)\\left(${linear(1, b)}\\right)}{x\\left(${linear(1, b)}\\right)}` },
+      { text: 'Cancel the common factor:', tex: answer },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -62,12 +62,12 @@ function tier3(rng: Rng): Problem {
   const numerator: Poly = sum ? [lo + hi, 2] : [hi - lo]
   const value = `\\frac{${polyToLatex(numerator)}}{${polyToLatex(denominator)}}`
   return {
-    statement: { en: `Combine into a single fraction: $${statement}$`, ru: `Объедини в одну дробь: $${statement}$` },
+    statement: `Combine into a single fraction: $${statement}$`,
     answer: { kind: 'expression', value, variables: ['x'], domain: DOMAIN },
     solution: [
-      { ru: 'Общий знаменатель — произведение обоих:', tex: `${linear(1, lo)}\\cdot ${linear(1, hi)} = ${polyToLatex(denominator)}` },
+      { text: 'The common denominator is the product of both:', tex: `${linear(1, lo)}\\cdot ${linear(1, hi)} = ${polyToLatex(denominator)}` },
       {
-        ru: sum ? 'Приведём каждую дробь к общему знаменателю и сложим числители:' : 'Приведём каждую дробь к общему знаменателю и вычтем числители:',
+        text: sum ? 'Rewrite each fraction over the common denominator and add the numerators:' : 'Rewrite each fraction over the common denominator and subtract the numerators:',
         tex: value,
       },
     ],

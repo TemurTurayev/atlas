@@ -3,18 +3,18 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Алгебраическое выражение (algebraic expression) — запись с переменными, числами и действиями.',
-  'Подобные слагаемые (like terms) — одна и та же переменная в одной степени; их коэффициенты складываются.',
-  'Раскрытие скобок (expanding): $a(b+c) = ab + ac$ — знак перед скобкой умножается на каждое слагаемое.',
-  'Подстановка (substitution) — заменить буквы числами и вычислить по порядку действий.',
-  'Типичные ошибки: сложить коэффициенты разных переменных; не умножить второе слагаемое в скобке.',
+  'Algebraic expression: a combination of variables, numbers, and operations.',
+  'Like terms have the same variable raised to the same power; add their coefficients.',
+  'Expanding: $a(b+c) = ab + ac$ — the sign in front of the bracket multiplies every term inside.',
+  'Substitution: replace the letters with numbers and evaluate using the order of operations.',
+  'Common mistakes: adding coefficients of different variables; forgetting to multiply the second term inside the bracket.',
 ].join('\n')
 
 const HINTS = [
-  'Сгруппируй слагаемые с одинаковой переменной.',
-  'Раскрой скобки: умножь число перед скобкой на каждое слагаемое внутри.',
+  'Group the terms with the same variable.',
+  'Expand the brackets: multiply the number in front by each term inside.',
 ]
-const INPUT_HINT = 'Введи выражение через + и -, например 3x+7y'
+const INPUT_HINT = 'Enter the expression using + and -, e.g. 3x+7y'
 
 function tier1(rng: Rng): Problem {
   const cx1 = rng.intExcept(-9, 9, [0])
@@ -26,15 +26,12 @@ function tier1(rng: Rng): Problem {
   const statement = joinTerms([`${coefPrefix(cx1)}x`, `${coefPrefix(cy1)}y`, `${coefPrefix(cx2)}x`, `${coefPrefix(cy2)}y`])
   const answer = joinTerms([`${coefPrefix(X)}x`, `${coefPrefix(Y)}y`])
   return {
-    statement: {
-      en: `Simplify by collecting like terms: $${statement}$`,
-      ru: `Упрости, приведя подобные слагаемые: $${statement}$`,
-    },
+    statement: `Simplify by collecting like terms: $${statement}$`,
     answer: { kind: 'expression', value: answer, variables: ['x', 'y'], form: 'expanded' },
     solution: [
-      { ru: `Слагаемые с $x$: $${cx1}x ${cx2 >= 0 ? '+' : '-'} ${Math.abs(cx2)}x = ${X}x$` },
-      { ru: `Слагаемые с $y$: $${cy1}y ${cy2 >= 0 ? '+' : '-'} ${Math.abs(cy2)}y = ${Y}y$` },
-      { ru: 'Итог:', tex: answer },
+      { text: `Terms with $x$: $${cx1}x ${cx2 >= 0 ? '+' : '-'} ${Math.abs(cx2)}x = ${X}x$` },
+      { text: `Terms with $y$: $${cy1}y ${cy2 >= 0 ? '+' : '-'} ${Math.abs(cy2)}y = ${Y}y$` },
+      { text: 'Result:', tex: answer },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -58,18 +55,15 @@ function tier2(rng: Rng): Problem {
   const statement = joinTerms([term1, term2])
   const answer = joinTerms([`${coefPrefix(X)}x`, String(K)])
   return {
-    statement: {
-      en: `Expand and collect like terms: $${statement}$`,
-      ru: `Раскрой скобки и приведи подобные слагаемые: $${statement}$`,
-    },
+    statement: `Expand and collect like terms: $${statement}$`,
     answer: { kind: 'expression', value: answer, variables: ['x'], form: 'expanded' },
     solution: [
-      { ru: 'Раскроем первую скобку:', tex: `${p}\\left(${joinTerms([`${coefPrefix(a)}x`, String(b)])}\\right) = ${joinTerms([`${coefPrefix(p * a)}x`, String(p * b)])}` },
+      { text: 'Expand the first bracket:', tex: `${p}\\left(${joinTerms([`${coefPrefix(a)}x`, String(b)])}\\right) = ${joinTerms([`${coefPrefix(p * a)}x`, String(p * b)])}` },
       {
-        ru: sign === 1 ? 'Раскроем вторую скобку:' : 'Раскроем вторую скобку (не забудем сменить оба знака внутри):',
+        text: sign === 1 ? 'Expand the second bracket:' : 'Expand the second bracket (remember to flip both signs inside):',
         tex: `${sign === 1 ? '' : '-'}${q}\\left(${joinTerms([`${coefPrefix(c)}x`, String(d)])}\\right) = ${joinTerms([`${coefPrefix(sign * q * c)}x`, String(sign * q * d)])}`,
       },
-      { ru: 'Сложим подобные слагаемые:', tex: answer },
+      { text: 'Add the like terms:', tex: answer },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -87,17 +81,14 @@ function bmiProblem(rng: Rng): Problem {
   const bmi = Math.round((w / (hm * hm)) * 10) / 10
   const bmiStr = bmi.toFixed(1)
   return {
-    statement: {
-      en: `A patient weighs $${w}$ kg and is $${h}$ cm tall. Compute the BMI (body mass index) $= \\dfrac{\\text{weight, kg}}{\\text{height, m}^{2}}$, rounded to $1$ decimal place.`,
-      ru: `Пациент весит $${w}$ кг при росте $${h}$ см. Вычисли индекс массы тела (BMI) $= \\dfrac{\\text{вес, кг}}{\\text{рост, м}^{2}}$, округли до $1$ знака после запятой.`,
-    },
+    statement: `A patient weighs $${w}$ kg and is $${h}$ cm tall. Compute the BMI (body mass index) $= \\dfrac{\\text{weight, kg}}{\\text{height, m}^{2}}$, rounded to $1$ decimal place.`,
     answer: { kind: 'number', value: bmiStr },
     solution: [
-      { ru: `Переведём рост в метры: $${h}$ см $= ${hm}$ м.` },
-      { ru: 'Подставим в формулу и вычислим:', tex: `BMI = \\frac{${w}}{${hm}^{2}} \\approx ${bmiStr}` },
+      { text: `Convert the height to meters: $${h}$ cm $= ${hm}$ m.` },
+      { text: 'Substitute into the formula and compute:', tex: `BMI = \\frac{${w}}{${hm}^{2}} \\approx ${bmiStr}` },
     ],
-    hints: ['Переведи рост из сантиметров в метры перед возведением в квадрат.', 'BMI = вес (кг) / рост² (в метрах).'],
-    inputHint: 'Введи число с точкой, например 22.5',
+    hints: ['Convert the height from centimeters to meters before squaring.', 'BMI = weight (kg) / height² (in meters).'],
+    inputHint: 'Enter a number with a decimal point, e.g. 22.5',
   }
 }
 
@@ -110,17 +101,14 @@ function kinematicsProblem(rng: Rng): Problem {
   const term2Tenths = 5 * a * t * t
   const sStr = decimalString(term1Tenths + term2Tenths)
   return {
-    statement: {
-      en: `A body moves with initial velocity $v_0 = ${v0Str}$ m/s and constant acceleration $a = ${a}$ m/s$^{2}$. Find the distance $s = v_0 t + \\dfrac{a t^{2}}{2}$ after $t = ${t}$ s.`,
-      ru: `Тело движется с начальной скоростью $v_0 = ${v0Str}$ м/с и постоянным ускорением $a = ${a}$ м/с$^{2}$. Найди путь $s = v_0 t + \\dfrac{a t^{2}}{2}$ через $t = ${t}$ с.`,
-    },
+    statement: `A body moves with initial velocity $v_0 = ${v0Str}$ m/s and constant acceleration $a = ${a}$ m/s$^{2}$. Find the distance $s = v_0 t + \\dfrac{a t^{2}}{2}$ after $t = ${t}$ s.`,
     answer: { kind: 'number', value: sStr },
     solution: [
-      { ru: 'Подставим значения в формулу:', tex: `s = ${v0Str}\\cdot ${t} + \\frac{${a}\\cdot ${t}^{2}}{2}` },
-      { ru: 'Вычислим каждое слагаемое и сложим:', tex: `s = ${decimalString(term1Tenths)} + ${decimalString(term2Tenths)} = ${sStr}` },
+      { text: 'Substitute the values into the formula:', tex: `s = ${v0Str}\\cdot ${t} + \\frac{${a}\\cdot ${t}^{2}}{2}` },
+      { text: 'Compute each term and add them:', tex: `s = ${decimalString(term1Tenths)} + ${decimalString(term2Tenths)} = ${sStr}` },
     ],
-    hints: ['Подставь числа вместо $v_0$, $a$, $t$ по очереди.', 'Не забудь разделить $at^2$ на $2$.'],
-    inputHint: 'Введи число (можно с точкой)',
+    hints: ['Substitute the numbers for $v_0$, $a$, $t$ one at a time.', 'Do not forget to divide $at^2$ by $2$.'],
+    inputHint: 'Enter a number (a decimal point is allowed)',
   }
 }
 

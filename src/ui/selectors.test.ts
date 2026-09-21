@@ -44,8 +44,9 @@ describe('format', () => {
   })
   it('formats percents and plurals', () => {
     expect(formatPercent(0.384)).toBe('38%')
-    expect(plural(1, 'навык', 'навыка', 'навыков')).toBe('навык')
-    expect(plural(3, 'навык', 'навыка', 'навыков')).toBe('навыка')
-    expect(plural(11, 'навык', 'навыка', 'навыков')).toBe('навыков')
+    expect(plural(1, 'skill')).toBe('skill')
+    expect(plural(3, 'skill')).toBe('skills')
+    expect(plural(0, 'skill')).toBe('skills')
+    expect(plural(2, 'clean answer')).toBe('clean answers')
   })
 })

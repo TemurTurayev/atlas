@@ -7,10 +7,10 @@ import { evaluateItem, mustEvaluate, uniqueValues } from './values'
 type Tuple = readonly number[]
 
 export function setDiagnosis(refCount: number, userCount: number, missing: number, extra: number): string | undefined {
-  if (refCount === 0) return 'Здесь решений нет — ответ ∅'
-  if (userCount === 0) return 'Решения есть'
-  if (extra === 0) return `Найдено ${refCount - missing} из ${refCount}`
-  if (missing === 0) return 'Есть лишние значения'
+  if (refCount === 0) return 'There are no solutions here — the answer is ∅'
+  if (userCount === 0) return 'There are solutions'
+  if (extra === 0) return `Found ${refCount - missing} of ${refCount}`
+  if (missing === 0) return 'Some extra values are in there'
   return undefined
 }
 
@@ -24,7 +24,7 @@ export function checkNumberSet(reference: readonly string[], latex: string): Che
   const values: number[] = []
   for (const item of userItems(input)) {
     const v = evaluateItem(item)
-    if (v === null) return malformed(`Не получилось вычислить «${item}»`)
+    if (v === null) return malformed(`Could not evaluate “${item}”`)
     values.push(v)
   }
   const user = uniqueValues(values)
@@ -57,7 +57,7 @@ export function checkFiniteSet(reference: readonly string[], latex: string): Che
   const user: Tuple[] = []
   for (const item of userItems(input)) {
     const element = parseElement(item)
-    if (!element) return malformed(`Не получилось разобрать элемент «${item}»`)
+    if (!element) return malformed(`Could not read the element “${item}”`)
     if (!user.some((u) => sameTuple(u, element))) user.push(element)
   }
   const ref = reference.map((r) => {

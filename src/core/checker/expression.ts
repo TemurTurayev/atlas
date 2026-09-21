@@ -68,7 +68,7 @@ export function checkExpression(spec: ExpressionSpec, latex: string): CheckResul
   const user = parseLatex(stripAssignment(input))
   if (!user) return malformed(MSG.unparsable)
   const foreign = unknowns(user).filter((v) => !spec.variables.includes(v))
-  if (foreign.length > 0) return malformed(`Используй только переменные: ${spec.variables.join(', ')}`)
+  if (foreign.length > 0) return malformed(`Use only these variables: ${spec.variables.join(', ')}`)
   const reference = parseLatex(spec.value)
   if (!reference) throw new Error(`Invalid reference expression: ${spec.value}`)
   const verdict = compareOnSamples(reference, user, spec)

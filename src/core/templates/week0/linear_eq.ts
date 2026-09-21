@@ -20,7 +20,7 @@ const INPUT_HINT = 'Введи число. Дробь набирается че�
 
 function problem(equation: string, x: number, solution: Problem['solution']): Problem {
   return {
-    statement: { en: `Solve for $x$: $${equation}$`, ru: `Реши уравнение: $${equation}$` },
+    statement: `Solve for $x$: $${equation}$`,
     answer: { kind: 'number', value: String(x) },
     solution,
     hints: HINTS,
@@ -34,8 +34,8 @@ function tier1(rng: Rng): Problem {
   const b = rng.intExcept(-15, 15, [0])
   const c = a * x + b
   return problem(`${linear(a, b)} = ${c}`, x, [
-    { ru: 'Перенесём свободный член вправо, сменив знак:', tex: `${a}x = ${c} ${b > 0 ? '-' : '+'} ${Math.abs(b)} = ${c - b}` },
-    { ru: `Разделим обе части на $${a}$:`, tex: `x = \\frac{${c - b}}{${a}} = ${x}` },
+    { text: 'Перенесём свободный член вправо, сменив знак:', tex: `${a}x = ${c} ${b > 0 ? '-' : '+'} ${Math.abs(b)} = ${c - b}` },
+    { text: `Разделим обе части на $${a}$:`, tex: `x = \\frac{${c - b}}{${a}} = ${x}` },
   ])
 }
 
@@ -51,9 +51,9 @@ function tier2(rng: Rng): Problem {
   const k = a - r
   const constant = s - a * p - q
   return problem(`${lhs} = ${rhs}`, x, [
-    { ru: 'Раскроем скобки:', tex: `${linear(a, a * p + q)} = ${rhs}` },
-    { ru: 'Слагаемые с $x$ — влево, числа — вправо:', tex: `${linear(k, 0)} = ${constant}` },
-    { ru: 'Разделим на коэффициент при $x$:', tex: Math.abs(k) === 1 ? `x = ${x}` : `x = \\frac{${constant}}{${k}} = ${x}` },
+    { text: 'Раскроем скобки:', tex: `${linear(a, a * p + q)} = ${rhs}` },
+    { text: 'Слагаемые с $x$ — влево, числа — вправо:', tex: `${linear(k, 0)} = ${constant}` },
+    { text: 'Разделим на коэффициент при $x$:', tex: Math.abs(k) === 1 ? `x = ${x}` : `x = \\frac{${constant}}{${k}} = ${x}` },
   ])
 }
 
@@ -72,11 +72,11 @@ function tier3(rng: Rng): Problem {
   const equation = `\\frac{${linear(1, p)}}{${m}} - \\frac{${linear(1, -q)}}{${n}} = ${ratToLatex(k)}`
   return problem(equation, x, [
     {
-      ru: `Умножим обе части на общий знаменатель $${multiple}$:`,
+      text: `Умножим обе части на общий знаменатель $${multiple}$:`,
       tex: `${coefPrefix(cm)}\\left(${linear(1, p)}\\right) - ${coefPrefix(cn)}\\left(${linear(1, -q)}\\right) = ${right}`,
     },
-    { ru: 'Раскроем скобки — минус перед второй скобкой меняет оба знака:', tex: `${linear(coefX, constant)} = ${right}` },
-    { ru: 'Перенесём число и разделим:', tex: `${linear(coefX, 0)} = ${right - constant} \\Rightarrow x = ${x}` },
+    { text: 'Раскроем скобки — минус перед второй скобкой меняет оба знака:', tex: `${linear(coefX, constant)} = ${right}` },
+    { text: 'Перенесём число и разделим:', tex: `${linear(coefX, 0)} = ${right - constant} \\Rightarrow x = ${x}` },
   ])
 }
 

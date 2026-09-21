@@ -46,7 +46,7 @@ export function stripSetBraces(latex: string): string {
   return s
 }
 
-const EMPTY_SET_SPELLINGS: ReadonlySet<string> = new Set(['\\emptyset', '\\varnothing', '∅', '\\{\\}', '{}', 'none', 'нет', 'empty'])
+const EMPTY_SET_SPELLINGS: ReadonlySet<string> = new Set(['\\emptyset', '\\varnothing', '∅', '\\{\\}', '{}', 'none', 'empty'])
 
 export function isEmptySetLatex(latex: string): boolean {
   const s = normalizeLatex(latex)

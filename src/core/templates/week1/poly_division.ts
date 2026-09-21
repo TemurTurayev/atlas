@@ -3,21 +3,21 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SolutionStep, SkillTemplate } from '../types'
 
 const theory = [
-  'Деление многочленов столбиком (polynomial long division) — как деление чисел столбиком, только с одночленами.',
-  'На каждом шаге: дели старший член остатка на старший член делителя, умножай результат на весь делитель и вычитай из остатка.',
-  'Останавливаемся, когда степень остатка меньше степени делителя: $P(x) = D(x)\\cdot Q(x) + R(x)$, $\\deg R < \\deg D$.',
-  'Если $R(x) = 0$ — деление нацело (exact division), $Q(x)$ и есть искомое частное.',
-  'Если $R(x) \\ne 0$, дробь раскладывается как $\\frac{P(x)}{D(x)} = Q(x) + \\frac{R(x)}{D(x)}$, где $Q(x)$ — многочленная часть (polynomial part).',
-  'Типичные ошибки: забыть знак при вычитании; пропустить одночлен с нулевым коэффициентом.',
+  'Polynomial long division works like long division of numbers, but with monomials.',
+  'At each step: divide the leading term of the remainder by the leading term of the divisor, multiply the result by the whole divisor, and subtract from the remainder.',
+  'Stop when the degree of the remainder is less than the degree of the divisor: $P(x) = D(x)\\cdot Q(x) + R(x)$, $\\deg R < \\deg D$.',
+  'If $R(x) = 0$, the division is exact, and $Q(x)$ is the quotient you want.',
+  'If $R(x) \\ne 0$, the fraction splits as $\\frac{P(x)}{D(x)} = Q(x) + \\frac{R(x)}{D(x)}$, where $Q(x)$ is the polynomial part.',
+  'Common mistakes: forgetting the sign when subtracting; skipping a monomial with a zero coefficient.',
 ].join('\n')
 
 const HINTS = [
-  'Раздели старший член делимого на старший член делителя — это первый член частного.',
-  'Умножь этот член на весь делитель и вычти результат из делимого; повтори для нового остатка.',
-  'Останови деление, как только степень остатка станет меньше степени делителя.',
+  'Divide the leading term of the dividend by the leading term of the divisor — this gives the first term of the quotient.',
+  'Multiply this term by the whole divisor and subtract the result from the dividend; repeat for the new remainder.',
+  'Stop dividing as soon as the degree of the remainder is less than the degree of the divisor.',
 ]
-const INPUT_HINT_EXACT = 'Введи частное как многочлен, например x+2 или x^2-3x+1'
-const INPUT_HINT_PART = 'Введи только многочленную часть S(x), без остатка, например x+2'
+const INPUT_HINT_EXACT = 'Enter the quotient as a polynomial, e.g. x+2 or x^2-3x+1'
+const INPUT_HINT_PART = 'Enter only the polynomial part S(x), without the remainder, e.g. x+2'
 
 interface DivisionResult {
   readonly quotient: Poly
@@ -51,7 +51,7 @@ function longDivide(dividend: Poly, divisor: Poly): DivisionResult {
     const subtractPoly = polyMul(term, dvsr)
     const next = trim(polyAdd(rem, polyScale(subtractPoly, -1)))
     steps.push({
-      ru: `Делим старшие члены: $${polyToLatex(monomial(rem[remDeg], remDeg))} \\div ${polyToLatex(monomial(lead, divDeg))} = ${polyToLatex(term)}$. Умножаем на делитель и вычитаем:`,
+      text: `Divide the leading terms: $${polyToLatex(monomial(rem[remDeg], remDeg))} \\div ${polyToLatex(monomial(lead, divDeg))} = ${polyToLatex(term)}$. Multiply by the divisor and subtract:`,
       tex: `${polyToLatex(rem)} - ${polyToLatex(term)}\\left(${polyToLatex(dvsr)}\\right) = ${polyToLatex(next)}`,
     })
     rem = next
@@ -66,24 +66,18 @@ function build(dividend: Poly, divisor: Poly): Problem {
   const quotientLatex = polyToLatex(result.quotient)
   const exact = isZeroPoly(result.remainder)
   const statement = exact
-    ? {
-        en: `Divide $${p}$ by $${d}$ and give the quotient.`,
-        ru: `Раздели $${p}$ на $${d}$ и найди частное.`,
-      }
-    : {
-        en: `Divide $${p}$ by $${d}$. Write $\\frac{${p}}{${d}} = S(x) + \\frac{R(x)}{${d}}$ and give the polynomial part $S(x)$.`,
-        ru: `Раздели $${p}$ на $${d}$. Запиши $\\frac{${p}}{${d}} = S(x) + \\frac{R(x)}{${d}}$ и найди многочленную часть $S(x)$.`,
-      }
+    ? `Divide $${p}$ by $${d}$ and give the quotient.`
+    : `Divide $${p}$ by $${d}$. Write $\\frac{${p}}{${d}} = S(x) + \\frac{R(x)}{${d}}$ and give the polynomial part $S(x)$.`
   const finalStep: SolutionStep = exact
-    ? { ru: 'Остаток равен нулю — деление выполняется нацело. Частное:', tex: `Q(x) = ${quotientLatex}` }
+    ? { text: 'The remainder is zero — the division is exact. Quotient:', tex: `Q(x) = ${quotientLatex}` }
     : {
-        ru: 'Степень остатка меньше степени делителя — дальше делить нельзя. Многочленная часть:',
+        text: 'The degree of the remainder is less than the degree of the divisor — division stops here. Polynomial part:',
         tex: `\\frac{${p}}{${d}} = \\underbrace{${quotientLatex}}_{S(x)} + \\frac{${polyToLatex(result.remainder)}}{${d}}`,
       }
   return {
     statement,
     answer: { kind: 'expression', value: quotientLatex, variables: ['x'] },
-    solution: [{ ru: 'Делим столбиком, начиная со старших членов:' }, ...result.steps, finalStep],
+    solution: [{ text: 'Divide by long division, starting from the leading terms:' }, ...result.steps, finalStep],
     hints: HINTS,
     inputHint: exact ? INPUT_HINT_EXACT : INPUT_HINT_PART,
   }

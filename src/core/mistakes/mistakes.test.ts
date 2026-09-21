@@ -65,7 +65,7 @@ describe('the log', () => {
   })
 })
 
-const node = (id: string, prereqs: string[] = []): SkillNode => ({ id, week: 0, prereqs, title: { en: id, ru: id }, highYield: false })
+const node = (id: string, prereqs: string[] = []): SkillNode => ({ id, week: 0, prereqs, title: id, highYield: false })
 const GRAPH = buildGraph([node('a'), node('b', ['a'])])
 const NOW = new Date(2026, 8, 21, 10, 0)
 const ctxAt = (now = NOW, seed = 5): EngineCtx => ({

@@ -68,7 +68,7 @@ describe('repo', () => {
   })
 
   it('rejects files that are not Atlas backups', async () => {
-    await expect(importAll(db, '{"app":"other"}')).rejects.toThrow(/резервной копии/)
+    await expect(importAll(db, '{"app":"other"}')).rejects.toThrow(/not an Atlas backup/)
     await expect(importAll(db, 'not json')).rejects.toThrow()
   })
 })

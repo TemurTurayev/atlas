@@ -2,11 +2,11 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Свойства логарифмов (log laws): $\\log_b(xy)=\\log_b x+\\log_b y$; $\\log_b\\frac{x}{y}=\\log_b x-\\log_b y$; $\\log_b(x^{k})=k\\log_b x$.',
-  'Логарифм $\\log_b N$ отвечает на вопрос: в какую степень нужно возвести основание $b$, чтобы получить $N$. Запись $\\log$ без индекса обычно означает основание $10$; $\\ln$ — натуральный логарифм, основание $e$.',
-  'Смена основания (change of base): $\\log_b N=\\dfrac{\\ln N}{\\ln b}$.',
-  'Логарифм определён только для положительных чисел под знаком — учитывай область допустимых значений (ОДЗ).',
-  'Типичная ошибка: путать $\\log(x+y)$ с $\\log x+\\log y$ — складывать можно только сами логарифмы, а не их аргументы под знаком суммы.',
+  'Properties of logarithms (log laws): $\\log_b(xy)=\\log_b x+\\log_b y$; $\\log_b\\frac{x}{y}=\\log_b x-\\log_b y$; $\\log_b(x^{k})=k\\log_b x$.',
+  'The logarithm $\\log_b N$ answers the question: to what power must the base $b$ be raised to get $N$? Writing $\\log$ without a base usually means base $10$; $\\ln$ is the natural logarithm, base $e$.',
+  'Change of base: $\\log_b N=\\dfrac{\\ln N}{\\ln b}$.',
+  'A logarithm is defined only for a positive argument — keep track of the domain of validity.',
+  'Common mistake: confusing $\\log(x+y)$ with $\\log x+\\log y$ — only the logarithms themselves can be added, not their arguments inside the sum.',
 ].join('\n')
 
 type Base = 2 | 3 | 5 | 10 | 'e'
@@ -25,15 +25,15 @@ function tier1(rng: Rng): Problem {
   const N = b ** m
   const expr = logLatex(b, String(N))
   return {
-    statement: { en: `Compute: $${expr}$`, ru: `Вычисли: $${expr}$` },
+    statement: `Compute: $${expr}$`,
     answer: { kind: 'number', value: String(m) },
     solution: [
-      { ru: 'Подбираем показатель степени:', tex: `${b}^{${m}} = ${N}` },
-      { ru: 'Значит:', tex: `${expr} = ${m}` },
+      { text: 'Find the exponent:', tex: `${b}^{${m}} = ${N}` },
+      { text: 'So:', tex: `${expr} = ${m}` },
     ],
     hints: [
-      'Логарифм $\\log_b N$ — это показатель степени, в которую нужно возвести $b$, чтобы получить $N$.',
-      'Перебирай степени основания, пока не получишь число под логарифмом.',
+      'The logarithm $\\log_b N$ is the exponent to which $b$ must be raised to get $N$.',
+      'Try powers of the base until you get the number under the logarithm.',
     ],
   }
 }
@@ -50,20 +50,17 @@ function tier2(rng: Rng): Problem {
   const ratioExpr = logLatex(base, `\\frac{${term1}}{${term2}}`)
   const answerValue = logLatex(base, resultTerm)
   return {
-    statement: {
-      en: `Combine into a single logarithm and simplify: $${first} - ${second}$.`,
-      ru: `Объедини в один логарифм и упрости: $${first} - ${second}$.`,
-    },
+    statement: `Combine into a single logarithm and simplify: $${first} - ${second}$.`,
     answer: { kind: 'expression', value: answerValue, variables: ['a', 'b'], domain: { a: [1.5, 4], b: [1.5, 4] } },
     solution: [
-      { ru: 'Разность логарифмов одного основания — это логарифм частного:', tex: `${first} - ${second} = ${ratioExpr}` },
-      { ru: 'Сокращаем дробь под знаком логарифма:', tex: `${ratioExpr} = ${answerValue}` },
+      { text: 'The difference of logarithms with the same base is the logarithm of the quotient:', tex: `${first} - ${second} = ${ratioExpr}` },
+      { text: 'Simplify the fraction inside the logarithm:', tex: `${ratioExpr} = ${answerValue}` },
     ],
     hints: [
-      'Используй $\\log_b x-\\log_b y=\\log_b\\frac{x}{y}$.',
-      `Сократи дробь $\\frac{${term1}}{${term2}}$, вычитая показатели степеней при $a$ и при $b$.`,
+      'Use $\\log_b x-\\log_b y=\\log_b\\frac{x}{y}$.',
+      `Simplify the fraction $\\frac{${term1}}{${term2}}$ by subtracting the exponents of $a$ and $b$.`,
     ],
-    inputHint: 'Ответ — логарифм в переменных a, b, например \\log_2(ab)',
+    inputHint: 'The answer is a logarithm in variables a, b, e.g. \\log_2(ab)',
   }
 }
 
@@ -76,20 +73,17 @@ function tier3(rng: Rng): Problem {
   const poweredTerm = `${varPow('x', m)}${varPow('y', n)}`
   const answerValue = logLatex(base, poweredTerm)
   return {
-    statement: {
-      en: `Write as a single logarithm: $${leftTerm} + ${rightTerm}$.`,
-      ru: `Запиши как один логарифм: $${leftTerm} + ${rightTerm}$.`,
-    },
+    statement: `Write as a single logarithm: $${leftTerm} + ${rightTerm}$.`,
     answer: { kind: 'expression', value: answerValue, variables: ['x', 'y'], domain: { x: [1.5, 4], y: [1.5, 4] } },
     solution: [
-      { ru: 'Коэффициент перед логарифмом переносим в показатель степени под логарифмом:', tex: `${leftTerm} = ${logLatex(base, varPow('x', m))}, \\quad ${rightTerm} = ${logLatex(base, varPow('y', n))}` },
-      { ru: 'Логарифмы одного основания складываются в логарифм произведения:', tex: `${logLatex(base, varPow('x', m))} + ${logLatex(base, varPow('y', n))} = ${answerValue}` },
+      { text: 'Move the coefficient in front of the logarithm into the exponent inside the logarithm:', tex: `${leftTerm} = ${logLatex(base, varPow('x', m))}, \\quad ${rightTerm} = ${logLatex(base, varPow('y', n))}` },
+      { text: 'Logarithms with the same base add up to the logarithm of the product:', tex: `${logLatex(base, varPow('x', m))} + ${logLatex(base, varPow('y', n))} = ${answerValue}` },
     ],
     hints: [
-      'Используй $k\\log_b x=\\log_b(x^{k})$, чтобы занести коэффициент под знак логарифма.',
-      'Используй $\\log_b x+\\log_b y=\\log_b(xy)$, чтобы объединить в один логарифм.',
+      'Use $k\\log_b x=\\log_b(x^{k})$ to bring the coefficient inside the logarithm.',
+      'Use $\\log_b x+\\log_b y=\\log_b(xy)$ to combine into a single logarithm.',
     ],
-    inputHint: 'Ответ — логарифм в переменных x, y, например \\log_3(x^2y)',
+    inputHint: 'The answer is a logarithm in variables x, y, e.g. \\log_3(x^2y)',
   }
 }
 

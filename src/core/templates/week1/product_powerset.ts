@@ -3,11 +3,11 @@ import type { Rng } from '../../random/rng'
 import type { ChoiceOption, Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Булеан (power set) $P(A)$ — множество всех подмножеств $A$, включая $\\emptyset$ и само $A$.',
-  'Если $|A| = n$, то $|P(A)| = 2^n$ — каждый элемент либо входит в подмножество, либо нет.',
-  'Декартово произведение (Cartesian product) $A \\times B$ — все пары $(a, b)$, $a \\in A$, $b \\in B$; $|A \\times B| = |A| \\cdot |B|$.',
-  'Элементы $P(A)$ — это множества, а не сами элементы $A$: например $\\{1\\} \\in P(\\{1,2\\})$, но $1 \\notin P(\\{1,2\\})$.',
-  'Типичная ошибка: путать элемент $a \\in A$ с одноэлементным подмножеством $\\{a\\} \\in P(A)$.',
+  'The power set $P(A)$ is the set of all subsets of $A$, including $\\emptyset$ and $A$ itself.',
+  'If $|A| = n$, then $|P(A)| = 2^n$ — each element either belongs to a subset or does not.',
+  'The Cartesian product $A \\times B$ is the set of all pairs $(a, b)$, $a \\in A$, $b \\in B$; $|A \\times B| = |A| \\cdot |B|$.',
+  'Elements of $P(A)$ are sets, not elements of $A$ themselves: for example $\\{1\\} \\in P(\\{1,2\\})$, but $1 \\notin P(\\{1,2\\})$.',
+  'Common mistake: confusing an element $a \\in A$ with the singleton subset $\\{a\\} \\in P(A)$.',
 ].join('\n')
 
 function randomDistinctPair(rng: Rng, max: number): readonly [number, number] {
@@ -19,17 +19,14 @@ function randomDistinctPair(rng: Rng, max: number): readonly [number, number] {
 function tier1(rng: Rng): Problem {
   const n = rng.int(2, 6)
   return {
-    statement: {
-      en: `Let $|A| = ${n}$. Find $|P(A)|$, the number of subsets of $A$.`,
-      ru: `Пусть $|A| = ${n}$. Найди $|P(A)|$ — число подмножеств множества $A$.`,
-    },
+    statement: `Let $|A| = ${n}$. Find $|P(A)|$, the number of subsets of $A$.`,
     answer: { kind: 'number', value: String(2 ** n) },
     solution: [
-      { ru: `Каждый из $${n}$ элементов независимо либо входит в подмножество, либо нет: $2^{${n}}$ вариантов.` },
-      { ru: 'Значит:', tex: `|P(A)| = 2^{${n}} = ${2 ** n}` },
+      { text: `Each of the $${n}$ elements independently either belongs to a subset or does not: $2^{${n}}$ possibilities.` },
+      { text: 'So:', tex: `|P(A)| = 2^{${n}} = ${2 ** n}` },
     ],
-    hints: ['Для каждого элемента есть 2 варианта: взять его или нет.', `Перемножь $${n}$ двоек: $2^{${n}}$.`],
-    inputHint: 'Введи целое число',
+    hints: ['For each element there are 2 choices: include it or not.', `Multiply $${n}$ twos together: $2^{${n}}$.`],
+    inputHint: 'Enter an integer',
   }
 }
 
@@ -53,16 +50,13 @@ function tier2(rng: Rng): Problem {
   const kept = rng.shuffle(correctLabels).slice(0, 3)
   const options = rng.shuffle([wrong, ...kept])
   return {
-    statement: {
-      en: `Let $A = ${setText}$. Which of the following is NOT an element of $P(A)$?`,
-      ru: `Пусть $A = ${setText}$. Какой из вариантов НЕ является элементом $P(A)$?`,
-    },
+    statement: `Let $A = ${setText}$. Which of the following is NOT an element of $P(A)$?`,
     answer: { kind: 'choice', options, correctId: wrong.id },
     solution: [
-      { ru: 'Элементы $P(A)$ — все подмножества $A$:', tex: `P(A) = \\{\\emptyset, \\{${a}\\}, \\{${b}\\}, \\{${a}, ${b}\\}\\}` },
-      { ru: 'Элементами булеана являются множества, а не отдельные числа или упорядоченные пары.' },
+      { text: 'The elements of $P(A)$ are all the subsets of $A$:', tex: `P(A) = \\{\\emptyset, \\{${a}\\}, \\{${b}\\}, \\{${a}, ${b}\\}\\}` },
+      { text: 'Elements of a power set are sets, not individual numbers or ordered pairs.' },
     ],
-    hints: ['Выпиши все 4 подмножества $A$: пустое, два одноэлементных, само $A$.', 'Элемент булеана всегда записывается в фигурных скобках — это множество.'],
+    hints: ['List all 4 subsets of $A$: the empty set, two singletons, and $A$ itself.', 'An element of a power set is always written in curly braces — it is a set.'],
   }
 }
 
@@ -79,21 +73,18 @@ function tier3(rng: Rng): Problem {
   const answerValue = askPowerset ? 2 ** product : product
   const solution = askPowerset
     ? [
-        { ru: `Сначала размер произведения: $|A \\times B| = ${setA.length} \\cdot ${setB.length} = ${product}$.` },
-        { ru: 'Булеан множества из $n$ элементов имеет $2^n$ элементов:', tex: `|P(A \\times B)| = 2^{${product}} = ${answerValue}` },
+        { text: `First, the size of the product: $|A \\times B| = ${setA.length} \\cdot ${setB.length} = ${product}$.` },
+        { text: 'A power set of a set with $n$ elements has $2^n$ elements:', tex: `|P(A \\times B)| = 2^{${product}} = ${answerValue}` },
       ]
-    : [{ ru: `Каждый элемент $A$ образует пару с каждым элементом $B$:`, tex: `|A \\times B| = |A| \\cdot |B| = ${setA.length} \\cdot ${setB.length} = ${product}` }]
+    : [{ text: `Each element of $A$ pairs with each element of $B$:`, tex: `|A \\times B| = |A| \\cdot |B| = ${setA.length} \\cdot ${setB.length} = ${product}` }]
   return {
-    statement: {
-      en: `Let $A = ${setLatex(setA)}$ and $B = ${setLatex(setB)}$. Find $|${target}|$.`,
-      ru: `Пусть $A = ${setLatex(setA)}$ и $B = ${setLatex(setB)}$. Найди $|${target}|$.`,
-    },
+    statement: `Let $A = ${setLatex(setA)}$ and $B = ${setLatex(setB)}$. Find $|${target}|$.`,
     answer: { kind: 'number', value: String(answerValue) },
     solution,
     hints: askPowerset
-      ? ['Сначала найди $|A \\times B|$ — это $|A| \\cdot |B|$.', 'Затем возведи 2 в степень, равную этому числу.']
-      : ['Пар в декартовом произведении столько, сколько $|A| \\cdot |B|$.'],
-    inputHint: 'Введи целое число',
+      ? ['First find $|A \\times B|$ — that is $|A| \\cdot |B|$.', 'Then raise 2 to the power equal to that number.']
+      : ['The number of pairs in the Cartesian product equals $|A| \\cdot |B|$.'],
+    inputHint: 'Enter an integer',
   }
 }
 

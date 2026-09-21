@@ -6,7 +6,7 @@ import { generateProblem } from '../../core/templates/registry'
 import { AnswerInput, emptyAnswer } from '../components/AnswerInput'
 import { ExamClock, useExamClock } from '../components/ExamClock'
 import { RichText } from '../components/Tex'
-import { plural } from '../format'
+import { countOf } from '../format'
 import { masteredCount } from '../selectors'
 import { useAtlas } from '../store'
 import { ExamResults } from './ExamResults'
@@ -19,28 +19,28 @@ function Intro({ ready, missing, onStart, go }: { ready: boolean; missing: numbe
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl">Пробный экзамен</h1>
+        <h1 className="text-xl">Mock exam</h1>
         <button type="button" className="text-sm text-muted underline" onClick={() => go('home')}>
-          Назад
+          Back
         </button>
       </div>
       <div className={card}>
         <p className="leading-relaxed">
-          Всё освоенное вперемешку, до {EXAM_MINUTES} минут, таймер на виду. Подсказок нет, решения не показываются — работа проверяется
-          целиком, когда ты её сдашь.
+          Everything you have mastered, mixed, up to {EXAM_MINUTES} minutes, clock in plain sight. No hints, no solutions — the paper is
+          marked as a whole once you hand it in.
         </p>
         <p className="text-muted text-sm">
-          Считай на бумаге, в поле вводи только ответ. Между задачами можно ходить вперёд и назад, пропущенные засчитываются как неверные.
+          Work on paper and type only the answer. You can move back and forth between problems; anything left blank counts as wrong.
         </p>
-        <p className="text-muted text-sm">Порог — 45 %, как на настоящем экзамене. Результат идёт в прогноз и в расписание повторений.</p>
+        <p className="text-muted text-sm">The pass mark is 45 %, as on the real exam. The result feeds the forecast and your review schedule.</p>
       </div>
       {ready ? (
         <button type="button" className={primary} onClick={onStart}>
-          Начать экзамен
+          Start the exam
         </button>
       ) : (
         <p className="text-warn text-sm">
-          Откроется, когда освоишь {EXAM_MIN_SKILLS} навыков — осталось {missing} {plural(missing, 'навык', 'навыка', 'навыков')}.
+          Opens once you have mastered {EXAM_MIN_SKILLS} skills — {countOf(missing, 'skill')} to go.
         </p>
       )}
     </div>
@@ -49,7 +49,6 @@ function Intro({ ready, missing, onStart, go }: { ready: boolean; missing: numbe
 
 function Paper({ exam, remainingMs, go }: { exam: ExamState; remainingMs: number; go: (s: 'home') => void }) {
   const { examAnswers, setExamAnswer, goExamQuestion, handInExam } = useAtlas()
-  const [showRu, setShowRu] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const problems = useMemo(() => exam.questions.map((q) => generateProblem(q.skillId, q.seed, q.tier)), [exam.questions])
 
@@ -59,7 +58,6 @@ function Paper({ exam, remainingMs, go }: { exam: ExamState; remainingMs: number
   const blank = exam.questions.length - answered
 
   const move = (to: number) => {
-    setShowRu(false)
     setConfirming(false)
     void goExamQuestion(to)
   }
@@ -75,10 +73,10 @@ function Paper({ exam, remainingMs, go }: { exam: ExamState; remainingMs: number
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
       <header className="flex items-center justify-between gap-3">
-        <span className="text-xs px-2 py-1 rounded-lg bg-raised border border-line text-muted">Экзамен</span>
+        <span className="text-xs px-2 py-1 rounded-lg bg-raised border border-line text-muted">Exam</span>
         <ExamClock remainingMs={remainingMs} />
         <button type="button" className="text-sm text-muted underline" onClick={() => go('home')}>
-          Выйти
+          Leave
         </button>
       </header>
 
@@ -88,7 +86,7 @@ function Paper({ exam, remainingMs, go }: { exam: ExamState; remainingMs: number
             key={i}
             type="button"
             onClick={() => move(i)}
-            aria-label={`задача ${i + 1}`}
+            aria-label={`problem ${i + 1}`}
             className={`h-8 w-8 rounded-lg border text-xs ${
               i === index
                 ? 'border-accent text-accent'
@@ -105,14 +103,11 @@ function Paper({ exam, remainingMs, go }: { exam: ExamState; remainingMs: number
       <div className={card}>
         <div className="flex items-start justify-between gap-3">
           <p className="text-sm text-muted">
-            Задача {index + 1} из {exam.questions.length}
+            Problem {index + 1} of {exam.questions.length}
           </p>
-          <button type="button" className="text-xs text-muted border border-line rounded-lg px-2 py-1" onClick={() => setShowRu(!showRu)}>
-            {showRu ? 'EN' : 'RU'}
-          </button>
         </div>
         <p className="text-lg leading-relaxed">
-          <RichText text={showRu ? problem.statement.ru : problem.statement.en} />
+          <RichText text={problem.statement} />
         </p>
         <AnswerInput
           spec={problem.answer}
@@ -126,24 +121,24 @@ function Paper({ exam, remainingMs, go }: { exam: ExamState; remainingMs: number
 
       <div className="flex items-center justify-between gap-3">
         <button type="button" className={ghost} disabled={index === 0} onClick={() => move(index - 1)}>
-          Назад
+          Back
         </button>
         <span className="text-sm text-muted">
-          отвечено {answered} из {exam.questions.length}
+          {answered} of {exam.questions.length} answered
         </span>
         <button type="button" className={ghost} disabled={index >= exam.questions.length - 1} onClick={() => move(index + 1)}>
-          Дальше
+          Next
         </button>
       </div>
 
       <div className={card}>
         {confirming && blank > 0 && (
           <p className="text-warn text-sm">
-            {blank} {plural(blank, 'задача', 'задачи', 'задач')} без ответа — они пойдут в минус. Нажми ещё раз, чтобы сдать.
+            {countOf(blank, 'problem')} still blank — they count as wrong. Press again to hand the paper in.
           </p>
         )}
         <button type="button" className={primary} onClick={handIn}>
-          Сдать работу
+          Hand it in
         </button>
       </div>
     </div>

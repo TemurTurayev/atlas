@@ -9,7 +9,7 @@ import { continueRun, openApp, startRun } from './start'
 import { submitAttempt, xpFor, type AttemptInput } from './submit'
 import { initialWorld, type EngineCtx, type Task, type World } from './world'
 
-const node = (id: string, prereqs: string[] = []): SkillNode => ({ id, week: 0, prereqs, title: { en: id, ru: id }, highYield: false })
+const node = (id: string, prereqs: string[] = []): SkillNode => ({ id, week: 0, prereqs, title: id, highYield: false })
 // ladder: a, b, g, c, d, e, f
 const GRAPH = buildGraph([node('a'), node('b', ['a']), node('c', ['b']), node('d', ['c']), node('e', ['d']), node('f', ['e']), node('g', ['a'])])
 const NOW = new Date(2026, 8, 21, 10, 0)

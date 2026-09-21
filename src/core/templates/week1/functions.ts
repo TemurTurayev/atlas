@@ -20,11 +20,11 @@ function tier1(rng: Rng): Problem {
   const a = rng.int(-6, 6)
   const f = `\\sqrt{${linear(1, -a)}}`
   return {
-    statement: { en: `Find the domain of $f(x) = ${f}$.`, ru: `Найди область определения $f(x) = ${f}$.` },
+    statement: `Find the domain of $f(x) = ${f}$.`,
     answer: { kind: 'interval', parts: [part(String(a), null, true, false)] },
     solution: [
-      { ru: `Подкоренное выражение не может быть отрицательным:`, tex: `${linear(1, -a)} \\ge 0` },
-      { ru: 'Решаем неравенство:', tex: `x \\ge ${a}` },
+      { text: `Подкоренное выражение не может быть отрицательным:`, tex: `${linear(1, -a)} \\ge 0` },
+      { text: 'Решаем неравенство:', tex: `x \\ge ${a}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -36,15 +36,15 @@ function tier2(rng: Rng): Problem {
   const b = rng.int(a + 1, a + 7)
   const f = `\\dfrac{\\sqrt{${linear(1, -a)}}}{${linear(1, -b)}}`
   return {
-    statement: { en: `Find the domain of $f(x) = ${f}$.`, ru: `Найди область определения $f(x) = ${f}$.` },
+    statement: `Find the domain of $f(x) = ${f}$.`,
     answer: {
       kind: 'interval',
       parts: [part(String(a), String(b), true, false), part(String(b), null, false, false)],
     },
     solution: [
-      { ru: 'Подкоренное выражение неотрицательно:', tex: `x \\ge ${a}` },
-      { ru: 'Знаменатель не равен нулю:', tex: `x \\ne ${b}` },
-      { ru: 'Объединяем оба условия (точка $b$ выколота):', tex: `[${a}, ${b}) \\cup (${b}, \\infty)` },
+      { text: 'Подкоренное выражение неотрицательно:', tex: `x \\ge ${a}` },
+      { text: 'Знаменатель не равен нулю:', tex: `x \\ne ${b}` },
+      { text: 'Объединяем оба условия (точка $b$ выколота):', tex: `[${a}, ${b}) \\cup (${b}, \\infty)` },
     ],
     hints: [...HINTS, `Не забудь, что $x = ${b}$ обнуляет знаменатель, даже если корень там определён.`],
     inputHint: INPUT_HINT,
@@ -55,11 +55,11 @@ function logDomain(rng: Rng): Problem {
   const a = rng.int(-6, 6)
   const f = `\\ln\\left(${linear(1, -a)}\\right)`
   return {
-    statement: { en: `Find the domain of $f(x) = ${f}$.`, ru: `Найди область определения $f(x) = ${f}$.` },
+    statement: `Find the domain of $f(x) = ${f}$.`,
     answer: { kind: 'interval', parts: [part(String(a), null, false, false)] },
     solution: [
-      { ru: 'Аргумент логарифма должен быть строго положительным:', tex: `${linear(1, -a)} > 0` },
-      { ru: 'Решаем неравенство:', tex: `x > ${a}` },
+      { text: 'Аргумент логарифма должен быть строго положительным:', tex: `${linear(1, -a)} > 0` },
+      { text: 'Решаем неравенство:', tex: `x > ${a}` },
     ],
     hints: ['Логарифм определён только для положительного аргумента.', `Реши строгое неравенство $${linear(1, -a)} > 0$.`],
     inputHint: INPUT_HINT,
@@ -73,15 +73,15 @@ function quadraticRange(rng: Rng): Problem {
   const sign = opensUp ? '' : '-'
   const f = `${sign}\\left(${linear(1, -h)}\\right)^{2}${k === 0 ? '' : k > 0 ? `+${k}` : k}`
   return {
-    statement: { en: `Find the range of $f(x) = ${f}$.`, ru: `Найди область значений $f(x) = ${f}$.` },
+    statement: `Find the range of $f(x) = ${f}$.`,
     answer: {
       kind: 'interval',
       parts: opensUp ? [part(String(k), null, true, false)] : [part(null, String(k), false, true)],
     },
     solution: [
-      { ru: `Вершина параболы в точке $x = ${h}$, значение в вершине $y = ${k}$.` },
+      { text: `Вершина параболы в точке $x = ${h}$, значение в вершине $y = ${k}$.` },
       {
-        ru: opensUp ? 'Ветви направлены вверх — минимум в вершине, дальше $y$ растёт без ограничений:' : 'Ветви направлены вниз — максимум в вершине, дальше $y$ убывает без ограничений:',
+        text: opensUp ? 'Ветви направлены вверх — минимум в вершине, дальше $y$ растёт без ограничений:' : 'Ветви направлены вниз — максимум в вершине, дальше $y$ убывает без ограничений:',
         tex: opensUp ? `y \\ge ${k}` : `y \\le ${k}`,
       },
     ],

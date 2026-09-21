@@ -3,14 +3,14 @@ import type { Rng } from '../../random/rng'
 import type { ChoiceOption, Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Сдвиг (shift) $f(x-h)+k$: график $f$ сдвигается на $h$ вправо и на $k$ вверх (при отрицательных — влево/вниз).',
-  'Растяжение по вертикали и отражение (vertical stretch/reflection): $a \\cdot f(x)$ растягивает график в $|a|$ раз; при $a<0$ ещё и отражает от оси $x$.',
-  'Растяжение по горизонтали (horizontal stretch): $f(bx)$ сжимает график в $|b|$ раз при $|b|>1$ и растягивает при $|b|<1$ — эффект обратный интуиции.',
-  'Типичная ошибка: $f(x-2)$ путают со сдвигом влево — на самом деле это сдвиг ВПРАВО на 2.',
-  'Другая ошибка: считать, что $f(2x)$ растягивает график — на самом деле умножение $x$ на число больше 1 сжимает график к оси $y$.',
+  'Shift $f(x-h)+k$: the graph of $f$ shifts $h$ units right and $k$ units up (left/down for negative values).',
+  'Vertical stretch/reflection: $a \\cdot f(x)$ stretches the graph by a factor of $|a|$; for $a<0$ it also reflects the graph across the $x$-axis.',
+  'Horizontal stretch: $f(bx)$ compresses the graph by a factor of $|b|$ when $|b|>1$ and stretches it when $|b|<1$ — the effect is opposite to intuition.',
+  'Common mistake: $f(x-2)$ is mistaken for a shift to the left — it is actually a shift RIGHT by 2.',
+  'Another mistake: assuming $f(2x)$ stretches the graph — multiplying $x$ by a number greater than 1 actually compresses the graph toward the $y$-axis.',
 ].join('\n')
 
-const HINTS = ['Сначала определи, что меняется — вход ($x$) или выход ($f(x)$) функции.', 'Изменения внутри скобок $f(\\ldots)$ действуют на график «наоборот» интуиции по горизонтали.']
+const HINTS = ['First determine what is changing — the input ($x$) or the output ($f(x)$) of the function.', 'Changes inside the parentheses $f(\\ldots)$ act on the graph "opposite" to intuition, horizontally.']
 
 type BaseFn = 'sq' | 'abs' | 'cube'
 
@@ -32,17 +32,14 @@ function tier1(rng: Rng): Problem {
   const value = addConst(shifted, k)
   const target = `f(${linear(1, -h)})${k > 0 ? `+${k}` : k}`
   return {
-    statement: {
-      en: `Given $f(x) = ${baseLabel(kind)}$, write the formula for $${target}$.`,
-      ru: `Дана $f(x) = ${baseLabel(kind)}$. Запиши формулу для $${target}$.`,
-    },
+    statement: `Given $f(x) = ${baseLabel(kind)}$, write the formula for $${target}$.`,
     answer: { kind: 'expression', value, variables: ['x'] },
     solution: [
-      { ru: `Сдвиг на $${h}$ вправо: заменяем $x$ на $${linear(1, -h)}$ внутри $f$.`, tex: `f(${linear(1, -h)}) = ${shifted}` },
-      { ru: `Сдвиг на $${k}$ вверх: прибавляем $${k}$ к результату.`, tex: value },
+      { text: `Shift $${h}$ units right: replace $x$ with $${linear(1, -h)}$ inside $f$.`, tex: `f(${linear(1, -h)}) = ${shifted}` },
+      { text: `Shift $${k}$ units up: add $${k}$ to the result.`, tex: value },
     ],
     hints: HINTS,
-    inputHint: 'Введи выражение через x',
+    inputHint: 'Enter an expression in x',
   }
 }
 
@@ -51,17 +48,14 @@ function tier2(rng: Rng): Problem {
   const s = rng.pick([-2, -3, -4])
   const value = mulConst(baseLabel(kind), s)
   return {
-    statement: {
-      en: `Given $f(x) = ${baseLabel(kind)}$, write the formula for $y = ${s}f(x)$.`,
-      ru: `Дана $f(x) = ${baseLabel(kind)}$. Запиши формулу для $y = ${s}f(x)$.`,
-    },
+    statement: `Given $f(x) = ${baseLabel(kind)}$, write the formula for $y = ${s}f(x)$.`,
     answer: { kind: 'expression', value, variables: ['x'] },
     solution: [
-      { ru: `Умножаем $f(x)$ на $${s}$: знак минус даёт отражение от оси $x$, а $|${s}| > 1$ — растяжение по вертикали.` },
-      { ru: 'Формула преобразования:', tex: `y = ${value}` },
+      { text: `Multiply $f(x)$ by $${s}$: the minus sign gives a reflection across the $x$-axis, and $|${s}| > 1$ gives a vertical stretch.` },
+      { text: 'The transformed formula:', tex: `y = ${value}` },
     ],
-    hints: ['Отрицательный множитель отражает график относительно оси $x$.', 'Множитель по модулю больше 1 растягивает график по вертикали.'],
-    inputHint: 'Введи выражение через x',
+    hints: ['A negative factor reflects the graph across the $x$-axis.', 'A factor with absolute value greater than 1 stretches the graph vertically.'],
+    inputHint: 'Enter an expression in x',
   }
 }
 
@@ -72,12 +66,12 @@ interface TransformCase {
 }
 
 const TRANSFORM_BANK: readonly TransformCase[] = [
-  { id: 'compress-reflect', formula: '-f(2x)', label: 'сжатие по горизонтали в 2 раза и отражение относительно оси $x$' },
-  { id: 'reflect-y', formula: 'f(-x)', label: 'отражение относительно оси $y$' },
-  { id: 'reflect-x', formula: '-f(x)', label: 'отражение относительно оси $x$' },
-  { id: 'stretch-vert', formula: '2f(x)', label: 'растяжение по вертикали в 2 раза' },
-  { id: 'stretch-horiz', formula: 'f\\left(\\dfrac{x}{2}\\right)', label: 'растяжение по горизонтали в 2 раза' },
-  { id: 'compress-horiz', formula: 'f(2x)', label: 'сжатие по горизонтали в 2 раза' },
+  { id: 'compress-reflect', formula: '-f(2x)', label: 'horizontal compression by a factor of 2 and reflection across the $x$-axis' },
+  { id: 'reflect-y', formula: 'f(-x)', label: 'reflection across the $y$-axis' },
+  { id: 'reflect-x', formula: '-f(x)', label: 'reflection across the $x$-axis' },
+  { id: 'stretch-vert', formula: '2f(x)', label: 'vertical stretch by a factor of 2' },
+  { id: 'stretch-horiz', formula: 'f\\left(\\dfrac{x}{2}\\right)', label: 'horizontal stretch by a factor of 2' },
+  { id: 'compress-horiz', formula: 'f(2x)', label: 'horizontal compression by a factor of 2' },
 ]
 
 function tier3(rng: Rng): Problem {
@@ -85,16 +79,13 @@ function tier3(rng: Rng): Problem {
   const others = rng.shuffle(TRANSFORM_BANK.filter((t) => t.id !== correct.id)).slice(0, 3)
   const options: readonly ChoiceOption[] = rng.shuffle([correct, ...others]).map((t) => ({ id: t.id, label: t.label }))
   return {
-    statement: {
-      en: `Which transformation turns $f(x)$ into $${correct.formula}$?`,
-      ru: `Какое преобразование переводит $f(x)$ в $${correct.formula}$?`,
-    },
+    statement: `Which transformation turns $f(x)$ into $${correct.formula}$?`,
     answer: { kind: 'choice', options, correctId: correct.id },
     solution: [
-      { ru: `Верный ответ: ${correct.label}.` },
-      { ru: 'Изменения аргумента (внутри скобок) действуют по горизонтали, изменения самой функции — по вертикали.' },
+      { text: `Correct answer: ${correct.label}.` },
+      { text: 'Changes to the argument (inside the parentheses) act horizontally; changes to the function itself act vertically.' },
     ],
-    hints: [...HINTS, 'Проверь отдельно: что происходит с $x$ внутри скобок и что происходит со знаком/множителем снаружи.'],
+    hints: [...HINTS, 'Check separately: what happens to $x$ inside the parentheses, and what happens to the sign/factor outside.'],
   }
 }
 

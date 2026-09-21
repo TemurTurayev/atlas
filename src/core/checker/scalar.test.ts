@@ -26,8 +26,8 @@ describe('checkNumber', () => {
   )
 
   it('diagnoses sign and reciprocal slips', () => {
-    expect(num('-\\frac{3}{4}', '\\frac{3}{4}')).toEqual({ status: 'incorrect', diagnosis: 'Похоже, ошибка в знаке' })
-    expect(num('\\frac{2}{3}', '\\frac{3}{2}')).toEqual({ status: 'incorrect', diagnosis: 'Похоже, дробь перевёрнута' })
+    expect(num('-\\frac{3}{4}', '\\frac{3}{4}')).toEqual({ status: 'incorrect', diagnosis: 'Looks like a sign slipped' })
+    expect(num('\\frac{2}{3}', '\\frac{3}{2}')).toEqual({ status: 'incorrect', diagnosis: 'Looks like the fraction is upside down' })
   })
 
   it('flags malformed input without counting it as wrong', () => {
@@ -38,7 +38,7 @@ describe('checkNumber', () => {
   })
 
   it('notes approximate answers', () => {
-    expect(num('\\sqrt{2}', '1.414')).toEqual({ status: 'correct', note: 'Верно (приближённо)' })
+    expect(num('\\sqrt{2}', '1.414')).toEqual({ status: 'correct', note: 'Correct (approximately)' })
   })
 })
 
@@ -55,18 +55,18 @@ describe('checkExpression', () => {
 
   it('rejects wrong expressions and diagnoses sign', () => {
     expect(expr('\\frac{3x+1}{x-2}', '\\frac{3x-1}{x-2}').status).toBe('incorrect')
-    expect(expr('x^2-x', '-x^2+x')).toEqual({ status: 'incorrect', diagnosis: 'Похоже, ошибка в знаке' })
+    expect(expr('x^2-x', '-x^2+x')).toEqual({ status: 'incorrect', diagnosis: 'Looks like a sign slipped' })
   })
 
   it('refuses foreign variables', () => {
-    expect(expr('x^2', 't^2')).toEqual({ status: 'malformed', message: 'Используй только переменные: x' })
+    expect(expr('x^2', 't^2')).toEqual({ status: 'malformed', message: 'Use only these variables: x' })
   })
 
   it('enforces factored form', () => {
     const spec = { form: 'factored' as const }
     expect(expr('(x-2)(x-3)', '(x-3)(x-2)', spec).status).toBe('correct')
     expect(expr('(x-2)(x-3)', 'x^2-5x+6', spec).status).toBe('malformed')
-    expect(expr('3x(x-2)', '3(x^2-2x)', spec)).toEqual({ status: 'malformed', message: 'Значение верное, но разложено не до конца' })
+    expect(expr('3x(x-2)', '3(x^2-2x)', spec)).toEqual({ status: 'malformed', message: 'Right value, but it can be factored further' })
     expect(expr('3x(x-2)', 'x(3x-6)', spec).status).toBe('correct')
   })
 

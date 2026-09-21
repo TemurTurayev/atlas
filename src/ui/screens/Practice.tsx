@@ -14,7 +14,7 @@ const card = 'rounded-card bg-surface border border-line p-5 space-y-4'
 const primary = 'px-5 py-3 rounded-xl bg-accent text-bg font-medium hover:opacity-90 disabled:opacity-50'
 const ghost = 'px-4 py-3 rounded-xl border border-line text-muted hover:border-accent disabled:opacity-40'
 
-const TIER_LABEL: Readonly<Record<Tier, string>> = { 1: 'Разогрев', 2: 'Стандарт', 3: 'Экзамен' }
+const TIER_LABEL: Readonly<Record<Tier, string>> = { 1: 'Warm-up', 2: 'Standard', 3: 'Exam' }
 
 const freshSeed = (): number => Math.floor(Math.random() * 0xffffffff) >>> 0
 
@@ -25,7 +25,6 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
   const [answer, setAnswer] = useState<UserAnswer | null>(null)
   const [result, setResult] = useState<CheckResult | null>(null)
   const [hintsUsed, setHintsUsed] = useState(0)
-  const [showRu, setShowRu] = useState(false)
   const [stats, setStats] = useState({ solved: 0, total: 0 })
   const [showSolution, setShowSolution] = useState(false)
 
@@ -39,7 +38,6 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
     setAnswer(null)
     setResult(null)
     setHintsUsed(0)
-    setShowRu(false)
     setShowSolution(false)
   }
 
@@ -55,9 +53,9 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl">{GRAPH.node(skillId).title.ru}</h1>
+        <h1 className="text-xl">{GRAPH.node(skillId).title}</h1>
         <button type="button" className="text-sm text-muted underline" onClick={() => go('map')}>
-          К карте
+          To the map
         </button>
       </div>
 
@@ -73,18 +71,15 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
           </button>
         ))}
         <span className="ml-auto text-sm text-muted self-center">
-          {stats.total > 0 ? `${stats.solved} из ${stats.total}` : 'тренировка'}
+          {stats.total > 0 ? `${stats.solved} of ${stats.total}` : 'practice'}
         </span>
       </div>
 
       <div className={card}>
         <div className="flex items-start justify-between gap-3">
           <p className="text-lg leading-relaxed">
-            <RichText text={showRu ? problem.statement.ru : problem.statement.en} />
+            <RichText text={problem.statement} />
           </p>
-          <button type="button" className="text-xs text-muted border border-line rounded-lg px-2 py-1" onClick={() => setShowRu(!showRu)}>
-            {showRu ? 'EN' : 'RU'}
-          </button>
         </div>
 
         <AnswerInput spec={problem.answer} answer={current} onChange={setAnswer} onSubmit={check} disabled={graded} />
@@ -93,10 +88,10 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
         {!graded && (
           <div className="flex flex-wrap gap-3">
             <button type="button" className={primary} onClick={check}>
-              Проверить
+              Check
             </button>
             <button type="button" className={ghost} onClick={() => setHintsUsed(hintsUsed + 1)} disabled={hintsUsed >= problem.hints.length}>
-              Подсказка
+              Hint
             </button>
             <button
               type="button"
@@ -106,7 +101,7 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
                 setStats((st) => ({ ...st, total: st.total + 1 }))
               }}
             >
-              Показать решение
+              Show the solution
             </button>
           </div>
         )}
@@ -122,12 +117,12 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
         )}
 
         {result?.status === 'malformed' && <p className="text-warn">{result.message}</p>}
-        {result?.status === 'correct' && <p className="text-good text-lg">Верно{result.note ? ` · ${result.note}` : ''}</p>}
+        {result?.status === 'correct' && <p className="text-good text-lg">Correct{result.note ? ` · ${result.note}` : ''}</p>}
         {result?.status === 'incorrect' && (
           <div className="space-y-2">
-            <p className="text-bad text-lg">Не сходится{result.diagnosis ? ` · ${result.diagnosis}` : ''}</p>
+            <p className="text-bad text-lg">Not quite{result.diagnosis ? ` · ${result.diagnosis}` : ''}</p>
             <p className="text-muted">
-              Правильный ответ: <Tex tex={answerToLatex(problem.answer)} />
+              Correct answer: <Tex tex={answerToLatex(problem.answer)} />
             </p>
           </div>
         )}
@@ -138,7 +133,7 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
               <Solution problem={problem} />
             ) : (
               <button type="button" className="text-sm text-accent underline" onClick={() => setShowSolution(true)}>
-                Показать решение
+                Show the solution
               </button>
             )}
           </div>
@@ -147,9 +142,9 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
 
       <div className="flex items-center justify-between gap-3">
         <button type="button" className={primary} onClick={() => nextProblem()}>
-          {graded ? 'Следующая' : 'Другая задача'}
+          {graded ? 'Next' : 'Another problem'}
         </button>
-        <p className="text-xs text-muted text-right">Это тренировка: прогресс и расписание повторений не меняются</p>
+        <p className="text-xs text-muted text-right">Practice only: progress and the review schedule stay as they are</p>
       </div>
     </div>
   )

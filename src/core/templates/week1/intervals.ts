@@ -27,11 +27,11 @@ function tier1(rng: Rng): Problem {
   const hiSign = hiClosed ? '\\le' : '<'
   const condition = `\\{x \\in \\mathbb{R} : ${a} ${loSign} x ${hiSign} ${b}\\}`
   return {
-    statement: { en: `Write $${condition}$ as an interval.`, ru: `Запиши $${condition}$ в виде интервала.` },
+    statement: `Write $${condition}$ as an interval.`,
     answer: { kind: 'interval', parts: [part(String(a), String(b), loClosed, hiClosed)] },
     solution: [
-      { ru: `Левый конец $${a}$ ${loClosed ? 'включён' : 'не включён'}, правый $${b}$ ${hiClosed ? 'включён' : 'не включён'}.` },
-      { ru: 'Значит, ответ:', tex: `${loClosed ? '[' : '('}${a}, ${b}${hiClosed ? ']' : ')'}` },
+      { text: `Левый конец $${a}$ ${loClosed ? 'включён' : 'не включён'}, правый $${b}$ ${hiClosed ? 'включён' : 'не включён'}.` },
+      { text: 'Значит, ответ:', tex: `${loClosed ? '[' : '('}${a}, ${b}${hiClosed ? ']' : ')'}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -48,15 +48,15 @@ function tier2(rng: Rng): Problem {
     ? [part(String(-k), String(k), !strict, !strict)]
     : [part(null, String(-k), false, !strict), part(String(k), null, !strict, false)]
   return {
-    statement: { en: `Write the solution set of $${condition}$ as an interval.`, ru: `Запиши решение неравенства $${condition}$ в виде интервала.` },
+    statement: `Write the solution set of $${condition}$ as an interval.`,
     answer: { kind: 'interval', parts },
     solution: [
       {
-        ru: less
+        text: less
           ? `Модуль меньше ${k} — значит $x$ лежит между $-${k}$ и $${k}$.`
           : `Модуль больше ${k} — значит $x$ дальше ${k} от нуля в любую сторону, получаются два куска.`,
       },
-      { ru: 'Ответ:', tex: less ? `${strict ? '(' : '['}-${k}, ${k}${strict ? ')' : ']'}` : `(-\\infty, -${k}${strict ? ')' : ']'} \\cup ${strict ? '(' : '['}${k}, \\infty)` },
+      { text: 'Ответ:', tex: less ? `${strict ? '(' : '['}-${k}, ${k}${strict ? ')' : ']'}` : `(-\\infty, -${k}${strict ? ')' : ']'} \\cup ${strict ? '(' : '['}${k}, \\infty)` },
     ],
     hints: [`$|x| ${sign} ${k}$ — это расстояние от нуля до $x$.`, 'Для «больше» получаются два промежутка, соединённых знаком $\\cup$.'],
     inputHint: INPUT_HINT,
@@ -69,14 +69,14 @@ function tier3(rng: Rng): Problem {
   const b = rng.int(gap + 1, gap + 5)
   const condition = `\\{x \\in \\mathbb{R} : ${a} \\le x \\le ${b},\\ x \\ne ${gap}\\}`
   return {
-    statement: { en: `Write $${condition}$ as a union of intervals.`, ru: `Запиши $${condition}$ как объединение интервалов.` },
+    statement: `Write $${condition}$ as a union of intervals.`,
     answer: {
       kind: 'interval',
       parts: [part(String(a), String(gap), true, false), part(String(gap), String(b), false, true)],
     },
     solution: [
-      { ru: `Берём отрезок $[${a}, ${b}]$ и выкалываем точку $${gap}$.` },
-      { ru: 'Получаются два куска — рядом с выколотой точкой скобки круглые:', tex: `[${a}, ${gap}) \\cup (${gap}, ${b}]` },
+      { text: `Берём отрезок $[${a}, ${b}]$ и выкалываем точку $${gap}$.` },
+      { text: 'Получаются два куска — рядом с выколотой точкой скобки круглые:', tex: `[${a}, ${gap}) \\cup (${gap}, ${b}]` },
     ],
     hints: ['Выколотая точка разрезает отрезок на два куска.', 'Возле выколотой точки скобки круглые, а внешние концы остаются включёнными.'],
     inputHint: INPUT_HINT,

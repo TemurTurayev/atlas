@@ -3,18 +3,18 @@ import type { Rng } from '../../random/rng'
 import type { IntervalPart, Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Неравенство (inequality) — сравнение выражений: $<, >, \\le, \\ge$.',
-  'Линейное неравенство решается как уравнение, но при умножении/делении обеих частей на отрицательное число знак меняется на противоположный.',
-  'Квадратное $x^2-k^2<0$ верно между корнями: $-k<x<k$; $x^2-k^2>0$ — вне корней: $x<-k$ или $x>k$.',
-  'Неравенство с модулем: $|x-p|\\le k \\Leftrightarrow -k\\le x-p\\le k$.',
-  'Типичная ошибка — забыть развернуть знак неравенства при умножении/делении на отрицательное число.',
+  'Inequality: a comparison of expressions using $<, >, \\le, \\ge$.',
+  'A linear inequality is solved like an equation, but multiplying or dividing both sides by a negative number reverses the inequality sign.',
+  'For a quadratic, $x^2-k^2<0$ holds between the roots: $-k<x<k$; $x^2-k^2>0$ holds outside the roots: $x<-k$ or $x>k$.',
+  'Absolute value inequality: $|x-p|\\le k \\Leftrightarrow -k\\le x-p\\le k$.',
+  'Common mistake: forgetting to reverse the inequality sign when multiplying or dividing by a negative number.',
 ].join('\n')
 
 const HINTS = [
-  'Реши как уравнение, чтобы найти границу(ы) промежутка.',
-  'При умножении/делении обеих частей на отрицательное число знак неравенства меняется на противоположный.',
+  'Solve it like an equation to find the boundary (or boundaries) of the interval.',
+  'Multiplying or dividing both sides by a negative number reverses the inequality sign.',
 ]
-const INPUT_HINT = 'Открытая скобка ( или ) не включает конец; закрытая [ или ] включает. Два промежутка соедини знаком ∪'
+const INPUT_HINT = 'A round bracket ( or ) excludes the endpoint; a square bracket [ or ] includes it. Join two intervals with ∪'
 
 type Dir = '<' | '>' | '\\le' | '\\ge'
 
@@ -40,11 +40,11 @@ function tier1(rng: Rng): Problem {
   const dir = rng.pick<Dir>(['<', '>', '\\le', '\\ge'])
   const statement = `${linear(a, b)} ${dir} ${rhs}`
   return {
-    statement: { en: `Solve the inequality: $${statement}$`, ru: `Реши неравенство: $${statement}$` },
+    statement: `Solve the inequality: $${statement}$`,
     answer: { kind: 'interval', parts: [boundaryPart(dir, x0)] },
     solution: [
-      { ru: `Перенесём число $${b}$ вправо:`, tex: `${linear(a, 0)} ${dir} ${rhs - b}` },
-      { ru: `Разделим обе части на $${a}$ (коэффициент положительный, знак не меняется):`, tex: `x ${dir} ${x0}` },
+      { text: `Move the number $${b}$ to the right side:`, tex: `${linear(a, 0)} ${dir} ${rhs - b}` },
+      { text: `Divide both sides by $${a}$ (the coefficient is positive, the sign stays the same):`, tex: `x ${dir} ${x0}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -55,11 +55,11 @@ function tier2(rng: Rng): Problem {
   const k = rng.int(2, 8)
   const statement = `x^{2} - ${k * k} < 0`
   return {
-    statement: { en: `Solve the inequality: $${statement}$`, ru: `Реши неравенство: $${statement}$` },
+    statement: `Solve the inequality: $${statement}$`,
     answer: { kind: 'interval', parts: [{ lo: String(-k), hi: String(k), loClosed: false, hiClosed: false }] },
     solution: [
-      { ru: 'Разложим левую часть на множители (разность квадратов):', tex: `x^{2}-${k * k} = \\left(x-${k}\\right)\\left(x+${k}\\right)` },
-      { ru: 'Произведение отрицательно строго между корнями:', tex: `-${k} < x < ${k}` },
+      { text: 'Factor the left side (difference of squares):', tex: `x^{2}-${k * k} = \\left(x-${k}\\right)\\left(x+${k}\\right)` },
+      { text: 'The product is negative strictly between the roots:', tex: `-${k} < x < ${k}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -74,11 +74,11 @@ function absValueBranch(rng: Rng): Problem {
   const inner = linear(1, -p)
   const statement = `\\left|${inner}\\right| ${dir} ${k}`
   return {
-    statement: { en: `Solve the inequality: $${statement}$`, ru: `Реши неравенство: $${statement}$` },
+    statement: `Solve the inequality: $${statement}$`,
     answer: { kind: 'interval', parts: [{ lo: String(p - k), hi: String(p + k), loClosed: closed, hiClosed: closed }] },
     solution: [
-      { ru: `Модульное неравенство $|A| ${dir} ${k}$ равносильно двойному неравенству:`, tex: `-${k} ${dir} ${inner} ${dir} ${k}` },
-      { ru: `Прибавим $${p}$ к каждой части:`, tex: `${p - k} ${dir} x ${dir} ${p + k}` },
+      { text: `The absolute value inequality $|A| ${dir} ${k}$ is equivalent to the double inequality:`, tex: `-${k} ${dir} ${inner} ${dir} ${k}` },
+      { text: `Add $${p}$ to each part:`, tex: `${p - k} ${dir} x ${dir} ${p + k}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -90,10 +90,7 @@ function quadraticParamBranch(rng: Rng): Problem {
   const boundary = 2 * Math.sqrt(c)
   const statement = `x^{2}+bx+${c}=0`
   return {
-    statement: {
-      en: `For which values of $b$ does $${statement}$ have two distinct real roots?`,
-      ru: `При каких значениях $b$ уравнение $${statement}$ имеет два различных действительных корня?`,
-    },
+    statement: `For which values of $b$ does $${statement}$ have two distinct real roots?`,
     answer: {
       kind: 'interval',
       parts: [
@@ -102,9 +99,9 @@ function quadraticParamBranch(rng: Rng): Problem {
       ],
     },
     solution: [
-      { ru: 'Два различных корня — когда дискриминант положителен:', tex: `D = b^{2}-4\\cdot ${c} > 0` },
-      { ru: 'Решаем неравенство относительно $b$:', tex: `b^{2} > ${4 * c} \\;\\Rightarrow\\; |b| > ${boundary}` },
-      { ru: 'Итог — объединение двух лучей:', tex: `b < ${-boundary} \\ \\text{или} \\ b > ${boundary}` },
+      { text: 'Two distinct roots occur when the discriminant is positive:', tex: `D = b^{2}-4\\cdot ${c} > 0` },
+      { text: 'Solve the inequality for $b$:', tex: `b^{2} > ${4 * c} \\;\\Rightarrow\\; |b| > ${boundary}` },
+      { text: 'Result — the union of two rays:', tex: `b < ${-boundary} \\ \\text{or} \\ b > ${boundary}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,

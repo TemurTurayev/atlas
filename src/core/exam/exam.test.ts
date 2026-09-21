@@ -15,7 +15,7 @@ const node = (id: string): SkillNode => ({
   id,
   week: 0,
   prereqs: [],
-  title: { en: id, ru: id },
+  title: id,
   highYield: false,
 })
 const ids = Array.from({ length: 12 }, (_, i) => `s${i}`)
@@ -51,9 +51,9 @@ const started = (world = world10, ctx = ctxAt()): World => ({
 })
 
 const numberProblem = (value: string): Problem => ({
-  statement: { en: 'x', ru: 'x' },
+  statement: 'x',
   answer: { kind: 'number', value },
-  solution: [{ ru: 'шаг' }],
+  solution: [{ text: 'step' }],
   hints: [],
 })
 

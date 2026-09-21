@@ -45,12 +45,9 @@ const SAMPLES: readonly Sample[] = [
 function tier1(rng: Rng): Problem {
   const sample = rng.pick(SAMPLES)
   return {
-    statement: {
-      en: `What is the smallest of the sets $\\mathbb{N}, \\mathbb{Z}, \\mathbb{Q}, \\mathbb{R}$ that contains $${sample.latex}$?`,
-      ru: `Какое из множеств $\\mathbb{N}, \\mathbb{Z}, \\mathbb{Q}, \\mathbb{R}$ — самое узкое из тех, что содержат $${sample.latex}$?`,
-    },
+    statement: `What is the smallest of the sets $\\mathbb{N}, \\mathbb{Z}, \\mathbb{Q}, \\mathbb{R}$ that contains $${sample.latex}$?`,
     answer: { kind: 'choice', options: SET_OPTIONS, correctId: sample.set },
-    solution: [{ ru: `Число $${sample.latex}$ — ${sample.why}.` }],
+    solution: [{ text: `Число $${sample.latex}$ — ${sample.why}.` }],
     hints: HINTS,
   }
 }
@@ -73,11 +70,11 @@ function tier2(rng: Rng): Problem {
     { id: 'empty', label: `$\\emptyset \\subseteq ${set}$` },
   ])
   return {
-    statement: { en: `Let $A = ${set}$. Which statement is false?`, ru: `Пусть $A = ${set}$. Какое утверждение неверно?` },
+    statement: `Let $A = ${set}$. Which statement is false?`,
     answer: { kind: 'choice', options, correctId: wrong.id },
     solution: [
-      { ru: `Элементы $A$ — это ${elements.join(', ')}; значит $${inside} \\in A$, а $${outside} \\notin A$.` },
-      { ru: 'Запись $\\{a\\}$ — это множество из одного элемента: оно может быть подмножеством ($\\subseteq$), но не элементом ($\\in$).' },
+      { text: `Элементы $A$ — это ${elements.join(', ')}; значит $${inside} \\in A$, а $${outside} \\notin A$.` },
+      { text: 'Запись $\\{a\\}$ — это множество из одного элемента: оно может быть подмножеством ($\\subseteq$), но не элементом ($\\in$).' },
     ],
     hints: ['Выпиши элементы множества и проверь каждое утверждение по очереди.', 'Помни разницу: $2 \\in A$, но $\\{2\\} \\subseteq A$.'],
   }
@@ -95,11 +92,11 @@ function tier3(rng: Rng): Problem {
   ])
   const condition = `\\{n \\in \\mathbb{Z} : ${low} \\le n < ${high}\\}`
   return {
-    statement: { en: `Which set is $${condition}$?`, ru: `Какому множеству равно $${condition}$?` },
+    statement: `Which set is $${condition}$?`,
     answer: { kind: 'choice', options, correctId: 'correct' },
     solution: [
-      { ru: `Условие $${low} \\le n$ включает $${low}$, а условие $n < ${high}$ исключает $${high}$.` },
-      { ru: 'Значит, множество равно:', tex: setLatex(correct) },
+      { text: `Условие $${low} \\le n$ включает $${low}$, а условие $n < ${high}$ исключает $${high}$.` },
+      { text: 'Значит, множество равно:', tex: setLatex(correct) },
     ],
     hints: [
       'Строгий знак $<$ конец не включает, нестрогий $\\le$ — включает.',

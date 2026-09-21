@@ -3,7 +3,7 @@ import { GRAPH } from '../../core/graph'
 import type { World } from '../../core/session/world'
 import { dayKey, daysBetween } from '../../core/time/day'
 import { Meter, Streak } from '../components/Meter'
-import { formatPercent, plural } from '../format'
+import { countOf, formatPercent } from '../format'
 import { dueCount, frontier, masteredCount } from '../selectors'
 import { useAtlas } from '../store'
 
@@ -12,14 +12,14 @@ function Banner({ daysAway, freshStart }: { daysAway: number; freshStart: boolea
   if (daysAway >= 2) {
     return (
       <p className="rounded-card border border-line bg-surface px-4 py-3 text-sm text-muted">
-        {daysAway} {plural(daysAway, 'день', 'дня', 'дней')} без Атласа. Пять минут сегодня — и ты снова в ритме.
+        {countOf(daysAway, 'day')} away from Atlas. Five minutes today and you are back in rhythm.
       </p>
     )
   }
   if (freshStart) {
     return (
       <p className="rounded-card border border-line bg-surface px-4 py-3 text-sm text-muted">
-        Новая неделя — хороший момент задать темп.
+        A new week — a good moment to set the pace.
       </p>
     )
   }
@@ -32,7 +32,7 @@ function ExamCard({ world, go }: { world: World; go: (screen: 'exam') => void })
   const last = world.examHistory[world.examHistory.length - 1]
   const ready = masteredCount(world) >= EXAM_MIN_SKILLS
   if (!ready && !exam && !last) return null
-  const label = exam === null ? 'Пробный экзамен' : exam.finishedAt === null ? 'Вернуться к экзамену' : 'Посмотреть результаты'
+  const label = exam === null ? 'Mock exam' : exam.finishedAt === null ? 'Back to the exam' : 'See the results'
   const tone = exam && exam.finishedAt === null ? 'border-warn text-warn' : 'border-line text-muted hover:border-accent'
   return (
     <section className="space-y-2">
@@ -41,7 +41,7 @@ function ExamCard({ world, go }: { world: World; go: (screen: 'exam') => void })
       </button>
       {last && (
         <p className="text-xs text-muted text-center">
-          Последняя работа: {last.correct} из {last.total} · {formatPercent(last.total === 0 ? 0 : last.correct / last.total)}
+          Last paper: {last.correct} of {last.total} · {formatPercent(last.total === 0 ? 0 : last.correct / last.total)}
         </p>
       )}
     </section>
@@ -67,17 +67,17 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam' 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl">Атлас</h1>
+        <h1 className="text-2xl">Atlas</h1>
         <Streak days={world.streak.current} freezes={world.streak.freezes} />
       </header>
 
       <Banner daysAway={daysAway} freshStart={freshStart} />
 
       <section className="rounded-card bg-surface border border-line p-5 space-y-4">
-        <Meter label="Экзамен — прогноз" value={forecast.exam} markerAt={0.45} />
-        <Meter label="База" value={forecast.base} tone="good" />
+        <Meter label="Exam forecast" value={forecast.exam} markerAt={0.45} />
+        <Meter label="Foundations" value={forecast.base} tone="good" />
         <p className="text-sm text-muted">
-          Сегодня: {world.day.xp} / {world.settings.dailyGoalXp} XP · повторить {due} {plural(due, 'навык', 'навыка', 'навыков')}
+          Today: {world.day.xp} / {world.settings.dailyGoalXp} XP · {countOf(due, 'skill')} to review
         </p>
       </section>
 
@@ -87,7 +87,7 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam' 
           onClick={() => start(false)}
           className="w-full py-4 rounded-card bg-accent text-bg text-lg font-medium hover:opacity-90"
         >
-          {inProgress ? 'Продолжить забег' : 'Начать забег'}
+          {inProgress ? 'Continue the run' : 'Start the run'}
         </button>
         {!inProgress && (
           <button
@@ -95,7 +95,7 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam' 
             onClick={() => start(true)}
             className="w-full py-3 rounded-card border border-line text-muted hover:border-accent"
           >
-            Короткая версия · 5 минут
+            Short version · 5 minutes
           </button>
         )}
       </div>
@@ -103,25 +103,25 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam' 
       <ExamCard world={world} go={go} />
 
       <section className="space-y-2">
-        <h2 className="text-sm text-muted">Дальше по карте</h2>
-        {next.length === 0 && <p className="text-muted text-sm">Всё доступное освоено — загляни на карту.</p>}
+        <h2 className="text-sm text-muted">Next on the map</h2>
+        {next.length === 0 && <p className="text-muted text-sm">Everything open is mastered — take a look at the map.</p>}
         {next.map((id) => (
           <div key={id} className="rounded-xl border border-line bg-surface px-4 py-3">
-            {GRAPH.node(id).title.ru}
+            {GRAPH.node(id).title}
           </div>
         ))}
       </section>
 
       <nav className="flex gap-4 text-sm">
         <button type="button" className="underline text-muted" onClick={() => go('map')}>
-          Карта навыков
+          Skill map
         </button>
         <button type="button" className="underline text-muted" onClick={() => go('settings')}>
-          Настройки
+          Settings
         </button>
         {world.mistakes.length > 0 && (
           <button type="button" className="underline text-warn" onClick={() => go('mistakes')}>
-            Ошибки · {world.mistakes.length}
+            Mistakes · {world.mistakes.length}
           </button>
         )}
       </nav>

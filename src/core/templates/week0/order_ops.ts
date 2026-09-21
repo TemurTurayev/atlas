@@ -4,18 +4,18 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Порядок действий (order of operations): скобки → степени и корни → умножение и деление слева направо → сложение и вычитание слева направо.',
-  'Дробная черта работает как скобки: числитель и знаменатель сначала считают отдельно, а делят в самом конце.',
-  'Пример: $2+3\\cdot4-6$ — сначала $3\\cdot4=12$, потом $2+12-6=8$.',
-  'Типичные ошибки: складывать раньше умножения; забыть, что деление и умножение равноправны и идут слева направо.',
+  'Order of operations: brackets, then powers and roots, then multiplication and division left to right, then addition and subtraction left to right.',
+  'A fraction bar works like brackets: compute the numerator and the denominator separately first, and divide last.',
+  'Example: $2+3\\cdot4-6$ — first $3\\cdot4=12$, then $2+12-6=8$.',
+  'Common mistakes: adding before multiplying; forgetting that multiplication and division have equal priority and go left to right.',
 ].join('\n')
 
-const HINTS_BASIC = ['Сначала выполни умножение и деление, потом сложение и вычитание.', 'Считай строго слева направо внутри одного уровня приоритета.']
-const INPUT_HINT = 'Введи число (можно дробью через /)'
+const HINTS_BASIC = ['Do the multiplication and division first, then the addition and subtraction.', 'Work strictly left to right within the same priority level.']
+const INPUT_HINT = 'Enter a number (a fraction with / is allowed)'
 
 function problem(equation: string, answer: string, solution: Problem['solution'], hints: readonly string[] = HINTS_BASIC): Problem {
   return {
-    statement: { en: `Evaluate: $${equation}$`, ru: `Вычисли: $${equation}$` },
+    statement: `Evaluate: $${equation}$`,
     answer: { kind: 'number', value: answer },
     solution,
     hints,
@@ -32,8 +32,8 @@ function tier1(rng: Rng): Problem {
   const value = a + product - d
   const equation = `${a} + ${b} \\cdot ${c} - ${d}`
   return problem(equation, String(value), [
-    { ru: 'Сначала умножение:', tex: `${b} \\cdot ${c} = ${product}` },
-    { ru: 'Теперь сложение и вычитание слева направо:', tex: `${a} + ${product} - ${d} = ${value}` },
+    { text: 'Multiply first:', tex: `${b} \\cdot ${c} = ${product}` },
+    { text: 'Now add and subtract left to right:', tex: `${a} + ${product} - ${d} = ${value}` },
   ])
 }
 
@@ -54,12 +54,12 @@ function tier2(rng: Rng): Problem {
     equation,
     String(value),
     [
-      { ru: 'Внутри скобок:', tex: `${c}-${d} = ${diff}` },
-      { ru: 'Возводим в степень:', tex: `${paren(diff)}^{2} = ${square}` },
-      { ru: 'Умножение и деление слева направо:', tex: `${b} \\cdot ${square} \\div ${e} = ${afterMul} \\div ${e} = ${afterDiv}` },
-      { ru: 'Прибавляем первое слагаемое:', tex: `${a} + ${afterDiv} = ${value}` },
+      { text: 'Inside the brackets:', tex: `${c}-${d} = ${diff}` },
+      { text: 'Raise to the power:', tex: `${paren(diff)}^{2} = ${square}` },
+      { text: 'Multiplication and division left to right:', tex: `${b} \\cdot ${square} \\div ${e} = ${afterMul} \\div ${e} = ${afterDiv}` },
+      { text: 'Add the first term:', tex: `${a} + ${afterDiv} = ${value}` },
     ],
-    ['Сначала посчитай то, что в скобках, потом возведи в степень.', 'Умножение и деление равноправны — считай их слева направо, а сложение оставь напоследок.'],
+    ['First compute the brackets, then raise to the power.', 'Multiplication and division have equal priority — do them left to right, and leave addition for last.'],
   )
 }
 
@@ -79,12 +79,12 @@ function tier3(rng: Rng): Problem {
     equation,
     ratToLatex(value),
     [
-      { ru: 'Сначала скобка в числителе:', tex: `${q}+${r} = ${inner}` },
-      { ru: 'Умножение, затем вычитание в числителе:', tex: `${p} \\cdot ${inner} - ${s} = ${p * inner} - ${s} = ${numerator}` },
-      { ru: 'Знаменатель:', tex: `${t}-${u} = ${denominator}` },
-      { ru: 'Делим числитель на знаменатель и сокращаем:', tex: `\\frac{${numerator}}{${denominator}} = ${ratToLatex(value)}` },
+      { text: 'First the brackets in the numerator:', tex: `${q}+${r} = ${inner}` },
+      { text: 'Multiply, then subtract in the numerator:', tex: `${p} \\cdot ${inner} - ${s} = ${p * inner} - ${s} = ${numerator}` },
+      { text: 'The denominator:', tex: `${t}-${u} = ${denominator}` },
+      { text: 'Divide the numerator by the denominator and simplify:', tex: `\\frac{${numerator}}{${denominator}} = ${ratToLatex(value)}` },
     ],
-    ['Числитель и знаменатель дробной черты считай отдельно, как будто каждый в своих скобках.', 'В числителе — сначала скобка, потом умножение, потом вычитание.'],
+    ['Treat the numerator and denominator of the fraction bar separately, as if each were in its own brackets.', 'In the numerator: first the brackets, then multiplication, then subtraction.'],
   )
 }
 

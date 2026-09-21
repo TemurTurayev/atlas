@@ -62,7 +62,7 @@ const reviveDates = (key: string, value: unknown): unknown => (DATE_FIELDS.has(k
 function parseBackup(json: string): ExportFile {
   const parsed = JSON.parse(json, reviveDates) as Partial<ExportFile>
   const ok = parsed.app === 'atlas' && parsed.version === 1 && Array.isArray(parsed.progress) && Array.isArray(parsed.kv)
-  if (!ok) throw new Error('Это не файл резервной копии Атласа')
+  if (!ok) throw new Error('This is not an Atlas backup file')
   return { ...parsed, days: parsed.days ?? [], attempts: parsed.attempts ?? [] } as ExportFile
 }
 

@@ -37,18 +37,18 @@ export type AnswerSpec =
   | { readonly kind: 'choice'; readonly options: readonly ChoiceOption[]; readonly correctId: string }
 
 export interface SolutionStep {
-  /** Russian explanation, may contain $…$ LaTeX. */
-  readonly ru: string
+  /** The explanation, may contain $…$ LaTeX. */
+  readonly text: string
   /** Optional display formula (LaTeX without $ delimiters). */
   readonly tex?: string
 }
 
 export interface Problem {
-  /** Statement with $…$ LaTeX. English is the default (exam language). */
-  readonly statement: { readonly en: string; readonly ru: string }
+  /** Statement with $…$ LaTeX. */
+  readonly statement: string
   readonly answer: AnswerSpec
   readonly solution: readonly SolutionStep[]
-  /** Russian hints, from gentle to specific. */
+  /** Hints, from gentle to specific. */
   readonly hints: readonly string[]
   /** A second way to solve the same problem, shown on request. */
   readonly alternative?: { readonly title: string; readonly steps: readonly SolutionStep[] }
@@ -58,7 +58,7 @@ export interface Problem {
 
 export interface SkillTemplate {
   readonly skillId: string
-  /** Short Russian theory card, 3–8 lines separated by \n, with $…$ LaTeX. */
+  /** Short theory card, 3–8 lines separated by \n, with $…$ LaTeX. */
   readonly theory: string
   readonly expectedSeconds: Readonly<Record<Tier, number>>
   generate(rng: Rng, tier: Tier): Problem

@@ -35,17 +35,13 @@ function tier1(rng: Rng): Problem {
   const side = sqrtCoefLatex(m, root)
   const exact = EXACT_LATEX[angle][useSin ? 'sin' : 'cos']
   const whichPhrase = useSin ? 'opposite' : 'adjacent to'
-  const whichRu = useSin ? 'противолежащий' : 'прилежащий'
   const letter = useSin ? 'a' : 'b'
   return {
-    statement: {
-      en: `A right triangle has hypotenuse $${hyp}$ and an acute angle of $${angle}^\\circ$. Find the length of the side ${whichPhrase} this angle.`,
-      ru: `В прямоугольном треугольнике гипотенуза равна $${hyp}$, острый угол равен $${angle}^\\circ$. Найди ${whichRu} этому углу катет.`,
-    },
+    statement: `A right triangle has hypotenuse $${hyp}$ and an acute angle of $${angle}^\\circ$. Find the length of the side ${whichPhrase} this angle.`,
     answer: { kind: 'number', value: side },
     solution: [
-      { ru: `${useSin ? 'Синус' : 'Косинус'} угла:`, tex: `${useSin ? '\\sin' : '\\cos'} ${angle}^\\circ = ${exact}` },
-      { ru: 'Сторона равна гипотенузе, умноженной на это значение:', tex: `${letter} = ${hyp}\\cdot ${exact} = ${side}` },
+      { text: `${useSin ? 'Синус' : 'Косинус'} угла:`, tex: `${useSin ? '\\sin' : '\\cos'} ${angle}^\\circ = ${exact}` },
+      { text: 'Сторона равна гипотенузе, умноженной на это значение:', tex: `${letter} = ${hyp}\\cdot ${exact} = ${side}` },
     ],
     hints: [
       'Вспомни точные значения синуса и косинуса для 30°, 45°, 60°.',
@@ -71,14 +67,11 @@ function tier2(rng: Rng): Problem {
     opposite = String(k)
   }
   return {
-    statement: {
-      en: `A right triangle has legs $${adjacent}$ (adjacent to angle $\\theta$) and $${opposite}$ (opposite angle $\\theta$). Find $\\theta$ in degrees.`,
-      ru: `В прямоугольном треугольнике катеты равны $${adjacent}$ (прилежащий углу $\\theta$) и $${opposite}$ (противолежащий углу $\\theta$). Найди угол $\\theta$ в градусах.`,
-    },
+    statement: `A right triangle has legs $${adjacent}$ (adjacent to angle $\\theta$) and $${opposite}$ (opposite angle $\\theta$). Find $\\theta$ in degrees.`,
     answer: { kind: 'number', value: String(angle) },
     solution: [
-      { ru: 'Тангенс угла — отношение противолежащего катета к прилежащему:', tex: `\\tan\\theta = \\frac{${opposite}}{${adjacent}}` },
-      { ru: 'Это табличное значение тангенса для угла:', tex: `\\theta = ${angle}^\\circ` },
+      { text: 'Тангенс угла — отношение противолежащего катета к прилежащему:', tex: `\\tan\\theta = \\frac{${opposite}}{${adjacent}}` },
+      { text: 'Это табличное значение тангенса для угла:', tex: `\\theta = ${angle}^\\circ` },
     ],
     hints: [
       '$\\tan\\theta = $ противолежащий $/$ прилежащий.',
@@ -106,14 +99,11 @@ function ladderTree(rng: Rng): Problem {
   const eye = rng.int(1, 3)
   const total = angle === 45 ? String(eye + m) : joinTerms([String(eye), climb])
   return {
-    statement: {
-      en: `A person whose eyes are $${eye}$ m above the ground stands $${d}$ m from a tree. The angle of elevation to the top of the tree is $${angle}^\\circ$. Find the height of the tree.`,
-      ru: `Глаза наблюдателя находятся на высоте $${eye}$ м, он стоит в $${d}$ м от дерева. Угол возвышения к вершине дерева равен $${angle}^\\circ$. Найди высоту дерева.`,
-    },
+    statement: `A person whose eyes are $${eye}$ m above the ground stands $${d}$ m from a tree. The angle of elevation to the top of the tree is $${angle}^\\circ$. Find the height of the tree.`,
     answer: { kind: 'number', value: total },
     solution: [
-      { ru: 'Высота от уровня глаз до вершины:', tex: `h_1 = ${d}\\cdot\\tan ${angle}^\\circ = ${climb}` },
-      { ru: 'Прибавляем высоту наблюдателя до уровня глаз:', tex: `h = h_1 + ${eye} = ${total}` },
+      { text: 'Высота от уровня глаз до вершины:', tex: `h_1 = ${d}\\cdot\\tan ${angle}^\\circ = ${climb}` },
+      { text: 'Прибавляем высоту наблюдателя до уровня глаз:', tex: `h = h_1 + ${eye} = ${total}` },
     ],
     hints: [
       'Сначала найди высоту от уровня глаз до вершины: $h_1=d\\cdot\\tan\\theta$.',
@@ -139,14 +129,11 @@ function rampAngle(rng: Rng): Problem {
     run = sqrtCoefLatex(k, 3)
   }
   return {
-    statement: {
-      en: `A wheelchair ramp rises $${rise}$ m over a horizontal run of $${run}$ m. Find the angle the ramp makes with the ground, in degrees.`,
-      ru: `Пандус поднимается на $${rise}$ м на горизонтальном участке $${run}$ м. Найди угол наклона пандуса к земле, в градусах.`,
-    },
+    statement: `A wheelchair ramp rises $${rise}$ m over a horizontal run of $${run}$ m. Find the angle the ramp makes with the ground, in degrees.`,
     answer: { kind: 'number', value: String(angle) },
     solution: [
-      { ru: 'Тангенс угла наклона:', tex: `\\tan\\theta = \\frac{${rise}}{${run}}` },
-      { ru: 'Сравниваем с табличным значением:', tex: `\\theta = ${angle}^\\circ` },
+      { text: 'Тангенс угла наклона:', tex: `\\tan\\theta = \\frac{${rise}}{${run}}` },
+      { text: 'Сравниваем с табличным значением:', tex: `\\theta = ${angle}^\\circ` },
     ],
     hints: [
       'Угол наклона находится через тангенс: подъём, делённый на горизонтальное расстояние.',

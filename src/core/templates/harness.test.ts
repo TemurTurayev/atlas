@@ -34,8 +34,7 @@ describe.each(entries)('template %s', (skillId, template) => {
     for (let seed = 1; seed <= GEN_SEEDS; seed += 1) {
       const a = template.generate(createRng(seed), tier)
       expect(template.generate(createRng(seed), tier)).toEqual(a)
-      expect(a.statement.en.length, `seed ${seed}`).toBeGreaterThan(5)
-      expect(a.statement.ru.length, `seed ${seed}`).toBeGreaterThan(5)
+      expect(a.statement.length, `seed ${seed}`).toBeGreaterThan(5)
       expect(a.solution.length, `seed ${seed}`).toBeGreaterThan(0)
       expect(a.hints.length, `seed ${seed}`).toBeGreaterThan(0)
     }
@@ -44,13 +43,13 @@ describe.each(entries)('template %s', (skillId, template) => {
   it.each(TIERS)('tier %i: all LaTeX renders', (tier) => {
     for (let seed = 1; seed <= CHECK_SEEDS; seed += 1) {
       const p = template.generate(createRng(seed), tier)
-      const texts = [p.statement.en, p.statement.ru, ...p.hints, ...p.solution.map((s) => s.ru)]
+      const texts = [p.statement, ...p.hints, ...p.solution.map((s) => s.text)]
       texts.flatMap(mathSegments).forEach((tex) => expect(renders(tex), `seed ${seed}: ${tex}`).toBe(true))
       p.solution.forEach((s) => s.tex && expect(renders(s.tex), `seed ${seed}: ${s.tex}`).toBe(true))
       if (p.alternative) {
         expect(p.alternative.title.length).toBeGreaterThan(5)
         p.alternative.steps.forEach((s) => {
-          mathSegments(s.ru).forEach((tex) => expect(renders(tex), `seed ${seed}: ${tex}`).toBe(true))
+          mathSegments(s.text).forEach((tex) => expect(renders(tex), `seed ${seed}: ${tex}`).toBe(true))
           if (s.tex) expect(renders(s.tex), `seed ${seed}: ${s.tex}`).toBe(true)
         })
       }
