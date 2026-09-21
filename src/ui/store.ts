@@ -31,6 +31,9 @@ const ctx = (): EngineCtx => ({
   rng: createRng((Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0),
 })
 
+/** The app can only teach skills that have a generator, so coverage is measured against those. */
+const forecastOf = (progress: World['progress']): Forecast => computeForecast(GRAPH, progress, new Date(), hasTemplate)
+
 async function persist(world: World): Promise<void> {
   await saveWorld(db, persisted, world)
   persisted = world
@@ -68,7 +71,7 @@ async function handIn(
     ),
   )
   play(examSummary(graded).passed ? 'mastered' : 'incorrect', world.settings.sound)
-  apply({ world: next, forecast: computeForecast(GRAPH, next.progress, new Date()), lastActiveDay: next.day.date })
+  apply({ world: next, forecast: forecastOf(next.progress), lastActiveDay: next.day.date })
 }
 
 export interface AtlasState {
@@ -133,7 +136,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
     set({
       world,
       ready: true,
-      forecast: computeForecast(GRAPH, world.progress, new Date()),
+      forecast: forecastOf(world.progress),
       lastActiveDay: active.length > 0 ? active[active.length - 1] : null,
       examAnswers: { ...(world.exam?.answers ?? {}) },
     })
@@ -163,8 +166,10 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   },
 
   async submit(answer) {
-    const { world, task, problem, hintsUsed, shownAt } = get()
+    const { world, task, problem, hintsUsed, shownAt, result: previous } = get()
     if (!world || !problem || task?.type !== 'problem') return
+    // The answer is already in: a stray Enter must not grade the same problem twice.
+    if (previous !== null && previous.status !== 'malformed') return
     const result = checkAnswer(problem.answer, answer)
     if (result.status === 'malformed') {
       set({ result })
@@ -190,7 +195,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
       set({ mixResults: { correct: mix.correct + (input.correct ? 1 : 0), total: mix.total + 1 } })
     }
     set({ lastActiveDay: outcome.world.day.date })
-    set({ world: outcome.world, result, events: outcome.events, forecast: computeForecast(GRAPH, outcome.world.progress, new Date()) })
+    set({ world: outcome.world, result, events: outcome.events, forecast: forecastOf(outcome.world.progress) })
   },
 
   async revealAnswer() {
@@ -305,7 +310,7 @@ export const useAtlas = create<AtlasState>((set, get) => ({
   async replaceWorld(world) {
     persisted = null
     await persist(world)
-    set({ world, task: null, problem: null, result: null, forecast: computeForecast(GRAPH, world.progress, new Date()) })
+    set({ world, task: null, problem: null, result: null, forecast: forecastOf(world.progress) })
   },
 }))
 

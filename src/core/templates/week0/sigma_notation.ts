@@ -2,17 +2,17 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Знак суммы $\\Sigma$ (sigma notation, summation): $\\sum_{i=m}^{n} a_i = a_m + a_{m+1} + \\dots + a_n$.',
-  'Индекс $i$ пробегает все целые значения от нижней границы $m$ до верхней $n$ включительно.',
-  'Полезная формула: $\\sum_{i=1}^{n} i = \\dfrac{n(n+1)}{2}$ — сумма первых $n$ натуральных чисел.',
-  'Типичная ошибка — забыть крайний член ($i=m$ или $i=n$) или неверно подставить нижнюю границу.',
+  'Summation (sigma notation) $\\Sigma$: $\\sum_{i=m}^{n} a_i = a_m + a_{m+1} + \\dots + a_n$.',
+  'The index $i$ runs through all integer values from the lower bound $m$ to the upper bound $n$, inclusive.',
+  'Useful formula: $\\sum_{i=1}^{n} i = \\dfrac{n(n+1)}{2}$ — the sum of the first $n$ natural numbers.',
+  'Common mistake: forgetting the last term ($i=m$ or $i=n$), or substituting the lower bound incorrectly.',
 ].join('\n')
 
 const HINTS = [
-  'Распиши сумму по слагаемым, подставляя по очереди каждое значение индекса.',
-  'Для суммы первых $n$ натуральных чисел используй формулу $\\frac{n(n+1)}{2}$.',
+  'Write out the sum term by term, substituting each value of the index in turn.',
+  'For the sum of the first $n$ natural numbers, use the formula $\\frac{n(n+1)}{2}$.',
 ]
-const INPUT_HINT = 'Введи число'
+const INPUT_HINT = 'Enter a number'
 
 function tier1(rng: Rng): Problem {
   const n = rng.int(3, 6)
@@ -23,8 +23,8 @@ function tier1(rng: Rng): Problem {
     statement: `Evaluate $${statement}$.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { text: 'Распишем слагаемые:', tex: `${terms.map((_, i) => `${i + 1}^{2}`).join('+')} = ${terms.join('+')}` },
-      { text: 'Сложим:', tex: `${sum}` },
+      { text: 'Write out the terms:', tex: `${terms.map((_, i) => `${i + 1}^{2}`).join('+')} = ${terms.join('+')}` },
+      { text: 'Add them up:', tex: `${sum}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -40,8 +40,8 @@ function tier2(rng: Rng): Problem {
     statement: `Evaluate $${statement}$.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { text: `Распишем слагаемые при $k=0,1,\\dots,${n}$:`, tex: `${terms.join('+')}` },
-      { text: 'Сложим:', tex: `${sum}` },
+      { text: `Write out the terms for $k=0,1,\\dots,${n}$:`, tex: `${terms.join('+')}` },
+      { text: 'Add them up:', tex: `${sum}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -56,8 +56,8 @@ function bigSumBranch(rng: Rng): Problem {
     statement: `Evaluate $${statement}$ using the formula for the sum of the first $n$ natural numbers.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { text: 'Формула суммы первых $n$ натуральных чисел:', tex: '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}' },
-      { text: `Подставим $n=${n}$:`, tex: `\\frac{${n}\\cdot ${n + 1}}{2} = ${sum}` },
+      { text: 'Formula for the sum of the first $n$ natural numbers:', tex: '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}' },
+      { text: `Substitute $n=${n}$:`, tex: `\\frac{${n}\\cdot ${n + 1}}{2} = ${sum}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -76,11 +76,11 @@ function shiftedBranch(rng: Rng): Problem {
     answer: { kind: 'number', value: String(sum) },
     solution: [
       {
-        text: 'Это сумма подряд идущих целых чисел — используем формулу суммы арифметической прогрессии:',
+        text: 'This is a sum of consecutive integers — use the formula for the sum of an arithmetic progression:',
         tex: `\\sum_{i=${k}}^{${upper}} i = \\frac{(${k}+${upper})\\cdot ${count}}{2}`,
       },
       {
-        text: 'Проверим через разность двух сумм от единицы:',
+        text: 'Check by taking the difference of two sums starting from one:',
         tex: `\\sum_{i=1}^{${upper}} i - \\sum_{i=1}^{${k - 1}} i = \\frac{${upper}\\cdot ${upper + 1}}{2} - \\frac{${k - 1}\\cdot ${k}}{2} = ${sum}`,
       },
     ],

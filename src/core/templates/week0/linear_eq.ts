@@ -4,19 +4,19 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Линейное уравнение (linear equation) — уравнение вида $ax + b = c$. Цель — оставить $x$ одного.',
-  '1. Раскрой скобки и приведи подобные слагаемые.',
-  '2. Слагаемые с $x$ перенеси влево, числа — вправо; при переносе знак меняется.',
-  '3. Раздели обе части на коэффициент при $x$.',
-  'Типичные ошибки: не сменить знак при переносе; умножить минус перед скобкой только на первое слагаемое.',
+  'A linear equation is an equation of the form $ax + b = c$. The goal is to isolate $x$.',
+  '1. Expand the parentheses and collect like terms.',
+  '2. Move the terms with $x$ to the left and the numbers to the right; the sign flips when a term crosses the equals sign.',
+  '3. Divide both sides by the coefficient of $x$.',
+  'Common mistakes: forgetting to flip the sign when moving a term; multiplying a minus sign in front of parentheses by only the first term.',
 ].join('\n')
 
 const HINTS = [
-  'Сначала раскрой скобки и собери всё, что с $x$, в одной части.',
-  'Числа перенеси в другую часть (со сменой знака), потом раздели на коэффициент при $x$.',
+  'First expand the parentheses and collect everything with $x$ on one side.',
+  'Move the numbers to the other side (flipping the sign), then divide by the coefficient of $x$.',
 ]
 
-const INPUT_HINT = 'Введи число. Дробь набирается через /'
+const INPUT_HINT = 'Enter a number. Type a fraction using /'
 
 function problem(equation: string, x: number, solution: Problem['solution']): Problem {
   return {
@@ -34,8 +34,8 @@ function tier1(rng: Rng): Problem {
   const b = rng.intExcept(-15, 15, [0])
   const c = a * x + b
   return problem(`${linear(a, b)} = ${c}`, x, [
-    { text: 'Перенесём свободный член вправо, сменив знак:', tex: `${a}x = ${c} ${b > 0 ? '-' : '+'} ${Math.abs(b)} = ${c - b}` },
-    { text: `Разделим обе части на $${a}$:`, tex: `x = \\frac{${c - b}}{${a}} = ${x}` },
+    { text: 'Move the constant term to the right, flipping its sign:', tex: `${a}x = ${c} ${b > 0 ? '-' : '+'} ${Math.abs(b)} = ${c - b}` },
+    { text: `Divide both sides by $${a}$:`, tex: `x = \\frac{${c - b}}{${a}} = ${x}` },
   ])
 }
 
@@ -51,9 +51,9 @@ function tier2(rng: Rng): Problem {
   const k = a - r
   const constant = s - a * p - q
   return problem(`${lhs} = ${rhs}`, x, [
-    { text: 'Раскроем скобки:', tex: `${linear(a, a * p + q)} = ${rhs}` },
-    { text: 'Слагаемые с $x$ — влево, числа — вправо:', tex: `${linear(k, 0)} = ${constant}` },
-    { text: 'Разделим на коэффициент при $x$:', tex: Math.abs(k) === 1 ? `x = ${x}` : `x = \\frac{${constant}}{${k}} = ${x}` },
+    { text: 'Expand the parentheses:', tex: `${linear(a, a * p + q)} = ${rhs}` },
+    { text: 'Move the terms with $x$ to the left, the numbers to the right:', tex: `${linear(k, 0)} = ${constant}` },
+    { text: 'Divide by the coefficient of $x$:', tex: Math.abs(k) === 1 ? `x = ${x}` : `x = \\frac{${constant}}{${k}} = ${x}` },
   ])
 }
 
@@ -72,11 +72,11 @@ function tier3(rng: Rng): Problem {
   const equation = `\\frac{${linear(1, p)}}{${m}} - \\frac{${linear(1, -q)}}{${n}} = ${ratToLatex(k)}`
   return problem(equation, x, [
     {
-      text: `Умножим обе части на общий знаменатель $${multiple}$:`,
+      text: `Multiply both sides by the common denominator $${multiple}$:`,
       tex: `${coefPrefix(cm)}\\left(${linear(1, p)}\\right) - ${coefPrefix(cn)}\\left(${linear(1, -q)}\\right) = ${right}`,
     },
-    { text: 'Раскроем скобки — минус перед второй скобкой меняет оба знака:', tex: `${linear(coefX, constant)} = ${right}` },
-    { text: 'Перенесём число и разделим:', tex: `${linear(coefX, 0)} = ${right - constant} \\Rightarrow x = ${x}` },
+    { text: 'Expand the parentheses — the minus sign in front of the second one flips both signs:', tex: `${linear(coefX, constant)} = ${right}` },
+    { text: 'Move the number across and divide:', tex: `${linear(coefX, 0)} = ${right - constant} \\Rightarrow x = ${x}` },
   ])
 }
 

@@ -32,6 +32,17 @@ describe('computeForecast', () => {
     expect(computeForecast(GRAPH, base, NOW).base).toBeCloseTo(3 / 24, 5)
   })
 
+  it('measures coverage only over the skills the app can teach', () => {
+    const taught = (id: string) => ['int_neg', 'order_ops', 'set_ops'].includes(id)
+    const progress = { int_neg: mastered('int_neg'), order_ops: mastered('order_ops') }
+    expect(computeForecast(GRAPH, progress, NOW, taught).covered).toBeCloseTo(2 / 3, 5)
+    expect(computeForecast(GRAPH, {}, NOW, taught).covered).toBe(0)
+  })
+
+  it('counts every skill in coverage when nothing is excluded', () => {
+    expect(computeForecast(GRAPH, masterWeek(1), NOW).covered).toBeCloseTo(17 / GRAPH.nodes.size, 5)
+  })
+
   it('ignores skills that are not mastered', () => {
     expect(computeForecast(GRAPH, { set_ops: startProgress('set_ops', 0) }, NOW).exam).toBe(0)
   })

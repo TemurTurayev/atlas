@@ -3,16 +3,16 @@ import type { Rng } from '../../random/rng'
 import type { IntervalPart, Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Область определения (domain) функции — все $x$, для которых формула имеет смысл.',
-  'Под квадратным корнем подкоренное выражение должно быть $\\ge 0$: $\\sqrt{x-a}$ требует $x \\ge a$.',
-  'Знаменатель дроби не может быть равен нулю — такие точки выкалываются из области.',
-  'Под логарифмом аргумент должен быть строго больше нуля: $\\ln(x-a)$ требует $x > a$.',
-  'Область значений (range) — все $y$, которые функция реально принимает.',
-  'Типичная ошибка: забыть выколоть точку, где знаменатель равен нулю, или спутать $\\ge$ со строгим $>$.',
+  'The domain of a function is the set of all $x$ for which the formula is defined.',
+  'Under a square root, the radicand must be $\\ge 0$: $\\sqrt{x-a}$ requires $x \\ge a$.',
+  'The denominator of a fraction cannot equal zero — such points are excluded from the domain.',
+  'Under a logarithm, the argument must be strictly greater than zero: $\\ln(x-a)$ requires $x > a$.',
+  'The range of a function is the set of all $y$ values it actually attains.',
+  'Common mistake: forgetting to exclude the point where the denominator equals zero, or confusing $\\ge$ with strict $>$.',
 ].join('\n')
 
-const HINTS = ['Найди отдельно каждое ограничение (корень, знаменатель, логарифм).', 'Объедини условия: возьми пересечение, а точки со знаменателем нулём — выколи.']
-const INPUT_HINT = 'Собери ответ кнопками: скобка ( не включает конец, [ включает'
+const HINTS = ['Find each restriction separately (radical, denominator, logarithm).', 'Combine the conditions: take the intersection, and exclude points where the denominator is zero.']
+const INPUT_HINT = 'Build the answer with the buttons: ( excludes the endpoint, [ includes it'
 
 const part = (lo: string | null, hi: string | null, loClosed: boolean, hiClosed: boolean): IntervalPart => ({ lo, hi, loClosed, hiClosed })
 
@@ -23,8 +23,8 @@ function tier1(rng: Rng): Problem {
     statement: `Find the domain of $f(x) = ${f}$.`,
     answer: { kind: 'interval', parts: [part(String(a), null, true, false)] },
     solution: [
-      { text: `Подкоренное выражение не может быть отрицательным:`, tex: `${linear(1, -a)} \\ge 0` },
-      { text: 'Решаем неравенство:', tex: `x \\ge ${a}` },
+      { text: `The radicand cannot be negative:`, tex: `${linear(1, -a)} \\ge 0` },
+      { text: 'Solve the inequality:', tex: `x \\ge ${a}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -42,11 +42,11 @@ function tier2(rng: Rng): Problem {
       parts: [part(String(a), String(b), true, false), part(String(b), null, false, false)],
     },
     solution: [
-      { text: 'Подкоренное выражение неотрицательно:', tex: `x \\ge ${a}` },
-      { text: 'Знаменатель не равен нулю:', tex: `x \\ne ${b}` },
-      { text: 'Объединяем оба условия (точка $b$ выколота):', tex: `[${a}, ${b}) \\cup (${b}, \\infty)` },
+      { text: 'The radicand is nonnegative:', tex: `x \\ge ${a}` },
+      { text: 'The denominator is not zero:', tex: `x \\ne ${b}` },
+      { text: 'Combine both conditions (the point $b$ is excluded):', tex: `[${a}, ${b}) \\cup (${b}, \\infty)` },
     ],
-    hints: [...HINTS, `Не забудь, что $x = ${b}$ обнуляет знаменатель, даже если корень там определён.`],
+    hints: [...HINTS, `Do not forget that $x = ${b}$ makes the denominator zero, even though the radical is defined there.`],
     inputHint: INPUT_HINT,
   }
 }
@@ -58,10 +58,10 @@ function logDomain(rng: Rng): Problem {
     statement: `Find the domain of $f(x) = ${f}$.`,
     answer: { kind: 'interval', parts: [part(String(a), null, false, false)] },
     solution: [
-      { text: 'Аргумент логарифма должен быть строго положительным:', tex: `${linear(1, -a)} > 0` },
-      { text: 'Решаем неравенство:', tex: `x > ${a}` },
+      { text: 'The argument of the logarithm must be strictly positive:', tex: `${linear(1, -a)} > 0` },
+      { text: 'Solve the inequality:', tex: `x > ${a}` },
     ],
-    hints: ['Логарифм определён только для положительного аргумента.', `Реши строгое неравенство $${linear(1, -a)} > 0$.`],
+    hints: ['A logarithm is defined only for a positive argument.', `Solve the strict inequality $${linear(1, -a)} > 0$.`],
     inputHint: INPUT_HINT,
   }
 }
@@ -79,13 +79,13 @@ function quadraticRange(rng: Rng): Problem {
       parts: opensUp ? [part(String(k), null, true, false)] : [part(null, String(k), false, true)],
     },
     solution: [
-      { text: `Вершина параболы в точке $x = ${h}$, значение в вершине $y = ${k}$.` },
+      { text: `The vertex of the parabola is at $x = ${h}$, with value $y = ${k}$ at the vertex.` },
       {
-        text: opensUp ? 'Ветви направлены вверх — минимум в вершине, дальше $y$ растёт без ограничений:' : 'Ветви направлены вниз — максимум в вершине, дальше $y$ убывает без ограничений:',
+        text: opensUp ? 'The branches open upward — the minimum is at the vertex, and $y$ increases without bound from there:' : 'The branches open downward — the maximum is at the vertex, and $y$ decreases without bound from there:',
         tex: opensUp ? `y \\ge ${k}` : `y \\le ${k}`,
       },
     ],
-    hints: ['Найди координату $y$ вершины параболы.', opensUp ? 'Ветви вверх — область значений начинается от вершины и идёт до $+\\infty$.' : 'Ветви вниз — область значений идёт от $-\\infty$ до вершины.'],
+    hints: ['Find the $y$-coordinate of the vertex of the parabola.', opensUp ? 'Branches upward — the range starts at the vertex and goes to $+\\infty$.' : 'Branches downward — the range goes from $-\\infty$ to the vertex.'],
     inputHint: INPUT_HINT,
   }
 }

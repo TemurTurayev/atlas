@@ -3,15 +3,15 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Целые числа (integers) — это …, −2, −1, 0, 1, 2, … Отрицательные числа лежат левее нуля на числовой прямой.',
-  'Знаки при умножении и делении: $(-a)\\cdot(-b)=ab$, $(-a)\\cdot b=-ab$, $\\dfrac{-a}{-b}=\\dfrac{a}{b}$.',
-  'Вычесть отрицательное число — то же самое, что прибавить: $a-(-b)=a+b$.',
-  'Чётная степень отрицательного числа положительна: $(-2)^{2}=4$; нечётная — отрицательна: $(-2)^{3}=-8$.',
-  'Типичные ошибки: потерять минус при раскрытии скобки $-(-n)$; забыть, что умножение выполняется раньше сложения и вычитания.',
+  'Integers are …, −2, −1, 0, 1, 2, … Negative numbers lie to the left of zero on the number line.',
+  'Signs in multiplication and division: $(-a)\\cdot(-b)=ab$, $(-a)\\cdot b=-ab$, $\\dfrac{-a}{-b}=\\dfrac{a}{b}$.',
+  'Subtracting a negative number is the same as adding: $a-(-b)=a+b$.',
+  'An even power of a negative number is positive: $(-2)^{2}=4$; an odd power is negative: $(-2)^{3}=-8$.',
+  'Common mistakes: losing the minus sign when expanding $-(-n)$; forgetting that multiplication is done before addition and subtraction.',
 ].join('\n')
 
-const HINTS_BASIC = ['Сначала выполни умножение, потом сложение и вычитание.', 'Вычесть отрицательное число — значит прибавить положительное: $a-(-n)=a+n$.']
-const INPUT_HINT = 'Введи целое число, например -7'
+const HINTS_BASIC = ['Do the multiplication first, then the addition and subtraction.', 'Subtracting a negative number means adding a positive one: $a-(-n)=a+n$.']
+const INPUT_HINT = 'Enter an integer, e.g. -7'
 
 function problem(equation: string, value: number, solution: Problem['solution'], hints: readonly string[] = HINTS_BASIC): Problem {
   return {
@@ -31,8 +31,8 @@ function tier1(rng: Rng): Problem {
   const value = a - product
   const equation = `${a} - ${paren(b)} \\cdot ${c}`
   return problem(equation, value, [
-    { text: 'Сначала умножение:', tex: `${paren(b)} \\cdot ${c} = ${product}` },
-    { text: `Вычесть $${product}$ — значит прибавить $${-product}$:`, tex: `${a} - \\left(${product}\\right) = ${a} + ${-product} = ${value}` },
+    { text: 'Multiply first:', tex: `${paren(b)} \\cdot ${c} = ${product}` },
+    { text: `Subtracting $${product}$ means adding $${-product}$:`, tex: `${a} - \\left(${product}\\right) = ${a} + ${-product} = ${value}` },
   ])
 }
 
@@ -48,11 +48,11 @@ function tier2(rng: Rng): Problem {
     equation,
     value,
     [
-      { text: 'Сначала умножение:', tex: `${paren(p3)} \\cdot ${p4} = ${product}` },
-      { text: `Вычесть отрицательное $${p2}$ — значит прибавить $${-p2}$:`, tex: `${p1} - \\left(${p2}\\right) = ${p1 - p2}` },
-      { text: 'Складываем всё по порядку слева направо:', tex: `${p1 - p2} + \\left(${product}\\right) = ${value}` },
+      { text: 'Multiply first:', tex: `${paren(p3)} \\cdot ${p4} = ${product}` },
+      { text: `Subtracting the negative $${p2}$ means adding $${-p2}$:`, tex: `${p1} - \\left(${p2}\\right) = ${p1 - p2}` },
+      { text: 'Add everything in order, left to right:', tex: `${p1 - p2} + \\left(${product}\\right) = ${value}` },
     ],
-    ['Умножение выполняется раньше сложения и вычитания.', 'Дальше складывай и вычитай слева направо, следя за знаком каждого слагаемого.'],
+    ['Multiplication is done before addition and subtraction.', 'Then add and subtract left to right, tracking the sign of each term.'],
   )
 }
 
@@ -69,13 +69,13 @@ function tier3(rng: Rng): Problem {
     equation,
     value,
     [
-      { text: `Возводим $${a}$ в степень $${p}$ (${p % 2 === 0 ? 'чётная степень — результат положителен' : 'нечётная степень — знак сохраняется'}):`, tex: `${paren(a)}^{${p}} = ${ap}` },
-      { text: `Возводим $${b}$ в степень $${q}$:`, tex: `${paren(b)}^{${q}} = ${bq}` },
-      { text: 'Вычитаем:', tex: `${ap} - \\left(${bq}\\right) = ${value}` },
+      { text: `Raise $${a}$ to the power $${p}$ (${p % 2 === 0 ? 'even power: the result is positive' : 'odd power: the sign is preserved'}):`, tex: `${paren(a)}^{${p}} = ${ap}` },
+      { text: `Raise $${b}$ to the power $${q}$:`, tex: `${paren(b)}^{${q}} = ${bq}` },
+      { text: 'Subtract:', tex: `${ap} - \\left(${bq}\\right) = ${value}` },
     ],
     [
-      'Чётная степень отрицательного числа даёт положительный результат, нечётная — отрицательный.',
-      'Вычисли каждую степень отдельно, затем выполни вычитание, помня про знак.',
+      'An even power of a negative number is positive; an odd power is negative.',
+      'Compute each power separately, then subtract, keeping track of the sign.',
     ],
   )
 }

@@ -3,16 +3,16 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Приставки СИ (SI prefixes): кило- $=10^{3}$, санти- $=10^{-2}$, милли- $=10^{-3}$, микро- $=10^{-6}$.',
-  'Перевод единиц — умножение на переводной коэффициент, например $1$ км/ч $=\\dfrac{5}{18}$ м/с, $1$ г/см$^3=1000$ кг/м$^3$.',
-  'При переходе от крупной единицы к мелкой число увеличивается; от мелкой к крупной — уменьшается.',
-  'Доза лекарства на массу тела: доза (мг) $=$ доза на кг (мг/кг) $\\times$ масса (кг).',
-  'Типичная ошибка: перепутать умножение с делением при переходе между единицами разного масштаба.',
+  'SI prefixes: kilo- $=10^{3}$, centi- $=10^{-2}$, milli- $=10^{-3}$, micro- $=10^{-6}$.',
+  'Unit conversion is multiplication by a conversion factor, for example $1$ km/h $=\\dfrac{5}{18}$ m/s, $1$ g/cm$^3=1000$ kg/m$^3$.',
+  'Converting from a larger unit to a smaller one increases the number; converting from a smaller unit to a larger one decreases it.',
+  'Drug dose by body weight: dose (mg) $=$ dose per kg (mg/kg) $\\times$ weight (kg).',
+  'Common mistake: confusing multiplication with division when converting between units of different scale.',
 ].join('\n')
 
-const HINTS_KMH = ['$1$ км/ч $=\\dfrac{1000\\text{ м}}{3600\\text{ с}}=\\dfrac{5}{18}$ м/с.', 'Умножь скорость в км/ч на $\\frac{5}{18}$.']
-const HINTS_SMALL = ['Определи, во сколько раз отличаются единицы (степень десяти).', 'Умножь или раздели на этот коэффициент — смотри, куда нужно двигать запятую.']
-const HINTS_MED = ['Найди коэффициент перевода между единицами.', 'Умножь исходное значение на найденный коэффициент.']
+const HINTS_KMH = ['$1$ km/h $=\\dfrac{1000\\text{ m}}{3600\\text{ s}}=\\dfrac{5}{18}$ m/s.', 'Multiply the speed in km/h by $\\frac{5}{18}$.']
+const HINTS_SMALL = ['Determine the ratio between the units (a power of ten).', 'Multiply or divide by that factor to see which way to shift the decimal point.']
+const HINTS_MED = ['Find the conversion factor between the units.', 'Multiply the original value by that factor.']
 
 function build(statement: string, value: string, solution: Problem['solution'], hints: readonly string[]): Problem {
   return {
@@ -20,7 +20,7 @@ function build(statement: string, value: string, solution: Problem['solution'], 
     answer: { kind: 'number', value },
     solution,
     hints,
-    inputHint: 'Введи число (единицу писать не нужно)',
+    inputHint: 'Enter a number (no need to write the unit)',
   }
 }
 
@@ -32,8 +32,8 @@ function tier1(rng: Rng): Problem {
     `Convert $${kmh}$ km/h to m/s.`,
     ratToLatex(value),
     [
-      { text: 'Коэффициент перевода:', tex: `1 \\text{ км/ч} = \\frac{5}{18} \\text{ м/с}` },
-      { text: 'Умножаем на скорость:', tex: `${kmh} \\cdot \\frac{5}{18} = ${ratToLatex(value)}` },
+      { text: 'Conversion factor:', tex: `1 \\text{ km/h} = \\frac{5}{18} \\text{ m/s}` },
+      { text: 'Multiply by the speed:', tex: `${kmh} \\cdot \\frac{5}{18} = ${ratToLatex(value)}` },
     ],
     HINTS_KMH,
   )
@@ -50,8 +50,8 @@ function microToMilli(rng: Rng): Problem {
     `Convert $${amountUl}$ µL to mL.`,
     value === '' ? '0' : value,
     [
-      { text: 'В одном миллилитре $1000$ микролитров:', tex: '1 \\text{ мл} = 1000 \\text{ мкл}' },
-      { text: 'Делим на 1000:', tex: `${amountUl} \\div 1000 = ${value}` },
+      { text: 'One milliliter contains $1000$ microliters:', tex: '1 \\text{ mL} = 1000 \\text{ \u00b5L}' },
+      { text: 'Divide by 1000:', tex: `${amountUl} \\div 1000 = ${value}` },
     ],
     HINTS_SMALL,
   )
@@ -65,8 +65,8 @@ function gramsToMilligrams(rng: Rng): Problem {
     `Convert $${grams}$ g to mg.`,
     String(value),
     [
-      { text: 'В одном грамме $1000$ миллиграммов:', tex: '1 \\text{ г} = 1000 \\text{ мг}' },
-      { text: 'Умножаем на 1000:', tex: `${grams} \\cdot 1000 = ${value}` },
+      { text: 'One gram contains $1000$ milligrams:', tex: '1 \\text{ g} = 1000 \\text{ mg}' },
+      { text: 'Multiply by 1000:', tex: `${grams} \\cdot 1000 = ${value}` },
     ],
     HINTS_SMALL,
   )
@@ -84,8 +84,8 @@ function density(rng: Rng): Problem {
     `A substance has density $${d}$ g/cm³. Convert it to kg/m³.`,
     String(value),
     [
-      { text: 'Коэффициент перевода:', tex: '1 \\text{ г/см}^3 = 1000 \\text{ кг/м}^3' },
-      { text: 'Умножаем на 1000:', tex: `${d} \\cdot 1000 = ${value}` },
+      { text: 'Conversion factor:', tex: '1 \\text{ g/cm}^3 = 1000 \\text{ kg/m}^3' },
+      { text: 'Multiply by 1000:', tex: `${d} \\cdot 1000 = ${value}` },
     ],
     HINTS_MED,
   )
@@ -99,7 +99,7 @@ function dosePerKg(rng: Rng): Problem {
     `A drug is dosed at $${dose}$ mg/kg. Find the total dose for a child weighing $${weight}$ kg.`,
     String(value),
     [
-      { text: 'Общая доза равна дозе на кг, умноженной на массу:', tex: `${dose} \\cdot ${weight} = ${value}` },
+      { text: 'Total dose equals the dose per kg multiplied by the weight:', tex: `${dose} \\cdot ${weight} = ${value}` },
     ],
     HINTS_MED,
   )

@@ -3,15 +3,15 @@ import type { Rng } from '../../random/rng'
 import type { ChoiceOption, Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Инъективная функция (injective, one-to-one): разным $x$ соответствуют разные $y$, то есть из $f(x_1) = f(x_2)$ следует $x_1 = x_2$.',
-  'Графический тест: любая горизонтальная прямая пересекает график не более одного раза.',
-  'Чётные степени и модуль ($x^2$, $|x|$) не инъективны на $\\mathbb{R}$ — например $f(-2) = f(2)$.',
-  'Строго монотонные функции (линейные с $a \\ne 0$, нечётные степени вроде $x^3$) инъективны на $\\mathbb{R}$.',
-  'Биекция (bijection) — это инъекция и сюръекция одновременно; функция должна быть определена на всём $\\mathbb{R}$.',
-  'Типичная ошибка: путать «каждому $x$ — одно значение $y$» (это просто функция) с «каждому $y$ — не более одного $x$» (это инъективность).',
+  'An injective function (one-to-one): different $x$ values map to different $y$ values, that is, $f(x_1) = f(x_2)$ implies $x_1 = x_2$.',
+  'Graphical test: any horizontal line crosses the graph at most once.',
+  'Even powers and the absolute value ($x^2$, $|x|$) are not injective on $\\mathbb{R}$ — for example $f(-2) = f(2)$.',
+  'Strictly monotonic functions (linear functions with $a \\ne 0$, odd powers such as $x^3$) are injective on $\\mathbb{R}$.',
+  'A bijection is both injective and surjective at once; the function must be defined on all of $\\mathbb{R}$.',
+  'Common mistake: confusing "each $x$ has one value of $y$" (this is just the definition of a function) with "each $y$ has at most one $x$" (this is injectivity).',
 ].join('\n')
 
-const HINTS = ['Проверь, симметричен ли график относительно вертикальной прямой — тогда есть повторяющиеся значения.', 'Строго возрастающая или строго убывающая функция на $\\mathbb{R}$ всегда инъективна.']
+const HINTS = ['Check whether the graph is symmetric about a vertical line — that indicates repeated values.', 'A strictly increasing or strictly decreasing function on $\\mathbb{R}$ is always injective.']
 
 const cubeLabel = (a: number, c: number): string => `${a === 1 ? '' : a === -1 ? '-' : a}x^{3}${c === 0 ? '' : c > 0 ? `+${c}` : c}`
 const quadLabel = (h: number, k: number): string => `\\left(${linear(1, -h)}\\right)^{2}${k === 0 ? '' : k > 0 ? `+${k}` : k}`
@@ -22,11 +22,11 @@ function injectiveCandidate(rng: Rng): { readonly label: string; readonly explan
   if (rng.chance(0.5)) {
     const a = rng.pick([-3, -2, -1, 1, 2, 3])
     const b = rng.int(-5, 5)
-    return { label: `$${linear(a, b)}$`, explanation: `линейная функция $${linear(a, b)}$ строго монотонна (коэффициент $${a} \\ne 0$)` }
+    return { label: `$${linear(a, b)}$`, explanation: `the linear function $${linear(a, b)}$ is strictly monotonic (coefficient $${a} \\ne 0$)` }
   }
   const a = rng.pick([-2, -1, 1, 2])
   const c = rng.int(-5, 5)
-  return { label: `$${cubeLabel(a, c)}$`, explanation: `нечётная степень $${cubeLabel(a, c)}$ строго монотонна на всей числовой прямой` }
+  return { label: `$${cubeLabel(a, c)}$`, explanation: `the odd power $${cubeLabel(a, c)}$ is strictly monotonic on the whole real line` }
 }
 
 function nonInjectiveCandidates(rng: Rng, count: number): readonly { readonly label: string; readonly explanation: string }[] {
@@ -36,7 +36,7 @@ function nonInjectiveCandidates(rng: Rng, count: number): readonly { readonly la
     const k = rng.int(-4, 4)
     const kind = kinds[i % kinds.length]
     const label = kind(h, k)
-    return { label: `$${label}$`, explanation: `$${label}$ принимает одинаковые значения слева и справа от $x = ${h}$` }
+    return { label: `$${label}$`, explanation: `$${label}$ takes the same value on both sides of $x = ${h}$` }
   })
 }
 
@@ -50,8 +50,8 @@ function buildChoice(rng: Rng, statement: string, distractorCount: number, corre
     statement,
     answer: { kind: 'choice', options, correctId: 'correct' },
     solution: [
-      { text: `Верный ответ: ${correct.explanation}.` },
-      { text: `Остальные варианты не инъективны: ${wrong.map((w) => w.explanation).join('; ')}.` },
+      { text: `Correct answer: ${correct.explanation}.` },
+      { text: `The other options are not injective: ${wrong.map((w) => w.explanation).join('; ')}.` },
     ],
     hints: HINTS,
   }
@@ -77,7 +77,7 @@ function tier3(rng: Rng): Problem {
   const wrong = nonInjectiveCandidates(rng, 2)
   const reciprocal = {
     label: `$\\dfrac{1}{${linear(1, -reciprocalShift)}}$`,
-    explanation: `$\\dfrac{1}{${linear(1, -reciprocalShift)}}$ не определена при $x = ${reciprocalShift}$, значит это не функция на всём $\\mathbb{R}$`,
+    explanation: `$\\dfrac{1}{${linear(1, -reciprocalShift)}}$ is undefined at $x = ${reciprocalShift}$, so it is not a function on all of $\\mathbb{R}$`,
   }
   const options: readonly ChoiceOption[] = rng.shuffle([
     { id: 'correct', label: correct.label },
@@ -89,10 +89,10 @@ function tier3(rng: Rng): Problem {
     statement: question,
     answer: { kind: 'choice', options, correctId: 'correct' },
     solution: [
-      { text: `Верный ответ: ${correct.explanation}, а на всём $\\mathbb{R}$ такая функция ещё и сюръективна.` },
-      { text: `Остальные не подходят: ${wrong.map((w) => w.explanation).join('; ')}; ${reciprocal.explanation}.` },
+      { text: `Correct answer: ${correct.explanation}, and on all of $\\mathbb{R}$ such a function is also surjective.` },
+      { text: `The others do not qualify: ${wrong.map((w) => w.explanation).join('; ')}; ${reciprocal.explanation}.` },
     ],
-    hints: [...HINTS, 'Проверь, что функция вообще определена для каждого $x \\in \\mathbb{R}$ — иначе это не функция $\\mathbb{R} \\to \\mathbb{R}$.'],
+    hints: [...HINTS, 'Check that the function is defined for every $x \\in \\mathbb{R}$ — otherwise it is not a function $\\mathbb{R} \\to \\mathbb{R}$.'],
   }
 }
 

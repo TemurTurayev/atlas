@@ -2,17 +2,17 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Выразить переменную (rearranging a formula) — оставить нужную букву одну в одной части равенства.',
-  'Действия те же, что и в уравнении: перенос слагаемых со сменой знака, умножение/деление обеих частей.',
-  'Если переменная в знаменателе — сначала умножь обе части на этот знаменатель.',
-  'Типичная ошибка: умножить/разделить только часть выражения, а не обе части целиком.',
+  'Rearranging a formula: isolate the required letter alone on one side of the equation.',
+  'The steps are the same as for an equation: move terms across with a sign change, multiply or divide both sides.',
+  'If the variable is in the denominator, first multiply both sides by that denominator.',
+  'Common mistake: multiplying or dividing only part of an expression instead of both whole sides.',
 ].join('\n')
 
 const HINTS = [
-  'Определи, какое действие "мешает" нужной переменной, и выполни обратное действие над обеими частями.',
-  'Если переменная в знаменателе — сначала умножь обе части на знаменатель, чтобы её оттуда убрать.',
+  'Identify which operation is "in the way" of the required variable, and apply the inverse operation to both sides.',
+  'If the variable is in the denominator, first multiply both sides by the denominator to remove it from there.',
 ]
-const INPUT_HINT = 'Введи выражение через известные буквы'
+const INPUT_HINT = 'Enter an expression in terms of the known letters'
 
 const VARIANTS1: readonly (readonly [string, string, string])[] = [
   ['v', 's', 't'],
@@ -26,8 +26,8 @@ function tier1(rng: Rng): Problem {
     statement: `Given $${lhs} = \\dfrac{${num}}{${den}}$, solve for $${den}$.`,
     answer: { kind: 'expression', value: `\\frac{${num}}{${lhs}}`, variables: [num, lhs] },
     solution: [
-      { text: `Умножим обе части на $${den}$:`, tex: `${lhs}${den} = ${num}` },
-      { text: `Разделим обе части на $${lhs}$:`, tex: `${den} = \\frac{${num}}{${lhs}}` },
+      { text: `Multiply both sides by $${den}$:`, tex: `${lhs}${den} = ${num}` },
+      { text: `Divide both sides by $${lhs}$:`, tex: `${den} = \\frac{${num}}{${lhs}}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -43,9 +43,9 @@ function tier2(rng: Rng): Problem {
     statement: `The thin-lens equation is $\\dfrac{1}{f} = \\dfrac{1}{a} + \\dfrac{1}{b}$. Solve for $${target}$ in terms of $${known}$ and $f$.`,
     answer: { kind: 'expression', value, variables: [known, 'f'], domain: { [known]: [2, 4], f: [0.3, 0.8] } },
     solution: [
-      { text: `Перенесём $\\frac{1}{${known}}$ в другую часть:`, tex: `\\frac{1}{${target}} = \\frac{1}{f} - \\frac{1}{${known}}` },
-      { text: 'Приведём к общему знаменателю:', tex: `\\frac{1}{${target}} = \\frac{${known}-f}{f\\cdot ${known}}` },
-      { text: 'Перевернём обе части (обратные величины):', tex: `${target} = \\frac{f\\cdot ${known}}{${known}-f} = \\frac{${known}f}{${known}-f}` },
+      { text: `Move $\\frac{1}{${known}}$ to the other side:`, tex: `\\frac{1}{${target}} = \\frac{1}{f} - \\frac{1}{${known}}` },
+      { text: 'Bring to a common denominator:', tex: `\\frac{1}{${target}} = \\frac{${known}-f}{f\\cdot ${known}}` },
+      { text: 'Take the reciprocal of both sides:', tex: `${target} = \\frac{f\\cdot ${known}}{${known}-f} = \\frac{${known}f}{${known}-f}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -57,9 +57,9 @@ function celsiusBranch(): Problem {
     statement: 'The formula $C = \\dfrac{5(F-32)}{9}$ converts Fahrenheit to Celsius. Solve for $F$.',
     answer: { kind: 'expression', value: '\\frac{9C}{5}+32', variables: ['C'] },
     solution: [
-      { text: 'Умножим обе части на $9$:', tex: '9C = 5(F-32)' },
-      { text: 'Разделим обе части на $5$:', tex: '\\frac{9C}{5} = F-32' },
-      { text: 'Прибавим $32$ к обеим частям:', tex: 'F = \\frac{9C}{5}+32' },
+      { text: 'Multiply both sides by $9$:', tex: '9C = 5(F-32)' },
+      { text: 'Divide both sides by $5$:', tex: '\\frac{9C}{5} = F-32' },
+      { text: 'Add $32$ to both sides:', tex: 'F = \\frac{9C}{5}+32' },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -71,9 +71,9 @@ function interestBranch(): Problem {
     statement: 'Simple interest is $A = P(1+rt)$. Solve for $r$.',
     answer: { kind: 'expression', value: '\\frac{A-P}{Pt}', variables: ['A', 'P', 't'], domain: { A: [3, 6], P: [1.5, 2.5], t: [0.5, 2.5] } },
     solution: [
-      { text: 'Раскроем скобки:', tex: 'A = P + Prt' },
-      { text: 'Перенесём $P$ в другую часть:', tex: 'A - P = Prt' },
-      { text: 'Разделим обе части на $Pt$:', tex: 'r = \\frac{A-P}{Pt}' },
+      { text: 'Expand the parentheses:', tex: 'A = P + Prt' },
+      { text: 'Move $P$ to the other side:', tex: 'A - P = Prt' },
+      { text: 'Divide both sides by $Pt$:', tex: 'r = \\frac{A-P}{Pt}' },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,

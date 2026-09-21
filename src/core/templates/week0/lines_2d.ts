@@ -5,25 +5,25 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Наклон прямой (slope) через две точки: $k=\\frac{y_2-y_1}{x_2-x_1}$.',
-  'Уравнение прямой (line equation) вида $y=kx+b$ — подставь одну из точек, чтобы найти $b$.',
-  'Параллельные прямые (parallel lines) имеют одинаковый наклон: $k_1=k_2$.',
-  'Перпендикулярные прямые (perpendicular lines): $k_1\\cdot k_2=-1$, то есть $k_2=-\\frac{1}{k_1}$.',
-  'Типичные ошибки: перепутать порядок вычитания в числителе и знаменателе; забыть сменить знак у перпендикулярного наклона.',
+  'Slope of a line through two points: $k=\\frac{y_2-y_1}{x_2-x_1}$.',
+  'Line equation of the form $y=kx+b$: substitute one of the points to find $b$.',
+  'Parallel lines have equal slopes: $k_1=k_2$.',
+  'Perpendicular lines: $k_1\\cdot k_2=-1$, that is, $k_2=-\\frac{1}{k_1}$.',
+  'Common mistakes: mixing up the order of subtraction in the numerator and the denominator; forgetting to flip the sign for a perpendicular slope.',
 ].join('\n')
 
 const TIER1_HINTS = [
-  'Наклон — это отношение изменения $y$ к изменению $x$.',
-  'Формула: $k=\\frac{y_2-y_1}{x_2-x_1}$. Подставь координаты точек.',
+  'The slope is the ratio of the change in $y$ to the change in $x$.',
+  'Formula: $k=\\frac{y_2-y_1}{x_2-x_1}$. Substitute the coordinates of the points.',
 ]
 const TIER2_HINTS = [
-  'Сначала найди наклон по двум точкам.',
-  'Подставь одну из точек в $y=kx+b$ и найди $b$.',
-  'Запиши итоговое уравнение в виде $y=kx+b$.',
+  'First find the slope from the two points.',
+  'Substitute one of the points into $y=kx+b$ and solve for $b$.',
+  'Write the final equation in the form $y=kx+b$.',
 ]
 const TIER3_HINTS = [
-  'У параллельных прямых наклон совпадает; у перпендикулярных — произведение наклонов равно $-1$.',
-  'Найди новый наклон, затем подставь данную точку, чтобы найти $b$.',
+  'Parallel lines have equal slopes; for perpendicular lines the product of the slopes is $-1$.',
+  'Find the new slope, then substitute the given point to find $b$.',
 ]
 
 function ratLinearLatex(m: Rational, b: Rational): string {
@@ -47,11 +47,11 @@ function tier1(rng: Rng): Problem {
     statement: `Find the slope of the line through $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
     answer: { kind: 'number', value: ratToLatex(slope) },
     solution: [
-      { text: 'Наклон через две точки:', tex: `k = \\frac{y_2-y_1}{x_2-x_1} = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}}` },
-      { text: 'Вычисляем:', tex: `k = \\frac{${y2 - y1}}{${x2 - x1}} = ${ratToLatex(slope)}` },
+      { text: 'Slope from two points:', tex: `k = \\frac{y_2-y_1}{x_2-x_1} = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}}` },
+      { text: 'Compute:', tex: `k = \\frac{${y2 - y1}}{${x2 - x1}} = ${ratToLatex(slope)}` },
     ],
     hints: TIER1_HINTS,
-    inputHint: 'Дробь пиши через /, например 3/4 или -2/5',
+    inputHint: 'Write a fraction with /, e.g. 3/4 or -2/5',
   }
 }
 
@@ -67,12 +67,12 @@ function tier2(rng: Rng): Problem {
     statement: `Find the equation, in the form $y = mx + b$, of the line through $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
     answer: { kind: 'expression', value: linear(m, b), variables: ['x'] },
     solution: [
-      { text: 'Наклон по двум точкам:', tex: `k = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}} = ${m}` },
-      { text: 'Подставим точку в $y=kx+b$, чтобы найти $b$:', tex: `${y1} = ${m}\\cdot${paren(x1)} + b \\Rightarrow b = ${b}` },
-      { text: 'Уравнение прямой:', tex: `y = ${linear(m, b)}` },
+      { text: 'Slope from two points:', tex: `k = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}} = ${m}` },
+      { text: 'Substitute the point into $y=kx+b$ to find $b$:', tex: `${y1} = ${m}\\cdot${paren(x1)} + b \\Rightarrow b = ${b}` },
+      { text: 'Equation of the line:', tex: `y = ${linear(m, b)}` },
     ],
     hints: TIER2_HINTS,
-    inputHint: 'Введи уравнение как y=..., например y=2x-3',
+    inputHint: 'Enter the equation as y=..., e.g. y=2x-3',
   }
 }
 
@@ -88,21 +88,21 @@ function tier3(rng: Rng): Problem {
   const relation = perpendicular ? 'perpendicular to' : 'parallel to'
   const solution: Problem['solution'] = perpendicular
     ? [
-        { text: `Наклон данной прямой $k=${m}$. Для перпендикулярной прямой наклон:`, tex: `k' = -\\frac{1}{k} = ${ratToLatex(slope)}` },
-        { text: 'Подставим точку, чтобы найти $b$:', tex: `${y0} = ${ratToLatex(slope)}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
-        { text: 'Уравнение прямой:', tex: `y = ${value}` },
+        { text: `The slope of the given line is $k=${m}$. For a perpendicular line, the slope is:`, tex: `k' = -\\frac{1}{k} = ${ratToLatex(slope)}` },
+        { text: 'Substitute the point to find $b$:', tex: `${y0} = ${ratToLatex(slope)}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
+        { text: 'Equation of the line:', tex: `y = ${value}` },
       ]
     : [
-        { text: 'Параллельные прямые имеют одинаковый наклон:', tex: `k' = k = ${m}` },
-        { text: 'Подставим точку, чтобы найти $b$:', tex: `${y0} = ${m}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
-        { text: 'Уравнение прямой:', tex: `y = ${value}` },
+        { text: 'Parallel lines have equal slopes:', tex: `k' = k = ${m}` },
+        { text: 'Substitute the point to find $b$:', tex: `${y0} = ${m}\\cdot${paren(x0)} + b \\Rightarrow b = ${ratToLatex(intercept)}` },
+        { text: 'Equation of the line:', tex: `y = ${value}` },
       ]
   return {
     statement: `The line $y = ${linear(m, c)}$ is given. Find the equation, in the form $y = mx + b$, of the line through $(${x0}, ${y0})$ that is ${relation} it.`,
     answer: { kind: 'expression', value, variables: ['x'] },
     solution,
     hints: TIER3_HINTS,
-    inputHint: 'Введи уравнение как y=... Наклон перпендикулярной прямой — обратное число с минусом',
+    inputHint: 'Enter the equation as y=... The slope of a perpendicular line is the negative reciprocal',
   }
 }
 

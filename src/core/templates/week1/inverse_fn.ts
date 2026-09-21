@@ -3,15 +3,15 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Обратная функция (inverse function) $f^{-1}$ «отменяет» действие $f$: если $f(a) = b$, то $f^{-1}(b) = a$.',
-  'Чтобы найти $f^{-1}$: замени $f(x)$ на $y$, поменяй местами $x$ и $y$, затем реши уравнение относительно $y$.',
-  'Обратная функция существует только у инъективной (взаимно однозначной) функции.',
-  'Область определения $f^{-1}$ — это область значений исходной $f$, и наоборот.',
-  'Типичная ошибка: путать $f^{-1}(x)$ с $\\dfrac{1}{f(x)}$ — это совершенно разные вещи.',
+  'The inverse function $f^{-1}$ "undoes" the action of $f$: if $f(a) = b$, then $f^{-1}(b) = a$.',
+  'To find $f^{-1}$: replace $f(x)$ with $y$, swap $x$ and $y$, then solve the equation for $y$.',
+  'An inverse function exists only for an injective (one-to-one) function.',
+  'The domain of $f^{-1}$ is the range of the original $f$, and vice versa.',
+  'Common mistake: confusing $f^{-1}(x)$ with $\\dfrac{1}{f(x)}$ — these are completely different things.',
 ].join('\n')
 
-const HINTS = ['Замени $f(x)$ на $y$, поменяй местами $x$ и $y$.', 'Реши получившееся уравнение относительно новой $y$ — это и есть $f^{-1}(x)$.']
-const DOMAIN_HINT = 'Введи выражение через x'
+const HINTS = ['Replace $f(x)$ with $y$, then swap $x$ and $y$.', 'Solve the resulting equation for the new $y$ — that is $f^{-1}(x)$.']
+const DOMAIN_HINT = 'Enter an expression in x'
 
 function tier1(rng: Rng): Problem {
   const a = rng.intExcept(-6, 6, [0])
@@ -22,8 +22,8 @@ function tier1(rng: Rng): Problem {
     statement: `Given $f(x) = ${f}$, find $f^{-1}(x)$.`,
     answer: { kind: 'expression', value, variables: ['x'] },
     solution: [
-      { text: 'Меняем местами $x$ и $y$ в уравнении $y = ax+b$:', tex: `x = ${linear(a, b, 'y')}` },
-      { text: 'Переносим $b$ и делим на $a$:', tex: `y = ${value}` },
+      { text: 'Swap $x$ and $y$ in the equation $y = ax+b$:', tex: `x = ${linear(a, b, 'y')}` },
+      { text: 'Move $b$ to the other side and divide by $a$:', tex: `y = ${value}` },
     ],
     hints: HINTS,
     inputHint: DOMAIN_HINT,
@@ -43,12 +43,12 @@ function tier2(rng: Rng): Problem {
     statement: `Given $f(x) = ${f}$, find $f^{-1}(x)$.`,
     answer: { kind: 'expression', value, variables: ['x'], domain: { x: [1.5, 4] } },
     solution: [
-      { text: 'Заменяем $f(x)$ на $y$ и меняем $x$ с $y$ местами:', tex: `x = \\dfrac{${linear(a, b)}}{${linear(c, d)}}` },
-      { text: 'Умножаем обе части на знаменатель:', tex: `x(${linear(c, d)}) = ${linear(a, b)}` },
-      { text: 'Собираем слагаемые с $y$ в одной части и выражаем $y$:', tex: `y = ${value}` },
+      { text: 'Replace $f(x)$ with $y$ and swap $x$ and $y$:', tex: `x = \\dfrac{${linear(a, b)}}{${linear(c, d)}}` },
+      { text: 'Multiply both sides by the denominator:', tex: `x(${linear(c, d)}) = ${linear(a, b)}` },
+      { text: 'Collect the terms with $y$ on one side and solve for $y$:', tex: `y = ${value}` },
     ],
-    hints: [...HINTS, 'Умножь обе части на знаменатель, потом собери все члены с $y$ в одной части.'],
-    inputHint: 'Введи дробь через /, например (2x+1)/(3-x)',
+    hints: [...HINTS, 'Multiply both sides by the denominator, then collect all the terms with $y$ on one side.'],
+    inputHint: 'Enter a fraction using /, e.g. (2x+1)/(3-x)',
   }
 }
 
@@ -62,11 +62,11 @@ function expBranch(rng: Rng): Problem {
     statement: `Given $f(x) = ${f}$, find $f^{-1}(x)$.`,
     answer: { kind: 'expression', value, variables: ['x'], domain: { x: [c + 1, c + 5] } },
     solution: [
-      { text: 'Меняем $x$ и $y$ местами:', tex: `x = ${addConst('e^{y}', c)}` },
-      { text: 'Выражаем экспоненту и берём натуральный логарифм от обеих частей:', tex: `e^y = ${linear(1, -c)} \\;\\Rightarrow\\; y = ${value}` },
+      { text: 'Swap $x$ and $y$:', tex: `x = ${addConst('e^{y}', c)}` },
+      { text: 'Isolate the exponential and take the natural logarithm of both sides:', tex: `e^y = ${linear(1, -c)} \\;\\Rightarrow\\; y = ${value}` },
     ],
-    hints: ['Перенеси константу, чтобы экспонента осталась одна.', 'Логарифм — обратная операция к экспоненте: $\\ln(e^y) = y$.'],
-    inputHint: 'Введи через натуральный логарифм: ln(...)',
+    hints: ['Move the constant so the exponential stands alone.', 'The logarithm is the inverse operation of the exponential: $\\ln(e^y) = y$.'],
+    inputHint: 'Enter using the natural logarithm: ln(...)',
   }
 }
 
@@ -78,11 +78,11 @@ function sqrtBranch(rng: Rng): Problem {
     statement: `Given $f(x) = ${f}$ for $x \\ge ${a}$, find $f^{-1}(x)$.`,
     answer: { kind: 'expression', value, variables: ['x'], domain: { x: [0.3, 4] } },
     solution: [
-      { text: 'Меняем $x$ и $y$ местами:', tex: `x = \\sqrt{${linear(1, -a, 'y')}}` },
-      { text: 'Возводим обе части в квадрат (учитывая, что $x \\ge 0$):', tex: `x^2 = ${linear(1, -a, 'y')} \\;\\Rightarrow\\; y = ${value}` },
+      { text: 'Swap $x$ and $y$:', tex: `x = \\sqrt{${linear(1, -a, 'y')}}` },
+      { text: 'Square both sides (keeping in mind that $x \\ge 0$):', tex: `x^2 = ${linear(1, -a, 'y')} \\;\\Rightarrow\\; y = ${value}` },
     ],
-    hints: ['Возведи обе части в квадрат, чтобы избавиться от корня.', 'Область определения $f^{-1}$ — это $x \\ge 0$, ведь корень не бывает отрицательным.'],
-    inputHint: 'Введи выражение через x, например x^2+3',
+    hints: ['Square both sides to get rid of the square root.', 'The domain of $f^{-1}$ is $x \\ge 0$, since a square root is never negative.'],
+    inputHint: 'Enter an expression in x, e.g. x^2+3',
   }
 }
 

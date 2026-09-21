@@ -5,15 +5,15 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SolutionStep, SkillTemplate } from '../types'
 
 const theory = [
-  'Квадратное уравнение (quadratic equation): $ax^2 + bx + c = 0$.',
-  'Дискриминант (discriminant): $D = b^2 - 4ac$.',
-  '$D > 0$ — два корня $x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a}$; $D = 0$ — один двойной корень $x = -\\frac{b}{2a}$; $D < 0$ — действительных корней нет.',
-  'Если $c = 0$, вынеси $x$ за скобки. Уравнение $x^4 + px^2 + q = 0$ решай заменой $z = x^2$.',
-  'Типичные ошибки: потерять минус в $-b$; делить на $2a$ только $\\sqrt{D}$.',
+  'A quadratic equation: $ax^2 + bx + c = 0$.',
+  'The discriminant: $D = b^2 - 4ac$.',
+  '$D > 0$ gives two roots $x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a}$; $D = 0$ gives one repeated root $x = -\\frac{b}{2a}$; $D < 0$ means there are no real roots.',
+  'If $c = 0$, factor out $x$. Solve $x^4 + px^2 + q = 0$ using the substitution $z = x^2$.',
+  'Common mistakes: dropping the minus sign in $-b$; dividing only $\\sqrt{D}$ by $2a$.',
 ].join('\n')
 
-const HINTS = ['Вычисли дискриминант $D = b^2 - 4ac$.', 'Подставь в формулу $x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a}$.']
-const INPUT_HINT = 'Корни через запятую: 2, -3. Если корней нет — напиши none'
+const HINTS = ['Compute the discriminant $D = b^2 - 4ac$.', 'Substitute into the formula $x_{1,2} = \\frac{-b \\pm \\sqrt{D}}{2a}$.']
+const INPUT_HINT = 'Roots separated by commas: 2, -3. If there are no roots, write none'
 
 const coprimeTo = (rng: Rng, a: number): number =>
   rng.intExcept(-9, 9, Array.from({ length: 19 }, (_, i) => i - 9).filter((n) => gcd(n, a) !== 1))
@@ -21,16 +21,16 @@ const coprimeTo = (rng: Rng, a: number): number =>
 /** Discriminant walk-through for integer a, b, c whose discriminant is a perfect square or negative. */
 export function quadraticSteps(a: number, b: number, c: number): SolutionStep[] {
   const d = b * b - 4 * a * c
-  const dStep: SolutionStep = { text: 'Дискриминант:', tex: `D = ${paren(b)}^2 - 4 \\cdot ${paren(a)} \\cdot ${paren(c)} = ${d}` }
-  if (d < 0) return [dStep, { text: '$D < 0$, поэтому действительных корней нет.', tex: '\\emptyset' }]
+  const dStep: SolutionStep = { text: 'Discriminant:', tex: `D = ${paren(b)}^2 - 4 \\cdot ${paren(a)} \\cdot ${paren(c)} = ${d}` }
+  if (d < 0) return [dStep, { text: '$D < 0$, so there are no real roots.', tex: '\\emptyset' }]
   if (d === 0) {
-    return [dStep, { text: '$D = 0$ — один двойной корень:', tex: `x = \\frac{${-b}}{${2 * a}} = ${ratToLatex(rat(-b, 2 * a))}` }]
+    return [dStep, { text: '$D = 0$: one repeated root:', tex: `x = \\frac{${-b}}{${2 * a}} = ${ratToLatex(rat(-b, 2 * a))}` }]
   }
   const s = Math.round(Math.sqrt(d))
   return [
     dStep,
-    { text: 'Два корня:', tex: `x_{1,2} = \\frac{${-b} \\pm ${s}}{${2 * a}}` },
-    { text: 'Итого:', tex: `x_1 = ${ratToLatex(rat(-b + s, 2 * a))}, \\quad x_2 = ${ratToLatex(rat(-b - s, 2 * a))}` },
+    { text: 'Two roots:', tex: `x_{1,2} = \\frac{${-b} \\pm ${s}}{${2 * a}}` },
+    { text: 'Result:', tex: `x_1 = ${ratToLatex(rat(-b + s, 2 * a))}, \\quad x_2 = ${ratToLatex(rat(-b - s, 2 * a))}` },
   ]
 }
 
@@ -54,11 +54,11 @@ function build(
 /** Vieta's formulas: for x² + bx + c the roots sum to −b and multiply to c. */
 function vietaAlternative(poly: Poly, r1: number, r2: number): Problem['alternative'] {
   return {
-    title: 'Другой способ — теорема Виета (подбор корней)',
+    title: "Alternative method: Vieta's formulas (finding roots by inspection)",
     steps: [
-      { text: 'Для приведённого $x^2+bx+c$ сумма корней равна $-b$, а произведение равно $c$.' },
-      { text: `Ищем два числа с суммой $${r1 + r2}$ и произведением $${r1 * r2}$:`, tex: `x_1 = ${r1}, \\quad x_2 = ${r2}` },
-      { text: 'Проверка — раскроем скобки:', tex: `\\left(${linear(1, -r1)}\\right)\\left(${linear(1, -r2)}\\right) = ${polyToLatex(poly)}` },
+      { text: 'For a monic $x^2+bx+c$, the sum of the roots is $-b$ and the product is $c$.' },
+      { text: `Find two numbers with sum $${r1 + r2}$ and product $${r1 * r2}$:`, tex: `x_1 = ${r1}, \\quad x_2 = ${r2}` },
+      { text: 'Check by expanding the parentheses:', tex: `\\left(${linear(1, -r1)}\\right)\\left(${linear(1, -r2)}\\right) = ${polyToLatex(poly)}` },
     ],
   }
 }
@@ -95,9 +95,9 @@ function biquadratic(rng: Rng): Problem {
   const [p, q] = rng.shuffle([1, 2, 3, 4]).slice(0, 2)
   const poly = [p * p * q * q, 0, -(p * p + q * q), 0, 1]
   return build(poly, [String(p), String(-p), String(q), String(-q)], [
-    { text: 'Замена $z = x^2$:', tex: `${polyToLatex([p * p * q * q, -(p * p + q * q), 1], 'z')} = 0` },
-    { text: 'Корни по $z$ (оба положительны):', tex: `z_1 = ${p * p}, \\quad z_2 = ${q * q}` },
-    { text: 'Обратная замена $x = \\pm\\sqrt{z}$:', tex: `x = \\pm ${p}, \\quad x = \\pm ${q}` },
+    { text: 'Substitute $z = x^2$:', tex: `${polyToLatex([p * p * q * q, -(p * p + q * q), 1], 'z')} = 0` },
+    { text: 'Roots in $z$ (both positive):', tex: `z_1 = ${p * p}, \\quad z_2 = ${q * q}` },
+    { text: 'Back-substitute $x = \\pm\\sqrt{z}$:', tex: `x = \\pm ${p}, \\quad x = \\pm ${q}` },
   ])
 }
 
@@ -106,9 +106,9 @@ function biquadraticOneBranch(rng: Rng): Problem {
   const q = rng.int(1, 3)
   const poly = [-p * p * q * q, 0, q * q - p * p, 0, 1]
   return build(poly, [String(p), String(-p)], [
-    { text: 'Замена $z = x^2$:', tex: `${polyToLatex([-p * p * q * q, q * q - p * p, 1], 'z')} = 0` },
-    { text: 'Корни по $z$:', tex: `z_1 = ${p * p}, \\quad z_2 = ${-q * q}` },
-    { text: '$z_2 < 0$ не даёт действительных $x$; из $z_1$:', tex: `x = \\pm ${p}` },
+    { text: 'Substitute $z = x^2$:', tex: `${polyToLatex([-p * p * q * q, q * q - p * p, 1], 'z')} = 0` },
+    { text: 'Roots in $z$:', tex: `z_1 = ${p * p}, \\quad z_2 = ${-q * q}` },
+    { text: '$z_2 < 0$ gives no real $x$; from $z_1$:', tex: `x = \\pm ${p}` },
   ])
 }
 
@@ -118,8 +118,8 @@ function cubicWithZero(rng: Rng): Problem {
   const r2 = rng.intExcept(-5, 5, [0, r1])
   const quad = polyFromRoots(a, [r1, r2])
   return build(polyMul(quad, [0, 1]), ['0', String(r1), String(r2)], [
-    { text: 'Вынесем $x$ за скобки:', tex: `x\\left(${polyToLatex(quad)}\\right) = 0` },
-    { text: 'Один корень $x = 0$; остальные — из квадратного уравнения:', tex: `${polyToLatex(quad)} = 0` },
+    { text: 'Factor out $x$:', tex: `x\\left(${polyToLatex(quad)}\\right) = 0` },
+    { text: 'One root is $x = 0$; the rest come from the quadratic equation:', tex: `${polyToLatex(quad)} = 0` },
     ...quadraticSteps(quad[2], quad[1], quad[0]),
   ])
 }

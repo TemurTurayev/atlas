@@ -4,18 +4,18 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Система двух линейных уравнений (system of linear equations) с двумя неизвестными $x$ и $y$.',
-  'Способ подстановки (substitution): вырази одну переменную через другую и подставь во второе уравнение.',
-  'Способ сложения (elimination): умножь уравнения так, чтобы коэффициенты при одной переменной стали противоположными, и сложи их.',
-  'Ответ — единственная пара $(x, y)$, которая подходит в оба уравнения одновременно.',
-  'Типичная ошибка: умножить на множитель только одно слагаемое уравнения, а не обе части целиком.',
+  'A system of two linear equations in two unknowns $x$ and $y$.',
+  'Substitution method: express one variable in terms of the other and substitute into the second equation.',
+  'Elimination method: multiply the equations so that the coefficients of one variable become opposite, then add them.',
+  'The answer is the unique pair $(x, y)$ that satisfies both equations at once.',
+  'Common mistake: multiplying only one term of an equation by the factor instead of both sides in full.',
 ].join('\n')
 
 const HINTS = [
-  'Из одного уравнения вырази $y$ через $x$ (или наоборот) и подставь в другое.',
-  'Либо умножь уравнения так, чтобы коэффициенты при $x$ (или при $y$) стали противоположными, и сложи уравнения.',
+  'Express $y$ in terms of $x$ (or vice versa) from one equation and substitute it into the other.',
+  'Or multiply the equations so that the coefficients of $x$ (or of $y$) become opposite, then add the equations.',
 ]
-const INPUT_HINT = 'Ответ — пара (x, y), например (2,3)'
+const INPUT_HINT = 'The answer is a pair (x, y), e.g. (2,3)'
 
 function eqLatex(a: number, b: number, c: number): string {
   const termX = a === 0 ? '' : `${coefPrefix(a)}x`
@@ -48,26 +48,26 @@ function buildSystem(a1: number, b1: number, c1: number, a2: number, b2: number,
     answer: { kind: 'finiteSet', elements: [`(${xLatex},${yLatex})`] },
     solution: [
       {
-        text: `Умножим первое уравнение на $${b2}$, второе — на $${b1}$, чтобы коэффициенты при $y$ совпали:`,
+        text: `Multiply the first equation by $${b2}$ and the second by $${b1}$, so that the coefficients of $y$ match:`,
         tex: `${a1 * b2}x+${b1 * b2}y=${c1 * b2}, \\quad ${a2 * b1}x+${b1 * b2}y=${c2 * b1}`,
       },
-      { text: 'Вычтем второе уравнение из первого — $y$ сократится:', tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
-      { text: 'Подставим найденный $x$ в любое из уравнений и найдём $y$:', tex: `y = ${yLatex}` },
+      { text: 'Subtract the second equation from the first — $y$ cancels:', tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
+      { text: 'Substitute the found $x$ into either equation and solve for $y$:', tex: `y = ${yLatex}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
     ...(b1 !== 0
       ? {
           alternative: {
-            title: 'Другой способ — подстановка',
+            title: 'Alternative method: substitution',
             steps: [
-              { text: 'Выразим $y$ из первого уравнения:', tex: `y = \\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}` },
+              { text: 'Express $y$ from the first equation:', tex: `y = \\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}` },
               {
-                text: 'Подставим это выражение во второе уравнение:',
+                text: 'Substitute this expression into the second equation:',
                 tex: `${coefPrefix(a2)}x + ${coefPrefix(b2)}\\cdot\\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}} = ${c2}`,
               },
-              { text: `Умножим обе части на $${b1}$ и соберём подобные:`, tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
-              { text: 'Вернём найденный $x$ в выражение для $y$:', tex: `y = ${yLatex}` },
+              { text: `Multiply both sides by $${b1}$ and collect like terms:`, tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
+              { text: 'Substitute the found $x$ back into the expression for $y$:', tex: `y = ${yLatex}` },
             ],
           },
         }

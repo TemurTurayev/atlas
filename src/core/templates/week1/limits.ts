@@ -5,11 +5,11 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Предел (limit) функции при $x\\to a$ — значение, к которому приближается $f(x)$, когда $x$ приближается к $a$, необязательно его достигая.',
-  'Неопределённость $\\frac{0}{0}$: разложи числитель и знаменатель на множители и сократи общий множитель, только потом подставляй точку.',
-  'Предел рациональной функции при $x\\to\\infty$, если степени числителя и знаменателя равны, — это отношение старших коэффициентов.',
-  'Если в числителе или знаменателе корень, домножь дробь на сопряжённое выражение (conjugate), чтобы избавиться от неопределённости $\\frac00$.',
-  'Типичная ошибка: подставлять точку сразу, не заметив неопределённость $\\frac00$, и делать вывод, что предела не существует.',
+  'The limit of a function as $x\\to a$ is the value that $f(x)$ approaches as $x$ approaches $a$, without necessarily reaching it.',
+  'Indeterminate form $\\frac{0}{0}$: factor the numerator and denominator and cancel the common factor, only then substitute the point.',
+  'The limit of a rational function as $x\\to\\infty$, when the numerator and denominator have equal degree, is the ratio of the leading coefficients.',
+  'If there is a radical in the numerator or denominator, multiply the fraction by the conjugate expression to remove the indeterminate form $\\frac00$.',
+  'Common mistake: substituting the point right away without noticing the indeterminate form $\\frac00$, and concluding that the limit does not exist.',
 ].join('\n')
 
 function tier1(rng: Rng): Problem {
@@ -22,12 +22,12 @@ function tier1(rng: Rng): Problem {
     statement: `Find $\\displaystyle\\lim_{x\\to ${c}}\\frac{x^{2}-${c2}}{${factorMinus}}$.`,
     answer: { kind: 'number', value: String(value) },
     solution: [
-      { text: 'Числитель — разность квадратов, раскладываем на множители:', tex: `x^{2}-${c2} = \\left(${factorMinus}\\right)\\left(${factorPlus}\\right)` },
-      { text: `Сокращаем общий множитель $${factorMinus}$ со знаменателем и подставляем $x=${c}$:`, tex: `\\lim_{x\\to ${c}} \\left(${factorPlus}\\right) = ${value}` },
+      { text: 'The numerator is a difference of squares; factor it:', tex: `x^{2}-${c2} = \\left(${factorMinus}\\right)\\left(${factorPlus}\\right)` },
+      { text: `Cancel the common factor $${factorMinus}$ with the denominator and substitute $x=${c}$:`, tex: `\\lim_{x\\to ${c}} \\left(${factorPlus}\\right) = ${value}` },
     ],
     hints: [
-      'Числитель — разность квадратов; разложи его на два множителя.',
-      'Один из множителей сократится со знаменателем; после сокращения подставь предельную точку.',
+      'The numerator is a difference of squares; factor it into two factors.',
+      'One of the factors will cancel with the denominator; after canceling, substitute the limit point.',
     ],
   }
 }
@@ -49,14 +49,14 @@ function tier2(rng: Rng): Problem {
     answer: { kind: 'number', value },
     solution: [
       {
-        text: 'Степени числителя и знаменателя равны — при $x\\to\\infty$ предел определяют только старшие коэффициенты:',
+        text: 'The numerator and denominator have equal degree — as $x\\to\\infty$ the limit is determined only by the leading coefficients:',
         tex: `\\lim_{x\\to\\infty}\\frac{${numLatex}}{${denLatex}} = \\frac{${a}}{${f}}`,
       },
-      { text: 'Вычисляем отношение старших коэффициентов:', tex: `\\frac{${a}}{${f}} = ${value}` },
+      { text: 'Compute the ratio of the leading coefficients:', tex: `\\frac{${a}}{${f}} = ${value}` },
     ],
     hints: [
-      'Раздели числитель и знаменатель на $x$ в наибольшей встречающейся степени.',
-      'Все слагаемые вида $\\frac{k}{x^{n}}$ стремятся к нулю; останутся только старшие коэффициенты.',
+      'Divide the numerator and denominator by $x$ raised to the highest power that appears.',
+      'All terms of the form $\\frac{k}{x^{n}}$ tend to zero; only the leading coefficients remain.',
     ],
   }
 }
@@ -70,15 +70,15 @@ function tier3(rng: Rng): Problem {
     answer: { kind: 'number', value },
     solution: [
       {
-        text: `Домножаем числитель и знаменатель на сопряжённое выражение $\\sqrt{x}+${c}$:`,
+        text: `Multiply the numerator and denominator by the conjugate expression $\\sqrt{x}+${c}$:`,
         tex: `\\frac{\\sqrt{x}-${c}}{x-${c2}}\\cdot\\frac{\\sqrt{x}+${c}}{\\sqrt{x}+${c}} = \\frac{x-${c2}}{\\left(x-${c2}\\right)\\left(\\sqrt{x}+${c}\\right)}`,
       },
-      { text: `Сокращаем общий множитель $x-${c2}$:`, tex: `= \\frac{1}{\\sqrt{x}+${c}}` },
-      { text: `Подставляем $x=${c2}$:`, tex: `\\frac{1}{\\sqrt{${c2}}+${c}} = \\frac{1}{${2 * c}} = ${value}` },
+      { text: `Cancel the common factor $x-${c2}$:`, tex: `= \\frac{1}{\\sqrt{x}+${c}}` },
+      { text: `Substitute $x=${c2}$:`, tex: `\\frac{1}{\\sqrt{${c2}}+${c}} = \\frac{1}{${2 * c}} = ${value}` },
     ],
     hints: [
-      'Домножь числитель и знаменатель на сопряжённое выражение, чтобы убрать корень.',
-      'После сокращения общего множителя подставь предельную точку напрямую.',
+      'Multiply the numerator and denominator by the conjugate expression to remove the radical.',
+      'After canceling the common factor, substitute the limit point directly.',
     ],
   }
 }

@@ -98,7 +98,7 @@ function boxDiagonal(rng: Rng): Problem {
     `A rectangular box has edge lengths $${p}$, $${q}$ and $${r}$. Find the length of its space diagonal.`,
     value,
     [
-      { text: 'Диагональ параллелепипеда:', tex: `d^2 = ${p}^2+${q}^2+${r}^2 = ${sq}` },
+      { text: 'Space diagonal of the box:', tex: `d^2 = ${p}^2+${q}^2+${r}^2 = ${sq}` },
       { text: 'Take the square root:', tex: `d = \\sqrt{${sq}} = ${value}` },
     ],
   )
@@ -123,7 +123,7 @@ function pointDistance(rng: Rng): Problem {
     `Find the distance between the points $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
     value,
     [
-      { text: 'Формула расстояния между точками:', tex: `d^2 = (${x2}-${paren(x1)})^2+(${y2}-${paren(y1)})^2 = ${sq}` },
+      { text: 'Distance formula between two points:', tex: `d^2 = (${x2}-${paren(x1)})^2+(${y2}-${paren(y1)})^2 = ${sq}` },
       { text: 'Take the square root:', tex: `d = \\sqrt{${sq}} = ${value}` },
     ],
   )

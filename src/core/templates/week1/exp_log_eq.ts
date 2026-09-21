@@ -17,10 +17,10 @@ function tier1(rng: Rng): Problem {
     statement: `Solve for $x$: $${b}^{x} = ${N}$.`,
     answer: { kind: 'number', value: String(m) },
     solution: [
-      { text: 'Записываем правую часть как степень того же основания:', tex: `${N} = ${b}^{${m}}` },
-      { text: 'Основания равны, значит равны и показатели:', tex: `x = ${m}` },
+      { text: 'Write the right-hand side as a power of the same base:', tex: `${N} = ${b}^{${m}}` },
+      { text: 'The bases are equal, so the exponents are equal too:', tex: `x = ${m}` },
     ],
-    hints: ['Представь правую часть как степень основания $b$.', 'Если $b^{x}=b^{m}$, то $x=m$.'],
+    hints: ['Write the right-hand side as a power of base $b$.', 'If $b^{x}=b^{m}$, then $x=m$.'],
   }
 }
 
@@ -40,15 +40,15 @@ function tier2(rng: Rng): Problem {
     statement: `Solve for $t$: $${A}e^{${kLatex}t} = ${B}$.`,
     answer: { kind: 'number', value: `${n}\\ln ${R}` },
     solution: [
-      { text: 'Делим обе части на коэффициент перед экспонентой:', tex: `e^{${kLatex}t} = \\frac{${B}}{${A}} = ${R}` },
-      { text: 'Берём натуральный логарифм от обеих частей:', tex: `${kLatex}t = \\ln ${R}` },
-      { text: 'Выражаем $t$:', tex: `t = \\frac{\\ln ${R}}{${kLatex}} = ${n}\\ln ${R}` },
+      { text: 'Divide both sides by the coefficient in front of the exponential:', tex: `e^{${kLatex}t} = \\frac{${B}}{${A}} = ${R}` },
+      { text: 'Take the natural logarithm of both sides:', tex: `${kLatex}t = \\ln ${R}` },
+      { text: 'Solve for $t$:', tex: `t = \\frac{\\ln ${R}}{${kLatex}} = ${n}\\ln ${R}` },
     ],
     hints: [
-      'Раздели обе части уравнения на коэффициент перед экспонентой.',
-      'Прологарифмируй обе части натуральным логарифмом: $\\ln(e^{u})=u$.',
+      'Divide both sides of the equation by the coefficient in front of the exponential.',
+      'Take the natural logarithm of both sides: $\\ln(e^{u})=u$.',
     ],
-    inputHint: 'Точный ответ или десятичное приближение, например 5\\ln4 или 6.93',
+    inputHint: 'Exact answer or decimal approximation, e.g. 5\\ln4 or 6.93',
   }
 }
 
@@ -77,14 +77,14 @@ function tier3(rng: Rng): Problem {
     statement: `Solve for $x$ (assume $x>${p}$): $\\log_{${b}}(x-${p}) + \\log_{${b}}(x+${p}) = ${c}$.`,
     answer: { kind: 'number', value: String(x0) },
     solution: [
-      { text: 'Сумма логарифмов одного основания — это логарифм произведения:', tex: `\\log_{${b}}\\left((x-${p})(x+${p})\\right) = ${c}` },
-      { text: 'Переходим к показательной форме:', tex: `(x-${p})(x+${p}) = ${b}^{${c}} = ${bc}` },
-      { text: `Раскрываем разность квадратов и решаем (берём положительный корень, т.к. $x>${p}$):`, tex: `x^{2} - ${p * p} = ${bc} \\ \\Rightarrow\\ x^{2} = ${p * p + bc} \\ \\Rightarrow\\ x = ${x0}` },
+      { text: 'A sum of logarithms with the same base is the logarithm of the product:', tex: `\\log_{${b}}\\left((x-${p})(x+${p})\\right) = ${c}` },
+      { text: 'Switch to exponential form:', tex: `(x-${p})(x+${p}) = ${b}^{${c}} = ${bc}` },
+      { text: `Expand the difference of squares and solve (take the positive root, since $x>${p}$):`, tex: `x^{2} - ${p * p} = ${bc} \\ \\Rightarrow\\ x^{2} = ${p * p + bc} \\ \\Rightarrow\\ x = ${x0}` },
     ],
     hints: [
-      'Объедини сумму логарифмов в один: $\\log_b A+\\log_b B=\\log_b(AB)$.',
-      'Перейди от логарифмического уравнения к показательному: $\\log_b N=c \\iff N=b^{c}$.',
-      'Учти область допустимых значений: оба аргумента логарифма должны быть положительны.',
+      'Combine the sum of logarithms into one: $\\log_b A+\\log_b B=\\log_b(AB)$.',
+      'Switch from the logarithmic equation to the exponential one: $\\log_b N=c \\iff N=b^{c}$.',
+      'Account for the domain of validity: both arguments of the logarithm must be positive.',
     ],
   }
 }

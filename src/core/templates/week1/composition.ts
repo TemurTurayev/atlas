@@ -3,7 +3,7 @@ import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Composition of functions (composition) $(f \\circ g)(x) = f(g(x))$: apply $g$ first, then $f$ to the result.',
+  'Composition of functions: $(f \\circ g)(x) = f(g(x))$ — apply $g$ first, then $f$ to the result.',
   '$(f \\circ g)(x)$ and $(g \\circ f)(x)$ are generally different functions — order matters.',
   'The domain of the composition consists of the $x$ where $g$ is defined and $g(x)$ lies in the domain of $f$.',
   'To compute $f(g(x))$, substitute the entire formula for $g(x)$ in place of $x$ in the formula for $f$.',

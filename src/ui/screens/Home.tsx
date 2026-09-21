@@ -75,6 +75,7 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam' 
 
       <section className="rounded-card bg-surface border border-line p-5 space-y-4">
         <Meter label="Exam forecast" value={forecast.exam} markerAt={0.45} />
+        <Meter label="Material in the app" value={forecast.covered} />
         <Meter label="Foundations" value={forecast.base} tone="good" />
         <p className="text-sm text-muted">
           Today: {world.day.xp} / {world.settings.dailyGoalXp} XP · {countOf(due, 'skill')} to review

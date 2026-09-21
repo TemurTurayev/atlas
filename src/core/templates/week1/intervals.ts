@@ -2,19 +2,19 @@ import type { Rng } from '../../random/rng'
 import type { IntervalPart, Problem, SkillTemplate } from '../types'
 
 const theory = [
-  'Интервал (interval) — кусок числовой прямой.',
-  'Круглая скобка конец не включает: $(a, b) = \\{x \\in \\mathbb{R} : a < x < b\\}$.',
-  'Квадратная включает: $[a, b] = \\{x : a \\le x \\le b\\}$; бывают и смешанные — $[a, b)$, $(a, b]$.',
-  'У бесконечности скобка всегда круглая: $(-\\infty, 3]$, $(2, \\infty)$.',
-  'Знак $\\cup$ (объединение) соединяет куски: «всё, кроме 2» на отрезке $[0,5]$ — это $[0,2) \\cup (2,5]$.',
-  'Типичная ошибка — перепутать скобки: строгое неравенство $<$ даёт круглую, нестрогое $\\le$ — квадратную.',
+  'An interval is a piece of the number line.',
+  'A round bracket excludes the endpoint: $(a, b) = \\{x \\in \\mathbb{R} : a < x < b\\}$.',
+  'A square bracket includes it: $[a, b] = \\{x : a \\le x \\le b\\}$; mixed forms also occur — $[a, b)$, $(a, b]$.',
+  'Next to infinity the bracket is always round: $(-\\infty, 3]$, $(2, \\infty)$.',
+  'The symbol $\\cup$ (union) joins pieces together: "everything except 2" on the segment $[0,5]$ is $[0,2) \\cup (2,5]$.',
+  'Common mistake — mixing up the brackets: a strict inequality $<$ gives a round bracket, a non-strict $\\le$ gives a square one.',
 ].join('\n')
 
 const HINTS = [
-  'Строгий знак ($<$, $>$) — круглая скобка; нестрогий ($\\le$, $\\ge$) — квадратная.',
-  'Рядом с $\\infty$ скобка всегда круглая.',
+  'A strict sign ($<$, $>$) gives a round bracket; a non-strict one ($\\le$, $\\ge$) gives a square bracket.',
+  'Next to $\\infty$ the bracket is always round.',
 ]
-const INPUT_HINT = 'Собери ответ кнопками: скобка ( не включает конец, [ включает. Несколько кусков — кнопкой ∪'
+const INPUT_HINT = 'Build the answer with the buttons: ( excludes the endpoint, [ includes it. Several pieces — use the ∪ button'
 
 const part = (lo: string | null, hi: string | null, loClosed: boolean, hiClosed: boolean): IntervalPart => ({ lo, hi, loClosed, hiClosed })
 
@@ -30,8 +30,8 @@ function tier1(rng: Rng): Problem {
     statement: `Write $${condition}$ as an interval.`,
     answer: { kind: 'interval', parts: [part(String(a), String(b), loClosed, hiClosed)] },
     solution: [
-      { text: `Левый конец $${a}$ ${loClosed ? 'включён' : 'не включён'}, правый $${b}$ ${hiClosed ? 'включён' : 'не включён'}.` },
-      { text: 'Значит, ответ:', tex: `${loClosed ? '[' : '('}${a}, ${b}${hiClosed ? ']' : ')'}` },
+      { text: `The left endpoint $${a}$ is ${loClosed ? 'included' : 'not included'}, the right endpoint $${b}$ is ${hiClosed ? 'included' : 'not included'}.` },
+      { text: 'So the answer is:', tex: `${loClosed ? '[' : '('}${a}, ${b}${hiClosed ? ']' : ')'}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -53,12 +53,12 @@ function tier2(rng: Rng): Problem {
     solution: [
       {
         text: less
-          ? `Модуль меньше ${k} — значит $x$ лежит между $-${k}$ и $${k}$.`
-          : `Модуль больше ${k} — значит $x$ дальше ${k} от нуля в любую сторону, получаются два куска.`,
+          ? `The absolute value is less than ${k} — so $x$ lies between $-${k}$ and $${k}$.`
+          : `The absolute value is greater than ${k} — so $x$ is farther than ${k} from zero in either direction, giving two pieces.`,
       },
-      { text: 'Ответ:', tex: less ? `${strict ? '(' : '['}-${k}, ${k}${strict ? ')' : ']'}` : `(-\\infty, -${k}${strict ? ')' : ']'} \\cup ${strict ? '(' : '['}${k}, \\infty)` },
+      { text: 'Answer:', tex: less ? `${strict ? '(' : '['}-${k}, ${k}${strict ? ')' : ']'}` : `(-\\infty, -${k}${strict ? ')' : ']'} \\cup ${strict ? '(' : '['}${k}, \\infty)` },
     ],
-    hints: [`$|x| ${sign} ${k}$ — это расстояние от нуля до $x$.`, 'Для «больше» получаются два промежутка, соединённых знаком $\\cup$.'],
+    hints: [`$|x| ${sign} ${k}$ is the distance from zero to $x$.`, 'For "greater than" you get two intervals, joined by the $\\cup$ symbol.'],
     inputHint: INPUT_HINT,
   }
 }
@@ -75,10 +75,10 @@ function tier3(rng: Rng): Problem {
       parts: [part(String(a), String(gap), true, false), part(String(gap), String(b), false, true)],
     },
     solution: [
-      { text: `Берём отрезок $[${a}, ${b}]$ и выкалываем точку $${gap}$.` },
-      { text: 'Получаются два куска — рядом с выколотой точкой скобки круглые:', tex: `[${a}, ${gap}) \\cup (${gap}, ${b}]` },
+      { text: `Take the segment $[${a}, ${b}]$ and remove the point $${gap}$.` },
+      { text: 'This gives two pieces — the brackets next to the removed point are round:', tex: `[${a}, ${gap}) \\cup (${gap}, ${b}]` },
     ],
-    hints: ['Выколотая точка разрезает отрезок на два куска.', 'Возле выколотой точки скобки круглые, а внешние концы остаются включёнными.'],
+    hints: ['The removed point cuts the segment into two pieces.', 'Next to the removed point the brackets are round, while the outer endpoints stay included.'],
     inputHint: INPUT_HINT,
   }
 }

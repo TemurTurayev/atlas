@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import type { UserAnswer } from '../../core/checker/check'
+import type { RunState } from '../../core/session/world'
 import { answerToLatex } from '../../core/checker/reference'
 import { GRAPH } from '../../core/graph'
 import { getTemplate } from '../../core/templates/registry'
@@ -13,6 +14,16 @@ import { useAtlas } from '../store'
 const card = 'rounded-card bg-surface border border-line p-5 space-y-4'
 const primary = 'px-5 py-3 rounded-xl bg-accent text-bg font-medium hover:opacity-90 disabled:opacity-50'
 const ghost = 'px-4 py-3 rounded-xl border border-line text-muted hover:border-accent disabled:opacity-40'
+
+/** How far through this part of the run we are — a run with no visible end is hard to start. */
+function stepLabel(run: RunState, mixTarget: number, graded: boolean): string | null {
+  if (run.twin || run.repairQueue.length > 0 || run.jump) return null
+  // An answered problem keeps its own number: the counters below move on as soon as it is graded.
+  const at = (done: number, total: number) => `${Math.min(graded ? done : done + 1, total)} / ${total}`
+  if (run.phase === 'warmup') return at(run.warmupIndex, run.warmupQueue.length)
+  if (run.phase === 'mix' && mixTarget > 0) return at(run.mixDone, mixTarget)
+  return null
+}
 
 function PauseBar({ go, left }: { go: (screen: 'home') => void; left?: ReactNode }) {
   return (
@@ -37,6 +48,20 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
     if (problem) setAnswer(emptyAnswer(problem.answer))
     setShowSolution(false)
   }, [problem])
+
+  const graded = result !== null && result.status !== 'malformed'
+
+  // Once an answer is in, Enter moves on: a whole run should be playable from the keyboard.
+  useEffect(() => {
+    if (!graded) return undefined
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter') return
+      event.preventDefault()
+      void advance()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [graded, advance])
 
   if (!world || !task) return <div className="p-6 text-muted">Loading…</div>
 
@@ -144,7 +169,6 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
   }
 
   if (task.type !== 'problem' || !problem) return null
-  const graded = result !== null && result.status !== 'malformed'
   const run = world.run
   const masteredCount = Object.values(world.progress).filter((p) => p.phase === 'mastered').length
   const mixTarget = Math.min(run?.short === true ? 3 : 5, masteredCount)
@@ -180,7 +204,15 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
-      <PauseBar go={go} left={<ModeBadge mode={task.fromMistake === true ? 'mistake' : task.mode} tier={task.tier} />} />
+      <PauseBar
+        go={go}
+        left={
+          <div className="flex items-center gap-2">
+            <ModeBadge mode={task.fromMistake === true ? 'mistake' : task.mode} tier={task.tier} />
+            {run && <span className="text-xs text-muted">{stepLabel(run, mixTarget, graded)}</span>}
+          </div>
+        }
+      />
 
       <div className={card}>
         <div className="flex items-start justify-between gap-3">
@@ -189,7 +221,13 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
           </p>
         </div>
 
-        <AnswerInput spec={problem.answer} answer={answer} onChange={setAnswer} onSubmit={() => submit(answer)} disabled={graded} />
+        <AnswerInput
+          spec={problem.answer}
+          answer={answer}
+          onChange={setAnswer}
+          onSubmit={() => (graded ? advance() : submit(answer))}
+          disabled={graded}
+        />
         {problem.inputHint && !graded && <p className="text-xs text-muted">{problem.inputHint}</p>}
         {onPaper && !graded && <p className="text-xs text-warn">Work it out on paper, then type the answer — the exam will be the same.</p>}
 
