@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { checkAnswer } from './check'
+import { checkNumber } from './number'
 import { checkVector } from './vector'
 
 const spec = (components: string[]) => ({ kind: 'vector' as const, components })
@@ -44,5 +45,14 @@ describe('checkVector', () => {
   it('is reached through checkAnswer, and only with a vector answer', () => {
     expect(checkAnswer(spec(['1', '2']), { kind: 'vector', components: ['1', '2'] }).status).toBe('correct')
     expect(checkAnswer(spec(['1', '2']), { kind: 'latex', latex: '1, 2' }).status).toBe('malformed')
+  })
+})
+
+describe('degree signs', () => {
+  it('an answer in degrees may carry the unit', () => {
+    expect(checkNumber('45', '45^\\circ').status).toBe('correct')
+    expect(checkNumber('45', '45°').status).toBe('correct')
+    expect(checkNumber('45', '45').status).toBe('correct')
+    expect(checkNumber('45', '30^\\circ').status).toBe('incorrect')
   })
 })
