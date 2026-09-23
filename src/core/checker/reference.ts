@@ -1,4 +1,5 @@
 import { setLatex } from '../math/latex'
+import { matLatex } from '../math/matrix'
 import { vecLatex } from '../math/vector'
 import type { AnswerSpec, IntervalPart } from '../templates/types'
 import type { UserAnswer } from './check'
@@ -28,6 +29,8 @@ export function referenceAnswer(spec: AnswerSpec): UserAnswer {
       return { kind: 'interval', parts: spec.parts }
     case 'vector':
       return { kind: 'vector', components: spec.components }
+    case 'matrix':
+      return { kind: 'matrix', rows: spec.rows }
     case 'choice':
       return { kind: 'choice', id: spec.correctId }
   }
@@ -35,6 +38,7 @@ export function referenceAnswer(spec: AnswerSpec): UserAnswer {
 
 /** What the learner typed, ready to render next to the reference answer. */
 export function userAnswerLatex(answer: UserAnswer, spec: AnswerSpec): string {
+  if (answer.kind === 'matrix') return matLatex(answer.rows.map((row) => row.map((c) => (c.trim() === '' ? '?' : c))))
   if (answer.kind === 'vector') return vecLatex(answer.components.map((c) => (c.trim() === '' ? '?' : c)))
   if (answer.kind === 'interval') return intervalLatex(answer.parts)
   if (answer.kind === 'choice') return spec.kind === 'choice' ? (spec.options.find((o) => o.id === answer.id)?.label ?? answer.id) : answer.id
@@ -63,6 +67,11 @@ export function perturbedAnswer(spec: AnswerSpec): UserAnswer {
       return { kind: 'interval', parts: perturbIntervals(spec.parts) }
     case 'vector':
       return { kind: 'vector', components: spec.components.map((c, i) => (i === 0 ? `\\left(${c}\\right)+1` : c)) }
+    case 'matrix':
+      return {
+        kind: 'matrix',
+        rows: spec.rows.map((row, i) => row.map((c, j) => (i === 0 && j === 0 ? `\\left(${c}\\right)+1` : c))),
+      }
     case 'choice':
       return { kind: 'choice', id: spec.options.find((o) => o.id !== spec.correctId)?.id ?? `${spec.correctId}-wrong` }
   }
@@ -82,6 +91,8 @@ export function answerToLatex(spec: AnswerSpec): string {
       return intervalLatex(spec.parts)
     case 'vector':
       return vecLatex(spec.components)
+    case 'matrix':
+      return matLatex(spec.rows)
     case 'choice':
       return spec.options.find((o) => o.id === spec.correctId)?.label ?? ''
   }

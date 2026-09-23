@@ -2,6 +2,7 @@ import type { UserAnswer } from '../../core/checker/check'
 import type { AnswerSpec } from '../../core/templates/types'
 import { IntervalInput } from './IntervalInput'
 import { MathInput } from './MathInput'
+import { MatrixInput } from './MatrixInput'
 import { VectorInput } from './VectorInput'
 import { RichText } from './Tex'
 
@@ -17,6 +18,7 @@ export const emptyAnswer = (spec: AnswerSpec): UserAnswer => {
   if (spec.kind === 'interval') return { kind: 'interval', parts: [{ lo: '0', hi: '1', loClosed: false, hiClosed: false }] }
   if (spec.kind === 'choice') return { kind: 'choice', id: '' }
   if (spec.kind === 'vector') return { kind: 'vector', components: spec.components.map(() => '') }
+  if (spec.kind === 'matrix') return { kind: 'matrix', rows: spec.rows.map((row) => row.map(() => '')) }
   return { kind: 'latex', latex: '' }
 }
 
@@ -36,6 +38,11 @@ export function AnswerInput({ spec, answer, onChange, onSubmit, disabled }: Prop
           </button>
         ))}
       </div>
+    )
+  }
+  if (spec.kind === 'matrix' && answer.kind === 'matrix') {
+    return (
+      <MatrixInput rows={answer.rows} onChange={(rows) => onChange({ kind: 'matrix', rows })} onSubmit={onSubmit} disabled={disabled} />
     )
   }
   if (spec.kind === 'vector' && answer.kind === 'vector') {

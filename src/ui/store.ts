@@ -42,6 +42,7 @@ async function persist(world: World): Promise<void> {
 const describeAnswer = (answer: UserAnswer): string => {
   if (answer.kind === 'latex') return answer.latex
   if (answer.kind === 'choice') return answer.id
+  if (answer.kind === 'matrix') return answer.rows.map((row) => row.join(', ')).join(' ; ')
   if (answer.kind === 'vector') return answer.components.join(', ')
   return JSON.stringify(answer.parts)
 }

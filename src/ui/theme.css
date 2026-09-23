@@ -37,3 +37,10 @@ math-field {
 
 math-field:focus-within { border-color: var(--color-accent); outline: none; }
 .katex { font-size: 1.05em; }
+
+/* The power-user menu in every field is noise; a grid of them is unusable. */
+math-field::part(menu-toggle) { display: none; }
+
+/* Inside a vector or a matrix the fields are small — keep only the digits. */
+.math-grid math-field { font-size: 17px; padding: 8px 10px; }
+.math-grid math-field::part(virtual-keyboard-toggle) { display: none; }

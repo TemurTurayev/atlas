@@ -12,7 +12,7 @@ const bracket = 'w-2 border-y-2 border-line'
 /** A column vector: one field per component, between two brackets. */
 export function VectorInput({ components, onChange, onSubmit, disabled }: Props) {
   return (
-    <div className="flex items-stretch gap-2">
+    <div className="math-grid flex items-stretch gap-2">
       <span className={`${bracket} border-l-2 rounded-l`} />
       <div className="flex-1 space-y-2">
         {components.map((value, i) => (
