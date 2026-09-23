@@ -69,7 +69,6 @@ export function MapScreen({ go, onPractice }: Props) {
           {open !== null && GRAPH.node(open).week === week && (
             <div className="rounded-card border border-line bg-surface p-4 space-y-2">
               <h3 className="text-base">{GRAPH.node(open).title}</h3>
-              <p className="text-xs text-muted">{GRAPH.node(open).title}</p>
               {hasTemplate(open) ? (
                 getTemplate(open)
                   .theory.split('\n')

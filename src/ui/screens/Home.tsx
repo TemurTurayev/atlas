@@ -4,7 +4,7 @@ import type { World } from '../../core/session/world'
 import { dayKey, daysBetween } from '../../core/time/day'
 import { Meter, Streak } from '../components/Meter'
 import { countOf, formatPercent } from '../format'
-import { dueCount, frontier, masteredCount } from '../selectors'
+import { dueCount, frontier, masteredCount, taughtCount } from '../selectors'
 import { useAtlas } from '../store'
 
 /** A calm nudge after a gap, or a fresh-start note on Mondays and the first of the month. */
@@ -78,7 +78,10 @@ export function Home({ go }: { go: (screen: 'run' | 'map' | 'settings' | 'exam' 
         <Meter label="Material in the app" value={forecast.covered} />
         <Meter label="Foundations" value={forecast.base} tone="good" />
         <p className="text-sm text-muted">
-          Today: {world.day.xp} / {world.settings.dailyGoalXp} XP · {countOf(due, 'skill')} to review
+          {masteredCount(world)} of {taughtCount()} skills mastered · {countOf(due, 'skill')} to review today
+        </p>
+        <p className="text-sm text-muted">
+          Today: {world.day.xp} / {world.settings.dailyGoalXp} XP
         </p>
       </section>
 

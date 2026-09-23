@@ -6,6 +6,8 @@ interface Props {
   readonly onChange: (latex: string) => void
   readonly onEnter: () => void
   readonly disabled?: boolean
+  /** Only one field on a screen should take the caret. */
+  readonly autoFocus?: boolean
 }
 
 /** MathLive's own state, reached for one thing only — see `releaseFocus`. */
@@ -29,7 +31,7 @@ function releaseFocus(internals: FieldInternals | undefined): void {
 }
 
 /** MathLive field created imperatively — avoids custom-element JSX typings. */
-export function MathInput({ value, onChange, onEnter, disabled = false }: Props) {
+export function MathInput({ value, onChange, onEnter, disabled = false, autoFocus = true }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const field = useRef<MathfieldElement | null>(null)
   const handlers = useRef({ onChange, onEnter })
@@ -53,7 +55,7 @@ export function MathInput({ value, onChange, onEnter, disabled = false }: Props)
     container.appendChild(mf)
     field.current = mf
     const internals = internalsOf(mf)
-    mf.focus()
+    if (autoFocus) mf.focus()
     return () => {
       mf.removeEventListener('input', onInput)
       mf.removeEventListener('keydown', onKeyDown)
@@ -62,6 +64,7 @@ export function MathInput({ value, onChange, onEnter, disabled = false }: Props)
       mf.remove()
       field.current = null
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the field is created once; autoFocus only matters then
   }, [])
 
   useEffect(() => {

@@ -2,6 +2,7 @@ import type { UserAnswer } from '../../core/checker/check'
 import type { AnswerSpec } from '../../core/templates/types'
 import { IntervalInput } from './IntervalInput'
 import { MathInput } from './MathInput'
+import { VectorInput } from './VectorInput'
 import { RichText } from './Tex'
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 export const emptyAnswer = (spec: AnswerSpec): UserAnswer => {
   if (spec.kind === 'interval') return { kind: 'interval', parts: [{ lo: '0', hi: '1', loClosed: false, hiClosed: false }] }
   if (spec.kind === 'choice') return { kind: 'choice', id: '' }
+  if (spec.kind === 'vector') return { kind: 'vector', components: spec.components.map(() => '') }
   return { kind: 'latex', latex: '' }
 }
 
@@ -34,6 +36,16 @@ export function AnswerInput({ spec, answer, onChange, onSubmit, disabled }: Prop
           </button>
         ))}
       </div>
+    )
+  }
+  if (spec.kind === 'vector' && answer.kind === 'vector') {
+    return (
+      <VectorInput
+        components={answer.components}
+        onChange={(components) => onChange({ kind: 'vector', components })}
+        onSubmit={onSubmit}
+        disabled={disabled}
+      />
     )
   }
   if (spec.kind === 'interval' && answer.kind === 'interval') {

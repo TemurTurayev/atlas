@@ -39,8 +39,12 @@ async function persist(world: World): Promise<void> {
   persisted = world
 }
 
-const describeAnswer = (answer: UserAnswer): string =>
-  answer.kind === 'latex' ? answer.latex : answer.kind === 'choice' ? answer.id : JSON.stringify(answer.parts)
+const describeAnswer = (answer: UserAnswer): string => {
+  if (answer.kind === 'latex') return answer.latex
+  if (answer.kind === 'choice') return answer.id
+  if (answer.kind === 'vector') return answer.components.join(', ')
+  return JSON.stringify(answer.parts)
+}
 
 /** Grades the whole paper, schedules every tested skill and files the result. */
 async function handIn(

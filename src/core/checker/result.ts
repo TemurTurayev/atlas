@@ -19,4 +19,7 @@ export const MSG = {
   notFactored: 'Right value, but write it as a product of factors',
   notFullyFactored: 'Right value, but it can be factored further',
   notExpanded: 'Right value, but the brackets need expanding',
+  everyComponent: 'Fill in every component',
+  opposite: 'This is the opposite vector — check the signs',
+  wrongLength: 'Right direction, but the length is off',
 } as const

@@ -16,6 +16,9 @@ export function frontier(world: World, limit = 3): string[] {
     .slice(0, limit)
 }
 
+/** Every skill the app can teach today. */
+export const taughtCount = (): number => GRAPH.ladder.filter((id) => hasTemplate(id)).length
+
 /** Mastered skills that can actually be asked about. */
 export function masteredCount(world: World): number {
   return Object.values(world.progress).filter((p) => p.phase === 'mastered' && hasTemplate(p.skillId)).length
