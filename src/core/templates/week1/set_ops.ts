@@ -12,7 +12,7 @@ const theory = [
 ].join('\n')
 
 const HINTS = ['List the elements of each set and mark the ones needed according to the definition of the operation.', 'Order does not matter, and repeats are not written.']
-const INPUT_HINT = 'Elements separated by commas, e.g. {1, 2, 3}. Empty set — none. Pairs: (1,2)'
+const INPUT_HINT = 'Elements separated by commas, e.g. 1, 2, 3 (braces optional). Empty set — none. Pairs: (1,2)'
 
 type NumSet = readonly number[]
 

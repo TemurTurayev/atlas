@@ -20,6 +20,7 @@ export function VectorInput({ components, onChange, onSubmit, disabled }: Props)
             key={i}
             value={value}
             autoFocus={i === 0}
+            symbols={false}
             onChange={(latex) => onChange(components.map((c, j) => (j === i ? latex : c)))}
             onEnter={onSubmit}
             disabled={disabled}

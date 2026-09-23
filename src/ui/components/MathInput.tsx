@@ -8,7 +8,24 @@ interface Props {
   readonly disabled?: boolean
   /** Only one field on a screen should take the caret. */
   readonly autoFocus?: boolean
+  /** The row of symbols under the field; off inside a vector or matrix, where it would repeat. */
+  readonly symbols?: boolean
 }
+
+/**
+ * Symbols an answer may need that a keyboard does not have. MathLive also accepts typed shortcuts
+ * ("sqrt", "pi"), but nothing on screen says so, and a learner who cannot enter the answer they
+ * worked out on paper will read it as the app being wrong.
+ */
+const SYMBOLS: readonly { readonly label: string; readonly latex: string; readonly title: string }[] = [
+  { label: '√', latex: '\\sqrt{#?}', title: 'Square root — or type sqrt' },
+  { label: 'ⁿ√', latex: '\\sqrt[#?]{#?}', title: 'Root of any degree' },
+  { label: 'a/b', latex: '\\frac{#?}{#?}', title: 'Fraction — or press /' },
+  { label: 'xⁿ', latex: '^{#?}', title: 'Power — or press ^' },
+  { label: 'π', latex: '\\pi', title: 'Pi — or type pi' },
+  { label: '∞', latex: '\\infty', title: 'Infinity — or type infty' },
+  { label: '±', latex: '\\pm', title: 'Plus or minus' },
+]
 
 /** MathLive's own state, reached for one thing only — see `releaseFocus`. */
 interface FieldInternals {
@@ -31,7 +48,7 @@ function releaseFocus(internals: FieldInternals | undefined): void {
 }
 
 /** MathLive field created imperatively — avoids custom-element JSX typings. */
-export function MathInput({ value, onChange, onEnter, disabled = false, autoFocus = true }: Props) {
+export function MathInput({ value, onChange, onEnter, disabled = false, autoFocus = true, symbols = true }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const field = useRef<MathfieldElement | null>(null)
   const handlers = useRef({ onChange, onEnter })
@@ -77,5 +94,31 @@ export function MathInput({ value, onChange, onEnter, disabled = false, autoFocu
     if (mf) mf.readOnly = disabled
   }, [disabled])
 
-  return <div ref={host} />
+  const insert = (latex: string) => {
+    const mf = field.current
+    if (!mf || disabled) return
+    mf.executeCommand(['insert', latex, { focus: true, scrollIntoView: true, selectionMode: 'placeholder' }])
+    handlers.current.onChange(mf.value)
+  }
+
+  return (
+    <div className="space-y-2">
+      <div ref={host} />
+      {symbols && !disabled && (
+        <div className="flex flex-wrap gap-1.5">
+          {SYMBOLS.map((symbol) => (
+            <button
+              key={symbol.label}
+              type="button"
+              title={symbol.title}
+              onClick={() => insert(symbol.latex)}
+              className="min-w-9 px-2.5 py-1 rounded-lg border border-line bg-raised text-sm text-muted hover:border-accent hover:text-ink"
+            >
+              {symbol.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }

@@ -25,6 +25,7 @@ export function MatrixInput({ rows, onChange, onSubmit, disabled }: Props) {
                 <MathInput
                   value={value}
                   autoFocus={i === 0 && j === 0}
+                  symbols={false}
                   onChange={(latex) => set(i, j, latex)}
                   onEnter={onSubmit}
                   disabled={disabled}

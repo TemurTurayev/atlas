@@ -47,7 +47,7 @@ function tier1(rng: Rng): Problem {
       'Recall the exact values of sine and cosine for 30°, 45°, 60°.',
       `${useSin ? 'Sine' : 'Cosine'} of the angle is the needed side divided by the hypotenuse; express the needed side.`,
     ],
-    inputHint: 'If the answer is irrational, write it with a radical: 5\\sqrt{3}',
+    inputHint: 'If the answer is irrational, use the √ button, e.g. 5√3',
   }
 }
 
@@ -109,7 +109,7 @@ function ladderTree(rng: Rng): Problem {
       'First find the height from eye level to the top: $h_1=d\\cdot\\tan\\theta$.',
       'Do not forget to add the height of the observer up to eye level.',
     ],
-    inputHint: 'If the answer contains a radical, write it exactly, e.g. 2+3\\sqrt{3}',
+    inputHint: 'If the answer contains a radical, write it exactly with the √ button, e.g. 2+3√3',
   }
 }
 

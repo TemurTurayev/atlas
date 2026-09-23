@@ -16,7 +16,7 @@ const HINTS = [
   'Determine what is given — the hypotenuse or a leg — and substitute into the right formula.',
   'If the number under the root is not a perfect square, factor out the largest square factor: $\\sqrt{50}=\\sqrt{25\\cdot2}=5\\sqrt{2}$.',
 ]
-const INPUT_HINT = 'Write an irrational answer with a root, e.g. 5\\sqrt{2}'
+const INPUT_HINT = 'Write an irrational answer with a root: press the √ button, e.g. 5√2'
 
 const TRIPLES: readonly (readonly [number, number, number])[] = [
   [3, 4, 5],
