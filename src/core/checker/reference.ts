@@ -3,6 +3,7 @@ import { matLatex } from '../math/matrix'
 import { vecLatex } from '../math/vector'
 import type { AnswerSpec, IntervalPart } from '../templates/types'
 import type { UserAnswer } from './check'
+import { evaluateItem } from './values'
 
 export function intervalLatex(parts: readonly IntervalPart[]): string {
   if (parts.length === 0) return '\\emptyset'
@@ -45,6 +46,17 @@ export function userAnswerLatex(answer: UserAnswer, spec: AnswerSpec): string {
   return answer.latex
 }
 
+/**
+ * A wrong vector. Adding to the only nonzero component merely rescales the direction, and an
+ * up-to-scale answer counts every multiple as correct — so disturb a zero component instead.
+ */
+function perturbVector(components: readonly string[]): string[] {
+  const values = components.map((c) => evaluateItem(c) ?? 0)
+  const zeroAt = values.findIndex((v) => v === 0)
+  const target = values.filter((v) => v !== 0).length <= 1 && zeroAt >= 0 ? zeroAt : 0
+  return components.map((c, i) => (i === target ? `\\left(${c}\\right)+1` : c))
+}
+
 function perturbIntervals(parts: readonly IntervalPart[]): IntervalPart[] {
   if (parts.length === 0) return [{ lo: '0', hi: '1', loClosed: true, hiClosed: true }]
   const [first, ...rest] = parts
@@ -66,7 +78,7 @@ export function perturbedAnswer(spec: AnswerSpec): UserAnswer {
     case 'interval':
       return { kind: 'interval', parts: perturbIntervals(spec.parts) }
     case 'vector':
-      return { kind: 'vector', components: spec.components.map((c, i) => (i === 0 ? `\\left(${c}\\right)+1` : c)) }
+      return { kind: 'vector', components: perturbVector(spec.components) }
     case 'matrix':
       return {
         kind: 'matrix',

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { checkAnswer } from './check'
 import { checkNumber } from './number'
+import { perturbedAnswer, referenceAnswer } from './reference'
 import { checkVector } from './vector'
 
 const spec = (components: string[]) => ({ kind: 'vector' as const, components })
@@ -54,5 +55,40 @@ describe('degree signs', () => {
     expect(checkNumber('45', '45°').status).toBe('correct')
     expect(checkNumber('45', '45').status).toBe('correct')
     expect(checkNumber('45', '30^\\circ').status).toBe('incorrect')
+  })
+})
+
+describe('a direction answer', () => {
+  it('accepts any nonzero multiple, including the opposite one', () => {
+    expect(checkVector(['1', '2'], ['1', '2'], true).status).toBe('correct')
+    expect(checkVector(['1', '2'], ['3', '6'], true)).toEqual({
+      status: 'correct',
+      note: 'Correct — any nonzero multiple of this direction works',
+    })
+    expect(checkVector(['1', '2'], ['-1', '-2'], true).status).toBe('correct')
+    expect(checkVector(['1', '2'], ['\\frac{1}{2}', '1'], true).status).toBe('correct')
+  })
+
+  it('still refuses a different direction, and the zero vector', () => {
+    expect(checkVector(['1', '2'], ['2', '1'], true).status).toBe('incorrect')
+    expect(checkVector(['1', '2'], ['0', '0'], true).status).toBe('incorrect')
+  })
+
+  it('leaves the exact-answer behaviour alone when the flag is off', () => {
+    expect(checkVector(['1', '2'], ['3', '6'])).toEqual({ status: 'incorrect', diagnosis: 'Right direction, but the length is off' })
+  })
+})
+
+describe('the perturbed answer the harness uses', () => {
+  it('breaks the direction even when only one component is nonzero', () => {
+    const spec = { kind: 'vector' as const, components: ['2', '0', '0'], upToScale: true }
+    const wrong = perturbedAnswer(spec)
+    expect(checkAnswer(spec, wrong).status).not.toBe('correct')
+    expect(checkAnswer(spec, referenceAnswer(spec)).status).toBe('correct')
+  })
+
+  it('still breaks an ordinary vector answer', () => {
+    const spec = { kind: 'vector' as const, components: ['3', '-1'] }
+    expect(checkAnswer(spec, perturbedAnswer(spec)).status).not.toBe('correct')
   })
 })

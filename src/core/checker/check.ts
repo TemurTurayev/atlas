@@ -30,7 +30,9 @@ export function checkAnswer(spec: AnswerSpec, answer: UserAnswer): CheckResult {
     case 'interval':
       return answer.kind === 'interval' ? checkInterval(spec.parts, answer.parts) : malformed(MSG.wrongInput)
     case 'vector':
-      return answer.kind === 'vector' ? checkVector(spec.components, answer.components) : malformed(MSG.wrongInput)
+      return answer.kind === 'vector'
+        ? checkVector(spec.components, answer.components, spec.upToScale === true)
+        : malformed(MSG.wrongInput)
     case 'matrix':
       return answer.kind === 'matrix' ? checkMatrix(spec.rows, answer.rows) : malformed(MSG.wrongInput)
     case 'choice':

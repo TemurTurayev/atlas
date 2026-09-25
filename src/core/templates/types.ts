@@ -34,7 +34,12 @@ export type AnswerSpec =
   | { readonly kind: 'numberSet'; readonly values: readonly string[] }
   | { readonly kind: 'finiteSet'; readonly elements: readonly string[] }
   | { readonly kind: 'interval'; readonly parts: readonly IntervalPart[] }
-  | { readonly kind: 'vector'; readonly components: readonly string[] }
+  | {
+      readonly kind: 'vector'
+      readonly components: readonly string[]
+      /** An answer that is a direction, not a point: any nonzero multiple counts, as for an eigenvector. */
+      readonly upToScale?: boolean
+    }
   | { readonly kind: 'matrix'; readonly rows: readonly (readonly string[])[] }
   | { readonly kind: 'choice'; readonly options: readonly ChoiceOption[]; readonly correctId: string }
 

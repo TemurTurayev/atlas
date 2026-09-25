@@ -3,15 +3,20 @@ import { normalizeLatex } from './normalize'
 import { correct, incorrect, malformed, MSG, type CheckResult } from './result'
 import { evaluateItem, mustEvaluate } from './values'
 
-/** Every component is a scalar multiple of the reference by the same factor. */
-function sameDirection(user: readonly number[], reference: readonly number[]): boolean {
+/** The factor that takes the reference to the user's vector, or null if there is none. */
+function scaleFactor(user: readonly number[], reference: readonly number[]): number | null {
   const pivot = reference.findIndex((x) => x !== 0)
-  if (pivot < 0 || user[pivot] === 0) return false
+  if (pivot < 0 || user[pivot] === 0) return null
   const factor = user[pivot] / reference[pivot]
-  return reference.every((x, i) => exactClose(x * factor, user[i]))
+  return reference.every((x, i) => exactClose(x * factor, user[i])) ? factor : null
 }
 
-export function checkVector(components: readonly string[], typed: readonly string[]): CheckResult {
+export function checkVector(
+  components: readonly string[],
+  typed: readonly string[],
+  /** The answer is a direction: any nonzero multiple of it is the same answer. */
+  upToScale = false,
+): CheckResult {
   const input = typed.map(normalizeLatex)
   if (input.every((c) => c === '')) return malformed(MSG.empty)
   if (input.some((c) => c === '')) return malformed(MSG.everyComponent)
@@ -25,7 +30,10 @@ export function checkVector(components: readonly string[], typed: readonly strin
   const approx = input.some(hasDecimal)
   const same = approx ? approxClose : exactClose
   if (answer.every((v, i) => same(v, reference[i]))) return correct(approx ? MSG.approximate : undefined)
+
+  const factor = scaleFactor(answer, reference)
+  if (upToScale) return factor === null ? incorrect() : correct(MSG.anyMultiple)
   if (answer.every((v, i) => same(v, -reference[i]))) return incorrect(MSG.opposite)
-  if (sameDirection(answer, reference)) return incorrect(MSG.wrongLength)
+  if (factor !== null) return incorrect(MSG.wrongLength)
   return incorrect()
 }
