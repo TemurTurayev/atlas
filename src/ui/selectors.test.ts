@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { GRAPH } from '../core/graph'
+import { hasTemplate } from '../core/templates/registry'
 import { startProgress, type SkillProgress } from '../core/learner/progress'
 import { newCard } from '../core/scheduler/fsrs'
 import { initialWorld, type World } from '../core/session/world'
@@ -30,7 +32,11 @@ describe('selectors', () => {
     expect(skillStatus(w, 'int_neg')).toBe('mastered')
     expect(skillStatus(w, 'order_ops')).toBe('learning')
     expect(skillStatus(w, 'quadratic_eq')).toBe('locked')
-    expect(skillStatus(w, 'char_poly')).toBe('soon')
+    // A skill whose week has no generators yet; pick it from the graph so writing that content
+    // does not break this test the way adding week 4 once did.
+    const untaught = GRAPH.ladder.find((id) => !hasTemplate(id))
+    expect(untaught, 'every skill has content — drop this case').toBeDefined()
+    expect(skillStatus(w, untaught as string)).toBe('soon')
   })
 })
 
