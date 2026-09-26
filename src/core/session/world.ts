@@ -11,7 +11,8 @@ import { dayKey, daysBetween } from '../time/day'
 export type Mode = 'express' | 'lesson' | 'review' | 'mix' | 'jump' | 'repair'
 
 export type Task =
-  | { readonly type: 'theory'; readonly skillId: string }
+  /** `intro`: the card that opens a new topic, before its first problem. */
+  | { readonly type: 'theory'; readonly skillId: string; readonly intro?: boolean }
   | { readonly type: 'worked'; readonly skillId: string; readonly seed: number }
   | {
       readonly type: 'problem'

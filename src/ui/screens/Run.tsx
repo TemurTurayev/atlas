@@ -3,17 +3,18 @@ import type { UserAnswer } from '../../core/checker/check'
 import type { RunState } from '../../core/session/world'
 import { answerToLatex } from '../../core/checker/reference'
 import { GRAPH } from '../../core/graph'
-import { getTemplate } from '../../core/templates/registry'
 import { AnswerInput, emptyAnswer } from '../components/AnswerInput'
 import { ModeBadge } from '../components/Meter'
 import { Solution } from '../components/Solution'
 import { RichText, Tex } from '../components/Tex'
-import { countOf, formatPercent } from '../format'
+import { TheoryCard } from '../components/TheoryCard'
+import { countOf, formatPercent, weekTitle } from '../format'
 import { useAtlas } from '../store'
 
 const card = 'rounded-card bg-surface border border-line p-5 space-y-4'
 const primary = 'px-5 py-3 rounded-xl bg-accent text-bg font-medium hover:opacity-90 disabled:opacity-50'
 const ghost = 'px-4 py-3 rounded-xl border border-line text-muted hover:border-accent disabled:opacity-40'
+const link = 'text-sm text-accent underline'
 
 /** How far through this part of the run we are — a run with no visible end is hard to start. */
 function stepLabel(run: RunState, mixTarget: number, graded: boolean): string | null {
@@ -43,10 +44,12 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
   } = useAtlas()
   const [answer, setAnswer] = useState<UserAnswer>({ kind: 'latex', latex: '' })
   const [showSolution, setShowSolution] = useState(false)
+  const [showTheory, setShowTheory] = useState(false)
 
   useEffect(() => {
     if (problem) setAnswer(emptyAnswer(problem.answer))
     setShowSolution(false)
+    setShowTheory(false)
   }, [problem])
 
   const graded = result !== null && result.status !== 'malformed'
@@ -129,20 +132,30 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
   }
 
   if (task.type === 'theory') {
+    const node = GRAPH.node(task.skillId)
+    const intro = task.intro === true
     return (
       <div className="mx-auto max-w-2xl p-5 space-y-5">
-        <PauseBar go={go} left={<h2 className="text-xl">{GRAPH.node(task.skillId).title}</h2>} />
+        <PauseBar
+          go={go}
+          left={
+            <span className="text-xs uppercase tracking-wide text-muted">
+              {intro ? 'New topic' : 'Theory'} · {weekTitle(node.week)}
+            </span>
+          }
+        />
         <div className={card}>
-          {getTemplate(task.skillId)
-            .theory.split('\n')
-            .map((line, i) => (
-              <p key={i} className="leading-relaxed">
-                <RichText text={line} />
-              </p>
-            ))}
+          <h2 className="text-xl">{node.title}</h2>
+          <TheoryCard skillId={task.skillId} />
         </div>
-        <button type="button" className={primary} onClick={() => acknowledge()}>
-          Got it
+        {intro && (
+          <p className="text-sm text-muted">
+            Read it through once before you start: the first problems check exactly this. The card stays one click away while you solve.
+          </p>
+        )}
+        {/* Focused, so Enter moves on as it does everywhere else in a run. */}
+        <button type="button" className={primary} onClick={() => acknowledge()} autoFocus>
+          {intro ? 'Start the problems' : 'Got it'}
         </button>
       </div>
     )
@@ -201,6 +214,8 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
   }
 
   const onPaper = world.settings.paperNudge && (task.tier === 3 || problem.solution.length >= 4)
+  // Theory is there while a topic is being learned; in reviews and the mix, recalling it is the point.
+  const theoryOpen = task.mode === 'express' || task.mode === 'lesson'
 
   return (
     <div className="mx-auto max-w-2xl p-5 space-y-5">
@@ -210,9 +225,21 @@ export function Run({ go }: { go: (screen: 'home') => void }) {
           <div className="flex items-center gap-2">
             <ModeBadge mode={task.fromMistake === true ? 'mistake' : task.mode} tier={task.tier} />
             {run && <span className="text-xs text-muted">{stepLabel(run, mixTarget, graded)}</span>}
+            {theoryOpen && (
+              <button type="button" className={link} onClick={() => setShowTheory(!showTheory)} aria-expanded={showTheory}>
+                {showTheory ? 'Hide theory' : 'Theory'}
+              </button>
+            )}
           </div>
         }
       />
+
+      {theoryOpen && showTheory && (
+        <div className={card}>
+          <h2 className="text-base text-muted">{GRAPH.node(task.skillId).title}</h2>
+          <TheoryCard skillId={task.skillId} compact />
+        </div>
+      )}
 
       <div className={card}>
         <div className="flex items-start justify-between gap-3">

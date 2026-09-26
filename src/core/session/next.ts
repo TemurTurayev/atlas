@@ -1,7 +1,7 @@
 import { jumpAllowed } from '../learner/meta'
 import { markServed, mistakeFor } from '../mistakes/log'
 import { pickJumpTarget } from '../learner/jump'
-import { advanceLessonStep, startProgress, type SkillProgress } from '../learner/progress'
+import { advanceLessonStep, markTheorySeen, startProgress, type SkillProgress } from '../learner/progress'
 import type { Tier } from '../templates/types'
 import {
   MIX_TARGET, SHORT_MIX_TARGET, masteredSet, requireRun, withProgress, withRun, type EngineCtx, type Mode, type RunState, type Task, type World,
@@ -48,7 +48,11 @@ function decideWarmup(world: World, run: RunState, ctx: EngineCtx): Step {
 }
 
 function activeSkillStep(world: World, p: SkillProgress, ctx: EngineCtx): Step {
-  if (p.phase === 'express') return show(world, problem(ctx, p.skillId, 2, 'express'))
+  if (p.phase === 'express') {
+    // Every topic opens with its theory card: a problem on something never explained is a guess, not a check.
+    if (p.theorySeen !== true) return show(world, { type: 'theory', skillId: p.skillId, intro: true })
+    return show(world, problem(ctx, p.skillId, 2, 'express'))
+  }
   switch (p.lessonStep) {
     case 'theory':
       return show(world, { type: 'theory', skillId: p.skillId })
@@ -151,5 +155,6 @@ export function acknowledgeStep(world: World): World {
   if (!current || (current.type !== 'theory' && current.type !== 'worked')) throw new Error('acknowledgeStep: current task is not a lesson step')
   const p = world.progress[current.skillId]
   if (!p) throw new Error(`acknowledgeStep: no progress for ${current.skillId}`)
-  return withRun(withProgress(world, advanceLessonStep(p)), { ...run, current: null })
+  const next = p.phase === 'express' ? markTheorySeen(p) : advanceLessonStep(p)
+  return withRun(withProgress(world, next), { ...run, current: null })
 }

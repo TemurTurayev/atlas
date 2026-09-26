@@ -22,8 +22,14 @@ const WRONG: AttemptInput = { correct: false, hintsUsed: 0, seconds: 40 }
 const begin = (world: World = initialWorld(NOW), ctx = ctxAt()): World => startRun(world, ctx)
 const peek = (world: World): { world: World; task: Task } => nextTask(world, ctxAt())
 
+/** Reads past a new topic's theory card, which comes before its first problem. */
+function pastIntro(world: World): World {
+  const { world: shown, task } = peek(world)
+  return task.type === 'theory' && task.intro === true ? acknowledgeStep(shown) : world
+}
+
 function answer(world: World, input: AttemptInput) {
-  const { world: shown, task } = nextTask(world, ctxAt())
+  const { world: shown, task } = nextTask(pastIntro(world), ctxAt())
   if (task.type !== 'problem') throw new Error(`expected a problem, got ${task.type}`)
   return { ...submitAttempt(shown, input, ctxAt()), task }
 }
@@ -66,9 +72,15 @@ describe('run start', () => {
 })
 
 describe('express from the base', () => {
+  it('opens a new topic with its theory card, then the express check', () => {
+    const intro = peek(begin())
+    expect(intro.task).toEqual({ type: 'theory', skillId: 'a', intro: true })
+    const read = acknowledgeStep(intro.world)
+    expect(read.progress.a).toMatchObject({ phase: 'express', theorySeen: true })
+    expect(peek(read).task).toMatchObject({ type: 'problem', skillId: 'a', mode: 'express', tier: 2 })
+  })
+
   it('masters the first skill on 2/2 and moves up the ladder', () => {
-    const first = peek(begin())
-    expect(first.task).toMatchObject({ type: 'problem', skillId: 'a', mode: 'express', tier: 2 })
     const one = answer(begin(), RIGHT)
     expect(one.events).toEqual(['correct'])
     const two = answer(one.world, RIGHT)
@@ -76,7 +88,7 @@ describe('express from the base', () => {
     expect(two.world.progress.a.phase).toBe('mastered')
     expect(two.world.progress.a.card).not.toBeNull()
     expect(two.world.meta.expressStreak).toBe(1)
-    expect(peek(two.world).task).toMatchObject({ skillId: 'b', mode: 'express' })
+    expect(peek(two.world).task).toEqual({ type: 'theory', skillId: 'b', intro: true })
   })
 
   it('fast express answers earn an Easy first interval', () => {
@@ -86,14 +98,13 @@ describe('express from the base', () => {
 })
 
 describe('lesson fallback', () => {
-  it('runs theory → worked → faded → T1 → T2 → mastered', () => {
+  it('runs theory → express miss → worked → faded → T1 → T2 → mastered', () => {
     const fail = answer(begin(), WRONG)
     expect(fail.events).toEqual(['incorrect', 'express-failed'])
     expect(fail.world.run?.lessonsStarted).toEqual(['a'])
-    expect(peek(fail.world).task).toEqual({ type: 'theory', skillId: 'a' })
-    let w = acknowledgeStep(peek(fail.world).world)
-    expect(peek(w).task).toMatchObject({ type: 'worked', skillId: 'a' })
-    w = acknowledgeStep(peek(w).world)
+    // The theory was read a minute ago, before the express problem: the lesson goes on from the example.
+    expect(peek(fail.world).task).toMatchObject({ type: 'worked', skillId: 'a' })
+    const w = acknowledgeStep(peek(fail.world).world)
     expect(peek(w).task).toMatchObject({ type: 'problem', mode: 'lesson', tier: 1, faded: true })
     let r = answer(w, RIGHT)
     r = answer(r.world, RIGHT)
@@ -108,8 +119,7 @@ describe('lesson fallback', () => {
     const base = { ...initialWorld(NOW), progress: { a: masteredWith('a', newCard('good', NOW, 120)) } }
     const fail = answer(begin(base), WRONG)
     expect(fail.task).toMatchObject({ skillId: 'b', mode: 'express' })
-    let w = acknowledgeStep(peek(fail.world).world)
-    w = acknowledgeStep(peek(w).world)
+    const w = acknowledgeStep(peek(fail.world).world)
     let r = answer(w, WRONG)
     r = answer(r.world, WRONG)
     expect(r.events).toEqual(['incorrect', 'repair-queued'])
@@ -137,7 +147,7 @@ describe('jumps', () => {
   it('a declined jump continues with the next skill', () => {
     const w = answerJumpOffer(peek(passExpress(begin(), 3)).world, false)
     expect(w.run?.jumpDeclined).toBe(true)
-    expect(peek(w).task).toMatchObject({ skillId: 'c', mode: 'express' })
+    expect(peek(w).task).toEqual({ type: 'theory', skillId: 'c', intro: true })
   })
 
   it('a failed jump costs nothing but resets the stride', () => {
@@ -145,7 +155,7 @@ describe('jumps', () => {
     expect(r.events).toEqual(['incorrect', 'jump-failed'])
     expect(r.world.meta.jumpStride).toBe(4)
     expect(r.world.progress.f).toBeUndefined()
-    expect(peek(r.world).task).toMatchObject({ skillId: 'c', mode: 'express' })
+    expect(peek(r.world).task).toEqual({ type: 'theory', skillId: 'c', intro: true })
   })
 })
 
@@ -162,7 +172,7 @@ describe('mix and summary', () => {
     expect(summary.task).toEqual({ type: 'summary' })
     const more = continueRun(summary.world)
     expect(more.run).toMatchObject({ phase: 'new', lessonQuota: 2 })
-    expect(peek(more).task).toMatchObject({ skillId: 'b', mode: 'express' })
+    expect(peek(more).task).toEqual({ type: 'theory', skillId: 'b', intro: true })
   })
 })
 
@@ -216,7 +226,7 @@ describe('stats', () => {
 
   it('guards against out-of-order calls', () => {
     expect(() => submitAttempt(begin(), RIGHT, ctxAt())).toThrow()
-    expect(() => acknowledgeStep(peek(begin()).world)).toThrow()
+    expect(() => acknowledgeStep(peek(pastIntro(begin())).world)).toThrow()
     expect(() => answerJumpOffer(peek(begin()).world, true)).toThrow()
     expect(() => nextTask(initialWorld(NOW), ctxAt())).toThrow()
   })

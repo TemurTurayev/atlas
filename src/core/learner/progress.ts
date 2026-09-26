@@ -20,6 +20,8 @@ export interface SkillProgress {
   readonly implicit: boolean
   /** Reopened because a prerequisite check failed. */
   readonly repair: boolean
+  /** The topic's theory card has been read. Absent on progress saved before the card opened every topic. */
+  readonly theorySeen?: boolean
   readonly startedAt: number
   readonly masteredAt: number | null
   readonly card: Card | null
@@ -42,17 +44,22 @@ const STEPS: readonly LessonStep[] = ['theory', 'worked', 'faded', 'practice']
 export function startProgress(skillId: string, now: number): SkillProgress {
   return {
     skillId, phase: 'express', expressCorrect: 0, lessonStep: 'theory', tier: 1, streakAtTier: 0, wrongStreakT1: 0,
-    t2Recent: [], implicit: false, repair: false, startedAt: now, masteredAt: null, card: null,
+    t2Recent: [], implicit: false, repair: false, theorySeen: false, startedAt: now, masteredAt: null, card: null,
   }
 }
+
+/** The theory card that opens a topic was read; the express check follows. */
+export const markTheorySeen = (p: SkillProgress): SkillProgress => ({ ...p, theorySeen: true })
 
 const isClean = (g: Graded): boolean => g.correct && g.hintsUsed === 0
 const master = (p: SkillProgress, now: number): SkillProgress => ({ ...p, phase: 'mastered', repair: false, masteredAt: now })
 
 function applyExpress(p: SkillProgress, g: Graded, now: number): LearningUpdate {
   if (!isClean(g)) {
+    // Theory read a minute ago, right before this problem, is not worth a second reading: the example is.
+    const lessonStep: LessonStep = p.theorySeen === true ? 'worked' : 'theory'
     return {
-      progress: { ...p, phase: 'lesson', lessonStep: 'theory', tier: 1, streakAtTier: 0, wrongStreakT1: 0, t2Recent: [] },
+      progress: { ...p, phase: 'lesson', lessonStep, tier: 1, streakAtTier: 0, wrongStreakT1: 0, t2Recent: [] },
       events: ['express-failed'],
     }
   }

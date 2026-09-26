@@ -1,11 +1,20 @@
 import { expect, test } from '@playwright/test'
 
-test('first run: start, answer, see the worked solution', async ({ page }) => {
+test('first run: read the theory, start, answer, see the worked solution', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Atlas' })).toBeVisible()
   await page.getByRole('button', { name: /Start the run|Continue the run/ }).click()
 
+  // A new topic opens with its theory card, not with a problem.
+  await expect(page.getByText(/New topic/)).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Check' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Start the problems' }).click()
+
   await expect(page.getByRole('button', { name: 'Check' })).toBeVisible()
+  // The card stays one click away while the topic is being learned.
+  await page.getByRole('button', { name: 'Theory' }).click()
+  await expect(page.getByRole('button', { name: 'Hide theory' })).toBeVisible()
+  await page.getByRole('button', { name: 'Hide theory' }).click()
   const mathField = page.locator('math-field')
   await mathField.click()
   await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).toBe('MATH-FIELD')
@@ -26,6 +35,7 @@ test('first run: start, answer, see the worked solution', async ({ page }) => {
 test('leaving a problem and coming back keeps the field usable', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: /Start the run|Continue the run/ }).click()
+  await page.getByRole('button', { name: 'Start the problems' }).click()
   await expect(page.getByRole('button', { name: 'Check' })).toBeVisible()
   await page.locator('math-field').click()
   await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).toBe('MATH-FIELD')

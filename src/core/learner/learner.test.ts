@@ -6,7 +6,7 @@ import { jumpCredits, pickJumpTarget } from './jump'
 import {
   INITIAL_META, jumpAllowed, lessonQuota, momentum, onExpressFailed, onExpressPassed, onJumpFailed, onJumpSucceeded, recordResult,
 } from './meta'
-import { advanceLessonStep, applyLearning, creditImplicit, startProgress, toRepairLesson, type SkillProgress } from './progress'
+import { advanceLessonStep, applyLearning, creditImplicit, markTheorySeen, startProgress, toRepairLesson, type SkillProgress } from './progress'
 import { repairCandidates } from './repair'
 
 const node = (id: string, prereqs: string[] = []): SkillNode => ({ id, week: 0, prereqs, title: id, highYield: false })
@@ -27,6 +27,15 @@ describe('express check', () => {
     const r = applyLearning(startProgress('a', 0), g, 2, 10)
     expect(r.events).toEqual(['express-failed'])
     expect(r.progress).toMatchObject({ phase: 'lesson', lessonStep: 'theory', tier: 1 })
+  })
+  it('a new topic has not shown its theory yet; reading it keeps the express check going', () => {
+    expect(startProgress('a', 0).theorySeen).toBe(false)
+    expect(markTheorySeen(startProgress('a', 0))).toMatchObject({ phase: 'express', theorySeen: true, lessonStep: 'theory' })
+  })
+  it('a miss right after the theory card goes straight to the worked example', () => {
+    const r = applyLearning(markTheorySeen(startProgress('a', 0)), wrong, 2, 10)
+    expect(r.events).toEqual(['express-failed'])
+    expect(r.progress).toMatchObject({ phase: 'lesson', lessonStep: 'worked', tier: 1 })
   })
 })
 

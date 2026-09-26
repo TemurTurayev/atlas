@@ -9,6 +9,7 @@ import { TIERS, type Tier } from '../../core/templates/types'
 import { AnswerInput, emptyAnswer } from '../components/AnswerInput'
 import { Solution } from '../components/Solution'
 import { RichText, Tex } from '../components/Tex'
+import { TheoryCard } from '../components/TheoryCard'
 
 const card = 'rounded-card bg-surface border border-line p-5 space-y-4'
 const primary = 'px-5 py-3 rounded-xl bg-accent text-bg font-medium hover:opacity-90 disabled:opacity-50'
@@ -27,6 +28,7 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
   const [hintsUsed, setHintsUsed] = useState(0)
   const [stats, setStats] = useState({ solved: 0, total: 0 })
   const [showSolution, setShowSolution] = useState(false)
+  const [showTheory, setShowTheory] = useState(false)
 
   const problem = useMemo(() => generateProblem(skillId, seed, tier), [skillId, seed, tier])
   const current = answer ?? emptyAnswer(problem.answer)
@@ -70,10 +72,19 @@ export function Practice({ skillId, go }: { skillId: string; go: (screen: 'map')
             {TIER_LABEL[t]}
           </button>
         ))}
+        <button type="button" className="text-sm text-accent underline self-center" onClick={() => setShowTheory(!showTheory)}>
+          {showTheory ? 'Hide theory' : 'Theory'}
+        </button>
         <span className="ml-auto text-sm text-muted self-center">
           {stats.total > 0 ? `${stats.solved} of ${stats.total}` : 'practice'}
         </span>
       </div>
+
+      {showTheory && (
+        <div className={card}>
+          <TheoryCard skillId={skillId} compact />
+        </div>
+      )}
 
       <div className={card}>
         <div className="flex items-start justify-between gap-3">
