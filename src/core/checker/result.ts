@@ -23,6 +23,8 @@ export const MSG = {
   opposite: 'This is the opposite vector — check the signs',
   wrongLength: 'Right direction, but the length is off',
   anyMultiple: 'Correct — any nonzero multiple of this direction works',
+  anyConstant: 'Correct — the constant of integration can be anything',
+  missingConstant: 'The function is right; an indefinite integral also needs "+ C"',
   everyEntry: 'Fill in every entry',
   transposed: 'These are the right numbers, but rows and columns are swapped',
   wrongScale: 'The pattern is right — every entry is off by the same factor',

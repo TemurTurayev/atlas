@@ -7,7 +7,10 @@ import { normalizeLatex } from './normalize'
 import { correct, incorrect, malformed, MSG, type CheckResult } from './result'
 import { stripAssignment } from './split'
 
-type Verdict = 'equal' | 'negated' | 'different'
+type Verdict = 'equal' | 'negated' | 'shifted' | 'different'
+
+/** The constant of integration, as it is written on paper. */
+const CONSTANT = 'C'
 
 const DEFAULT_RANGE: readonly [number, number] = [-3, 3]
 const TARGET_POINTS = 10
@@ -30,26 +33,35 @@ function samplePoint(rng: Rng, spec: ExpressionSpec): Record<string, number> {
   )
 }
 
-/** Compares two expressions at seeded random points inside the spec's domain. */
-export function compareOnSamples(reference: Expr, user: Expr, spec: ExpressionSpec): Verdict {
+/**
+ * Compares two expressions at seeded random points inside the spec's domain. `shifted` means the
+ * two differ by the same constant everywhere — the freedom an antiderivative has.
+ */
+export function compareOnSamples(reference: Expr, user: Expr, spec: ExpressionSpec, extra: Record<string, number> = {}): Verdict {
   const rng = createRng(0x5eed)
   let valid = 0
   let equal = true
   let negated = true
+  let shift: number | null = null
+  let shifted = true
   for (let attempt = 0; attempt < MAX_ATTEMPTS && valid < TARGET_POINTS; attempt += 1) {
     const point = samplePoint(rng, spec)
     const r = evalReal(reference, point)
     if (r === null) continue
     valid += 1
-    const u = evalReal(user, point)
+    const u = evalReal(user, { ...point, ...extra })
     if (u === null) return 'different'
     equal = equal && sampleClose(u, r)
     negated = negated && sampleClose(u, -r)
-    if (!equal && !negated) return 'different'
+    const gap = u - r
+    if (shift === null) shift = gap
+    shifted = shifted && sampleClose(gap - shift, 0)
+    if (!equal && !negated && !shifted) return 'different'
   }
   if (valid < 3) throw new Error(`Reference "${spec.value}" is undefined on its sampling domain`)
   if (equal) return 'equal'
-  return negated ? 'negated' : 'different'
+  if (negated) return 'negated'
+  return shifted ? 'shifted' : 'different'
 }
 
 function checkForm(spec: ExpressionSpec, reference: Expr, user: Expr): CheckResult {
@@ -67,12 +79,20 @@ export function checkExpression(spec: ExpressionSpec, latex: string): CheckResul
   if (input === '') return malformed(MSG.empty)
   const user = parseLatex(stripAssignment(input))
   if (!user) return malformed(MSG.unparsable)
-  const foreign = unknowns(user).filter((v) => !spec.variables.includes(v))
+  const upToConstant = spec.upToConstant === true
+  // An indefinite integral is written with a free constant; "C" is part of the answer, not a stray
+  // variable, and it is pinned to zero for the comparison.
+  const allowed = upToConstant ? [...spec.variables, CONSTANT] : spec.variables
+  const foreign = unknowns(user).filter((v) => !allowed.includes(v))
   if (foreign.length > 0) return malformed(`Use only these variables: ${spec.variables.join(', ')}`)
   const reference = parseLatex(spec.value)
   if (!reference) throw new Error(`Invalid reference expression: ${spec.value}`)
-  const verdict = compareOnSamples(reference, user, spec)
+  const verdict = compareOnSamples(reference, user, spec, upToConstant ? { [CONSTANT]: 0 } : {})
+  if (verdict === 'shifted') return upToConstant ? correct(MSG.anyConstant) : incorrect()
   if (verdict === 'negated') return incorrect(MSG.sign)
   if (verdict === 'different') return incorrect()
-  return checkForm(spec, reference, user)
+  const form = checkForm(spec, reference, user)
+  // "+ C" carries no numeric value, so the sampling cannot see it; the written answer can.
+  if (upToConstant && form.status === 'correct' && !unknowns(user).includes(CONSTANT)) return correct(MSG.missingConstant)
+  return form
 }

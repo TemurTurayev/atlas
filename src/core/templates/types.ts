@@ -24,6 +24,8 @@ export interface ExpressionSpec {
   readonly value: string
   readonly variables: readonly string[]
   readonly form?: ExprForm
+  /** An antiderivative: answers that differ from the reference by a constant are the same answer. */
+  readonly upToConstant?: boolean
   /** Sampling range per variable; default [-3, 3]. Must keep the reference defined on most points. */
   readonly domain?: Readonly<Record<string, readonly [number, number]>>
 }
