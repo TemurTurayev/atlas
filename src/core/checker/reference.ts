@@ -3,6 +3,7 @@ import { matLatex } from '../math/matrix'
 import { vecLatex } from '../math/vector'
 import type { AnswerSpec, IntervalPart } from '../templates/types'
 import type { UserAnswer } from './check'
+import { complexLatex } from './complex'
 import { evaluateItem } from './values'
 
 export function intervalLatex(parts: readonly IntervalPart[]): string {
@@ -32,6 +33,8 @@ export function referenceAnswer(spec: AnswerSpec): UserAnswer {
       return { kind: 'vector', components: spec.components }
     case 'matrix':
       return { kind: 'matrix', rows: spec.rows }
+    case 'complex':
+      return { kind: 'latex', latex: complexLatex(spec.re, spec.im) }
     case 'choice':
       return { kind: 'choice', id: spec.correctId }
   }
@@ -96,6 +99,9 @@ export function perturbedAnswer(spec: AnswerSpec): UserAnswer {
         kind: 'matrix',
         rows: spec.rows.map((row, i) => row.map((c, j) => (i === 0 && j === 0 ? `\\left(${c}\\right)+1` : c))),
       }
+    case 'complex':
+      // Moving along the imaginary axis is never the same number, and matches none of the named slips' shortcuts.
+      return { kind: 'latex', latex: `\\left(${complexLatex(spec.re, spec.im)}\\right)+i` }
     case 'choice':
       return { kind: 'choice', id: spec.options.find((o) => o.id !== spec.correctId)?.id ?? `${spec.correctId}-wrong` }
   }
@@ -117,6 +123,8 @@ export function answerToLatex(spec: AnswerSpec): string {
       return vecLatex(spec.components)
     case 'matrix':
       return matLatex(spec.rows)
+    case 'complex':
+      return complexLatex(spec.re, spec.im)
     case 'choice':
       return spec.options.find((o) => o.id === spec.correctId)?.label ?? ''
   }

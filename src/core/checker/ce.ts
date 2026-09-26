@@ -31,6 +31,19 @@ export function evalReal(expr: Expr, vars: Readonly<Record<string, number>> = {}
   }
 }
 
+/** Complex numeric value (a + bi); null when undefined or infinite. */
+export function evalComplex(expr: Expr): { readonly re: number; readonly im: number } | null {
+  try {
+    const value = expr.N()
+    const re = value.re
+    const im = typeof value.im === 'number' ? value.im : 0
+    if (typeof re !== 'number' || !Number.isFinite(re) || !Number.isFinite(im)) return null
+    return { re, im }
+  } catch {
+    return null
+  }
+}
+
 export const unknowns = (expr: Expr): readonly string[] => expr.unknowns ?? []
 export const operatorOf = (expr: Expr): string => expr.operator
 /** Operands of a function expression; `ops` only exists after narrowing with `isFunction` in 0.131.3. */

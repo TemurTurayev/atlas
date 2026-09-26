@@ -28,4 +28,7 @@ export const MSG = {
   everyEntry: 'Fill in every entry',
   transposed: 'These are the right numbers, but rows and columns are swapped',
   wrongScale: 'The pattern is right — every entry is off by the same factor',
+  conjugate: 'This is the complex conjugate — check the sign of the imaginary part',
+  swappedParts: 'The real and imaginary parts are swapped',
+  missingImaginary: 'The real part is right, but the imaginary part is missing',
 } as const

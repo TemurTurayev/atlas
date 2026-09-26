@@ -43,6 +43,8 @@ export type AnswerSpec =
       readonly upToScale?: boolean
     }
   | { readonly kind: 'matrix'; readonly rows: readonly (readonly string[])[] }
+  /** A complex number re + i·im; the parts are LaTeX. Typed as one formula, in any equivalent form. */
+  | { readonly kind: 'complex'; readonly re: string; readonly im: string }
   | { readonly kind: 'choice'; readonly options: readonly ChoiceOption[]; readonly correctId: string }
 
 export interface SolutionStep {

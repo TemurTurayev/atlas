@@ -1,4 +1,5 @@
 import type { AnswerSpec, IntervalPart } from '../templates/types'
+import { checkComplex } from './complex'
 import { checkExpression } from './expression'
 import { checkInterval } from './interval'
 import { checkMatrix } from './matrix'
@@ -35,6 +36,8 @@ export function checkAnswer(spec: AnswerSpec, answer: UserAnswer): CheckResult {
         : malformed(MSG.wrongInput)
     case 'matrix':
       return answer.kind === 'matrix' ? checkMatrix(spec.rows, answer.rows) : malformed(MSG.wrongInput)
+    case 'complex':
+      return answer.kind === 'latex' ? checkComplex(spec.re, spec.im, answer.latex) : malformed(MSG.wrongInput)
     case 'choice':
       if (answer.kind !== 'choice') return malformed(MSG.wrongInput)
       return answer.id === spec.correctId ? correct() : incorrect()
