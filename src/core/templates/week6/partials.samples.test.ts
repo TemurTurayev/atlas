@@ -122,7 +122,8 @@ describe('multivar_fns', () => {
         expect(p.answer.correctId, label).toBe(expected)
       } else if (/domain/.test(s)) {
         // The correct option must describe exactly the points where f is defined.
-        const correct = p.answer.options.find((o) => o.id === p.answer.correctId)
+        const { options, correctId } = p.answer
+        const correct = options.find((o) => o.id === correctId)
         expect(correct, label).toBeDefined()
         const body = parseLatex(mathSegments(s)[0].slice('f(x,y) = '.length))
         if (!body) throw new Error(`cannot parse f in: ${s}`)
