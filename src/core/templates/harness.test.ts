@@ -5,7 +5,7 @@ import { perturbedAnswer, referenceAnswer } from '../checker/reference'
 import { GRAPH } from '../graph'
 import { createRng } from '../random/rng'
 import { TEMPLATES } from './registry'
-import { mathSegments } from './testing'
+import { mathSegments, strayLatex } from './testing'
 import { TIERS } from './types'
 
 const GEN_SEEDS = 300
@@ -37,6 +37,19 @@ describe.each(entries)('template %s', (skillId, template) => {
       expect(a.statement.length, `seed ${seed}`).toBeGreaterThan(5)
       expect(a.solution.length, `seed ${seed}`).toBeGreaterThan(0)
       expect(a.hints.length, `seed ${seed}`).toBeGreaterThan(0)
+    }
+  })
+
+  it('theory keeps its LaTeX inside $…$', () => {
+    expect(strayLatex(template.theory), skillId).toEqual([])
+  })
+
+  it.each(TIERS)('tier %i: every formula lives inside $…$', (tier) => {
+    for (let seed = 1; seed <= CHECK_SEEDS; seed += 1) {
+      const p = template.generate(createRng(seed), tier)
+      const prose = [p.statement, ...p.hints, ...p.solution.map((s) => s.text), ...(p.alternative?.steps ?? []).map((s) => s.text)]
+      const options = p.answer.kind === 'choice' ? p.answer.options.map((o) => o.label) : []
+      ;[...prose, ...options].forEach((text) => expect(strayLatex(text), `seed ${seed}: ${text}`).toEqual([]))
     }
   })
 
