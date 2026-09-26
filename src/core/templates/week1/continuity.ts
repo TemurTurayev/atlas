@@ -1,4 +1,4 @@
-import { linear } from '../../math/latex'
+import { joinTerms, linear, paren } from '../../math/latex'
 import { polyAdd, polyEval, polyMul, polyToLatex, type Poly } from '../../math/poly'
 import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
@@ -24,8 +24,8 @@ function tier1(rng: Rng): Problem {
     answer: { kind: 'number', value: String(a) },
     solution: [
       { text: 'At the junction point, both formulas must give the same value.' },
-      { text: `The right-hand piece at $x=${c}$ equals:`, tex: `${m}\\cdot ${c} + ${k} = ${rhsAtC}` },
-      { text: 'Set the left-hand piece equal to this number and solve for $a$:', tex: `${c}^{2}+a = ${rhsAtC} \\ \\Rightarrow\\ a = ${rhsAtC} - ${c * c} = ${a}` },
+      { text: `The right-hand piece at $x=${c}$ equals:`, tex: `${joinTerms([`${m}\\cdot ${paren(c)}`, String(k)])} = ${rhsAtC}` },
+      { text: 'Set the left-hand piece equal to this number and solve for $a$:', tex: `${paren(c)}^{2}+a = ${rhsAtC} \\ \\Rightarrow\\ a = ${rhsAtC} - ${c * c} = ${a}` },
     ],
     hints: ['At the junction point, the values of both pieces must match.', `Substitute $x=${c}$ into both pieces and set them equal.`],
   }
@@ -61,9 +61,9 @@ function removableHole(rng: Rng): Problem {
     solution: [
       {
         text: 'Factor the numerator — one factor matches the denominator:',
-        tex: `\\frac{${numLatex}}{${denLatex}} = \\frac{\\left(x-${p}\\right)\\left(x-${q}\\right)}{x-${p}} = x-${q} \\quad (x\\ne ${p})`,
+        tex: `\\frac{${numLatex}}{${denLatex}} = \\frac{\\left(${linear(1, -p)}\\right)\\left(${linear(1, -q)}\\right)}{${linear(1, -p)}} = ${linear(1, -q)} \\quad (x\\ne ${p})`,
       },
-      { text: `Substitute the discontinuity point into the simplified expression:`, tex: `f(${p}) = ${p}-${q} = ${value}` },
+      { text: `Substitute the discontinuity point into the simplified expression:`, tex: `f(${p}) = ${paren(p)} - ${paren(q)} = ${value}` },
     ],
     hints: [
       'Factor the numerator — one factor should match the denominator.',
@@ -85,8 +85,8 @@ function twoConditions(rng: Rng): Problem {
     statement: `Suppose $f$ is continuous everywhere: $${statementCore}$. Find $a$.`,
     answer: { kind: 'number', value: String(a) },
     solution: [
-      { text: `Matching at $x=${p}$ gives the first equation:`, tex: `a\\cdot ${p} - b = ${m}` },
-      { text: `Matching at $x=${q}$ gives the second equation:`, tex: `b\\cdot ${q} + a = ${m}` },
+      { text: `Matching at $x=${p}$ gives the first equation:`, tex: `a\\cdot ${paren(p)} - b = ${m}` },
+      { text: `Matching at $x=${q}$ gives the second equation:`, tex: `b\\cdot ${paren(q)} + a = ${m}` },
       { text: 'Solve the system of two equations in two unknowns:', tex: `a = ${a}, \\quad b = ${b}` },
     ],
     hints: [

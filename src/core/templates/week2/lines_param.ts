@@ -1,4 +1,4 @@
-import { paren } from '../../math/latex'
+import { joinTerms, paren } from '../../math/latex'
 import { add, scale, tupleLatex, vecLatex, type Vec } from '../../math/vector'
 import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate, SolutionStep } from '../types'
@@ -79,7 +79,7 @@ function tier2(rng: Rng): Problem {
     `A line is given by $\\vec r(t) = \\vec p + t\\vec d$ with $\\vec p=${tupleLatex(p)}$ and $\\vec d=${tupleLatex(d)}$. Find the point on the line at $t=${t0}$.`,
     point,
     [
-      { text: `Substitute $t=${t0}$ into the line equation:`, tex: `\\vec r(${t0}) = \\vec p + ${t0}\\vec d` },
+      { text: `Substitute $t=${t0}$ into the line equation:`, tex: `\\vec r(${t0}) = ${joinTerms(['\\vec p', `${t0}\\vec d`])}` },
       { text: `Scale the direction vector by ${t0}:`, tex: `${t0}\\vec d = ${asColumn(scale(t0, d))}` },
       { text: 'Add $\\vec p$, component by component:', tex: point.map((v, i) => `${p[i]} + ${paren(scale(t0, d)[i])} = ${v}`).join(' \\\\ ') },
       { text: 'So the point is', tex: asColumn(point) },
@@ -98,10 +98,10 @@ function tier3(rng: Rng): Problem {
   const coordName = dim === 2 ? (['x', 'y'] as const)[i] : (['x', 'y', 'z'] as const)[i]
   const checkIndex = d.findIndex((x, idx) => idx !== i && x !== 0)
   const solution: SolutionStep[] = [
-    { text: `Write the ${coordName}-coordinate of a general point on the line:`, tex: `${coordName} = ${p[i]} + ${paren(d[i])}t` },
+    { text: `Write the ${coordName}-coordinate of a general point on the line:`, tex: `${coordName} = ${joinTerms([String(p[i]), `${d[i]}t`])}` },
     {
       text: `The point $Q${tupleLatex(Q)}$ lies on the line, so its ${coordName}-coordinate must match:`,
-      tex: `${Q[i]} = ${p[i]} + ${paren(d[i])}t`,
+      tex: `${Q[i]} = ${joinTerms([String(p[i]), `${d[i]}t`])}`,
     },
     { text: 'Solve for $t$:', tex: `t = \\frac{${Q[i]} - ${paren(p[i])}}{${d[i]}} = ${t0}` },
   ]

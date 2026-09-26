@@ -32,7 +32,7 @@ function tier1(rng: Rng): Problem {
   const poly: Poly = [a * b, a]
   const statement = `${coefPrefix(a)}\\left(${linear(1, b)}\\right)`
   return build(statement, poly, [
-    { text: `Multiply $${a}$ by each term inside the bracket:`, tex: `${a}\\cdot x ${b >= 0 ? '+' : '-'} ${a}\\cdot ${Math.abs(b)}` },
+    { text: `Multiply $${a}$ by each term inside the bracket:`, tex: `${a}\\cdot x ${a * b < 0 ? '-' : '+'} ${Math.abs(a)}\\cdot ${Math.abs(b)}` },
     { text: 'Result:', tex: polyToLatex(poly) },
   ])
 }
@@ -48,7 +48,7 @@ function squareBranch(rng: Rng): Problem {
     { text: 'The square-of-a-sum/difference formula:', tex: '(u+v)^2=u^2+2uv+v^2' },
     {
       text: `Here $u=${p}x$, $v=${paren(q)}$:`,
-      tex: `(${p}x)^{2} ${mid >= 0 ? '+' : '-'} 2\\cdot ${p}x\\cdot ${paren(q)} + ${paren(q)}^{2}`,
+      tex: `(${p}x)^{2} ${mid >= 0 ? '+' : '-'} 2\\cdot ${p}x\\cdot ${Math.abs(q)} + ${paren(q)}^{2}`,
     },
     { text: 'Result:', tex: polyToLatex(poly) },
   ])

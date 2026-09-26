@@ -74,15 +74,17 @@ function tier3(rng: Rng): Problem {
   const u = rng.intExcept(-6, 6, [t])
   const denominator = t - u
   const value = rat(numerator, denominator)
-  const equation = `\\frac{${p}\\left(${q}+${r}\\right)-${s}}{${t}-${u}}`
+  const equation = `\\frac{${p}\\left(${q}+${r}\\right)-${s}}{${t}-${paren(u)}}`
+  const fracStr = `\\frac{${numerator}}{${denominator}}`
+  const reducedStr = ratToLatex(value)
   return problem(
     equation,
-    ratToLatex(value),
+    reducedStr,
     [
       { text: 'First the brackets in the numerator:', tex: `${q}+${r} = ${inner}` },
       { text: 'Multiply, then subtract in the numerator:', tex: `${p} \\cdot ${inner} - ${s} = ${p * inner} - ${s} = ${numerator}` },
-      { text: 'The denominator:', tex: `${t}-${u} = ${denominator}` },
-      { text: 'Divide the numerator by the denominator and simplify:', tex: `\\frac{${numerator}}{${denominator}} = ${ratToLatex(value)}` },
+      { text: 'The denominator:', tex: `${t}-${paren(u)} = ${denominator}` },
+      { text: 'Divide the numerator by the denominator and simplify:', tex: `${fracStr === reducedStr ? reducedStr : `${fracStr} = ${reducedStr}`}` },
     ],
     ['Treat the numerator and denominator of the fraction bar separately, as if each were in its own brackets.', 'In the numerator: first the brackets, then multiplication, then subtraction.'],
   )

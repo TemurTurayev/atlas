@@ -1,4 +1,4 @@
-import { coefPrefix, linear } from '../../math/latex'
+import { coefPrefix, joinTerms, linear, paren } from '../../math/latex'
 import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
@@ -195,7 +195,7 @@ function nestedChain(rng: Rng): Built {
   const gLatex = linear(a, b)
   const hLatex = powerTerm(gLatex, 2)
   const middleCoeff = `${coefPrefix(2 * a)}${powerTerm(gLatex, 1)}`
-  const value = `e^{${hLatex}}\\cdot ${middleCoeff}`
+  const value = `e^{${hLatex}}\\cdot ${paren(middleCoeff)}`
   return {
     problem: {
       statement: `Differentiate: $y = e^{${hLatex}}$.`,
@@ -218,7 +218,7 @@ function chainInProduct(rng: Rng): Built {
   const b = rng.int(-3, 3)
   const gLatex = linear(a, b)
   const vPrimeLatex = `${coefPrefix(a)}e^{${gLatex}}`
-  const value = `e^{${gLatex}}+${coefPrefix(a)}xe^{${gLatex}}`
+  const value = joinTerms([`e^{${gLatex}}`, `${coefPrefix(a)}xe^{${gLatex}}`])
   return {
     problem: {
       statement: `Differentiate: $y = xe^{${gLatex}}$.`,
@@ -251,7 +251,7 @@ function pointEval(rng: Rng): Built {
       solution: [
         { text: 'Name the inner function and its derivative:', tex: `g(x) = ${gLatex}, \\quad g'(x) = ${a}` },
         { text: 'Write the derivative using the chain rule:', tex: `y'(x) = ${n}\\left(g(x)\\right)^{${n - 1}}g'(x)` },
-        { text: `Evaluate the inner function at $x=${x0}$, then substitute:`, tex: `g(${x0}) = ${gAt} \\quad\\Longrightarrow\\quad y'(${x0}) = ${n}\\left(${gAt}\\right)^{${n - 1}}\\cdot ${a} = ${value}` },
+        { text: `Evaluate the inner function at $x=${x0}$, then substitute:`, tex: `g(${x0}) = ${gAt} \\quad\\Longrightarrow\\quad y'(${x0}) = ${n}\\left(${paren(gAt)}\\right)^{${n - 1}}\\cdot ${paren(a)} = ${value}` },
       ],
       hints: HINTS_POINT,
       inputHint: INPUT_HINT_NUMBER,

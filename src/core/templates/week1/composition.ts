@@ -1,4 +1,4 @@
-import { linear } from '../../math/latex'
+import { joinTerms, linear } from '../../math/latex'
 import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
 
@@ -32,7 +32,7 @@ function tier1(rng: Rng): Problem {
         ]
       : [
           { text: 'Substitute $f(x)$ for $x$ in $g$:', tex: `g(f(x)) = ${addConst('f(x)', c)}` },
-          { text: 'Expand $f(x) = x^2$:', tex: `${addConst('x^2', c)} = ${value}` },
+          { text: 'Substitute $f(x) = x^2$:', tex: `g(f(x)) = ${value}` },
         ],
     hints: HINTS,
     inputHint: 'Enter an expression in terms of x, e.g. (x+3)^2',
@@ -57,8 +57,8 @@ function tier2(rng: Rng): Problem {
           { text: 'Write out $g(x)$ in full:', tex: value },
         ]
       : [
-          { text: 'Substitute $f(x)$ for $x$ in $g$:', tex: `g(f(x)) = \\dfrac{1}{f(x) - ${b}}` },
-          { text: 'Expand $f(x)$ in the denominator and simplify:', tex: `\\dfrac{1}{${linear(1, a)} - ${b}} = ${value}` },
+          { text: 'Substitute $f(x)$ for $x$ in $g$:', tex: `g(f(x)) = \\dfrac{1}{${joinTerms(['f(x)', String(-b)])}}` },
+          { text: 'Expand $f(x)$ in the denominator and simplify:', tex: `\\dfrac{1}{${joinTerms([linear(1, a), String(-b)])}} ${joinTerms([linear(1, a), String(-b)]) === linear(1, a - b) ? '' : `= ${value}`}` },
         ],
     hints: [...HINTS, `The domain is restricted to $[1.5, 4]$ — the denominator is never zero there.`],
     inputHint: 'Enter a fraction using /, e.g. 1/(x-2)+3',

@@ -1,3 +1,4 @@
+import { joinTerms } from '../../math/latex'
 import { rat, ratToLatex } from '../../math/rational'
 import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
@@ -49,12 +50,12 @@ function expectedValueTable(rng: Rng): Problem {
       { text: 'Apply the expected value formula:', tex: 'E[X] = \\sum x_i P(X = x_i)' },
       {
         text: 'Multiply each value by its probability and sum:',
-        tex: `E[X] = ${xVals.map((x, i) => `${x}\\left(\\frac{${pNums[i]}}{10}\\right)`).join(' + ')} = ${texStep}`,
+        tex: `E[X] = ${joinTerms(xVals.map((x, i) => `${x}\\left(\\frac{${pNums[i]}}{10}\\right)`))} = ${texStep}`,
       },
     ],
     hints: [
       'Multiply each value $x_i$ by its probability $P(X = x_i)$ and add them up.',
-      `Evaluate $\\frac{${xVals.map((x, i) => `${x}(${pNums[i]})`).join(' + ')}}{10}$.`,
+      `Evaluate $\\frac{${joinTerms(xVals.map((x, i) => `${x}(${pNums[i]})`))}}{10}$.`,
     ],
     inputHint: 'An exact fraction or decimal.',
   }

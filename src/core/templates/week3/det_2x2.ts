@@ -46,7 +46,7 @@ function tier1(rng: Rng): Problem {
   const solution: SolutionStep[] = [
     {
       text: 'Multiply the main diagonal, multiply the other diagonal, then subtract:',
-      tex: `\\det(A) = ${detExpr(a)} = ${a[0][0] * a[1][1]} - ${a[0][1] * a[1][0]} = ${value}`,
+      tex: `\\det(A) = ${detExpr(a)} = ${a[0][0] * a[1][1]} - ${paren(a[0][1] * a[1][0])} = ${value}`,
     },
   ]
   return {
@@ -139,7 +139,7 @@ function tier3Scale(rng: Rng): Problem {
       text: 'Multiplying out $kA$ and expanding the determinant works, but it is quicker to use the scaling property: for a $2\\times2$ matrix, $\\det(kA)=k^{2}\\det(A)$.',
     },
     { text: 'Find $\\det(A)$ first:', tex: `\\det(A) = ${detExpr(a)} = ${detA}` },
-    { text: 'Apply the property:', tex: `\\det(${k}A) = ${k}^{2}\\det(A) = ${k * k}\\cdot(${detA}) = ${value}` },
+    { text: 'Apply the property:', tex: `\\det(${k}A) = ${paren(k)}^{2}\\det(A) = ${k * k}\\cdot(${detA}) = ${value}` },
   ]
   return {
     statement: `Given $A = ${matLatex(a)}$, find $\\det(${k}A)$ without expanding $${k}A$ first.`,

@@ -55,7 +55,7 @@ function tier1(rng: Rng): Problem {
       { text: 'Evaluate the function at both endpoints:', tex: `f(${xa}) = ${fa}, \\qquad f(${xb}) = ${fb}` },
       {
         text: 'The slope of the secant line is the change in output divided by the change in input:',
-        tex: `\\frac{f(${xb})-f(${xa})}{${xb}-${xa}} = \\frac{${fb} - ${paren(fa)}}{${xb} - ${paren(xa)}} = ${slope}`,
+        tex: `\\frac{f(${xb})-f(${xa})}{${xb}-${paren(xa)}} = \\frac{${fb} - ${paren(fa)}}{${xb} - ${paren(xa)}} = ${slope}`,
       },
     ],
     hints: HINTS_SECANT,

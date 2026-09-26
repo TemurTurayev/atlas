@@ -69,14 +69,15 @@ function tier2(rng: Rng): Problem {
   const n = randomNonzeroVec(rng, 3, -7, 7)
   const P = randomVec(rng, 3, -6, 6)
   const dConst = dot(n, P)
+  const sumTerms = joinTerms([String(n[0] * P[0]), String(n[1] * P[1]), String(n[2] * P[2])])
   return {
     statement: `A plane passes through the point $P${tupleLatex(P)}$ and has normal vector $\\vec n=${tupleLatex(n)}$. Its equation has the form $ax+by+cz=d$ with $(a,b,c)=\\vec n$. Find $d$.`,
     answer: { kind: 'number', value: String(dConst) },
     solution: [
-      { text: 'Every point of the plane satisfies $ax+by+cz=d$; substitute $P$ for $(x,y,z)$:', tex: `d = ${n[0]}\\cdot${paren(P[0])} + ${n[1]}\\cdot${paren(P[1])} + ${n[2]}\\cdot${paren(P[2])}` },
+      { text: 'Every point of the plane satisfies $ax+by+cz=d$; substitute $P$ for $(x,y,z)$:', tex: `d = ${joinTerms(n.map((c, i) => `${c}\\cdot${paren(P[i])}`))}` },
       {
         text: 'Compute:',
-        tex: `d = ${joinTerms([String(n[0] * P[0]), String(n[1] * P[1]), String(n[2] * P[2])])} = ${dConst}`,
+        tex: `d = ${sumTerms === String(dConst) ? dConst : `${sumTerms} = ${dConst}`}`,
       },
     ],
     hints: HINTS_CONSTANT,
@@ -119,7 +120,7 @@ function tier3(rng: Rng): Problem {
       answer: { kind: 'vector', components: componentsOf(Q) },
       solution: [
         ...commonSolution,
-        { text: `Substitute $t=${t0}$ back into the line:`, tex: `\\vec r(${t0}) = ${asColumn(p)} + ${t0}${asColumn(d)} = ${asColumn(Q)}` },
+        { text: `Substitute $t=${t0}$ back into the line:`, tex: `\\vec r(${t0}) = ${asColumn(p)} ${t0 < 0 ? `- ${Math.abs(t0)}` : `+ ${t0}`}${asColumn(d)} = ${asColumn(Q)}` },
       ],
       hints: HINTS_INTERSECTION,
       inputHint: INPUT_HINT_VECTOR,

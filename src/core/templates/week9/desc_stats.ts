@@ -1,3 +1,4 @@
+import { joinTerms } from '../../math/latex'
 import { rat, ratToLatex } from '../../math/rational'
 import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
@@ -28,7 +29,7 @@ function computeMean(rng: Rng): Problem {
     statement: `Find the mean of the dataset: $${list.join(', ')}$.`,
     answer: { kind: 'number', value: String(M) },
     solution: [
-      { text: `Add all $${n}$ values in the dataset:`, tex: `${list.join(' + ')} = ${sum}` },
+      { text: `Add all $${n}$ values in the dataset:`, tex: `${joinTerms(list.map(String))} = ${sum}` },
       { text: `Divide the total sum by $n = ${n}$:`, tex: `\\bar{x} = \\frac{${sum}}{${n}} = ${M}` },
     ],
     hints: [
@@ -219,7 +220,7 @@ function correctedMean(rng: Rng): Problem {
     answer: { kind: 'number', value: String(newM) },
     solution: [
       { text: 'Find the original total sum:', tex: `S = ${n} \\cdot ${M} = ${initSum}` },
-      { text: `Adjust the sum by removing the wrong value $${xWrong}$ and adding the correct value $${xCorrect}$:`, tex: `S' = ${initSum} - ${xWrong} + ${xCorrect} = ${newSum}` },
+      { text: `Adjust the sum by removing the wrong value $${xWrong}$ and adding the correct value $${xCorrect}$:`, tex: `S' = ${joinTerms([String(initSum), String(-xWrong), String(xCorrect)])} = ${newSum}` },
       { text: `Divide the updated sum by $n = ${n}$:`, tex: `\\bar{x}' = \\frac{${newSum}}{${n}} = ${newM}` },
     ],
     hints: [

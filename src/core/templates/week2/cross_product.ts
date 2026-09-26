@@ -1,4 +1,4 @@
-import { paren } from '../../math/latex'
+import { joinTerms, paren } from '../../math/latex'
 import { rat, ratToLatex } from '../../math/rational'
 import { cross, dot, sub, tupleLatex, vecLatex, type Vec } from '../../math/vector'
 import type { Rng } from '../../random/rng'
@@ -34,9 +34,9 @@ const isZeroVec = (v: Vec): boolean => v.every((x) => x === 0)
 function crossSteps(a: Vec, b: Vec, sa: string, sb: string): SolutionStep[] {
   const c = cross(a, b)
   const rows: readonly (readonly [number, number, number, string, number])[] = [
-    [1, 2, 3, `${a[1]}\\cdot${paren(b[2])} - ${a[2]}\\cdot${paren(b[1])}`, c[0]],
-    [2, 3, 1, `${a[2]}\\cdot${paren(b[0])} - ${a[0]}\\cdot${paren(b[2])}`, c[1]],
-    [3, 1, 2, `${a[0]}\\cdot${paren(b[1])} - ${a[1]}\\cdot${paren(b[0])}`, c[2]],
+    [1, 2, 3, joinTerms([`${a[1]}\\cdot${paren(b[2])}`, `${-a[2]}\\cdot${paren(b[1])}`]), c[0]],
+    [2, 3, 1, joinTerms([`${a[2]}\\cdot${paren(b[0])}`, `${-a[0]}\\cdot${paren(b[2])}`]), c[1]],
+    [3, 1, 2, joinTerms([`${a[0]}\\cdot${paren(b[1])}`, `${-a[1]}\\cdot${paren(b[0])}`]), c[2]],
   ]
   const lines = rows.map(([k, i, j, substituted, val]) => `c_{${k}} = ${sa}_{${i}}${sb}_{${j}}-${sa}_{${j}}${sb}_{${i}} = ${substituted} = ${val}`)
   return [
@@ -177,7 +177,7 @@ function tier3(rng: Rng): Problem {
     text: 'Its length:',
     tex: `|\\vec a\\times \\vec b| = \\sqrt{${paren(c[0])}^{2}+${paren(c[1])}^{2}+${paren(c[2])}^{2}} = ${crossNorm}`,
   }
-  const halveStep: readonly SolutionStep[] = triangle ? [{ text: 'Halve it for the triangle:', tex: `\\text{Area} = \\frac{${crossNorm}}{2} = ${areaLatex}` }] : []
+  const halveStep: readonly SolutionStep[] = triangle ? [{ text: 'Halve it for the triangle:', tex: `\\text{Area} = ${crossNorm % 2 === 0 ? `\\frac{${crossNorm}}{2} = ${areaLatex}` : areaLatex}` }] : []
   return {
     statement: `Vectors $\\vec a=${tupleLatex(da.v)}$ and $\\vec b=${tupleLatex(db.v)}$ are two sides of a ${shape}, from the same vertex. Find its area.`,
     answer: { kind: 'number', value: areaLatex },

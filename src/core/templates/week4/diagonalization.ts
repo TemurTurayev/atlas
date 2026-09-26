@@ -1,4 +1,4 @@
-import { coefPrefix, paren } from '../../math/latex'
+import { coefPrefix, linear, paren } from '../../math/latex'
 import { adjugate2, det2, identity, matLatex, multiply, type Mat } from '../../math/matrix'
 import { add, parallel, scale, vecLatex, type Vec } from '../../math/vector'
 import type { Rng } from '../../random/rng'
@@ -112,7 +112,7 @@ function tier1(rng: Rng): Problem {
       },
       {
         text: 'Substitute them into $\\lambda^{2} - \\operatorname{tr}(A)\\lambda + \\det(A) = 0$ and factor:',
-        tex: `${joinCharPoly(trace, detA)} = 0 \\quad\\Longrightarrow\\quad (\\lambda - ${lo})(\\lambda - ${hi}) = 0`,
+        tex: `${joinCharPoly(trace, detA)} = 0 \\quad\\Longrightarrow\\quad \\left(${linear(1, -lo, '\\lambda')}\\right)\\left(${linear(1, -hi, '\\lambda')}\\right) = 0`,
       },
       { text: `So the eigenvalues are $\\lambda = ${lo}$ and $\\lambda = ${hi}$.` },
       {

@@ -1,4 +1,4 @@
-import { joinTerms, linear } from '../../math/latex'
+import { joinTerms, linear, paren } from '../../math/latex'
 import { polyEval, polyToLatex, trim, type Poly } from '../../math/poly'
 import type { Rng } from '../../random/rng'
 import type { Problem, SkillTemplate } from '../types'
@@ -106,7 +106,7 @@ function productPolyPoly(rng: Rng): Built {
   const u = piece(rng, rng.pick([1, 2] as const), 5)
   const v = piece(rng, 1, 5)
   const fLatex = times(u.poly, u.latex, v.poly, v.latex)
-  const value = `${times(u.prime, u.primeLatex, v.poly, v.latex)}+${times(u.poly, u.latex, v.prime, v.primeLatex)}`
+  const value = joinTerms([times(u.prime, u.primeLatex, v.poly, v.latex), times(u.poly, u.latex, v.prime, v.primeLatex)])
   return {
     problem: {
       statement: `Differentiate: $y = ${fLatex}$.`,
@@ -126,7 +126,7 @@ function productPolyPoly(rng: Rng): Built {
 function productPolyExp(rng: Rng): Built {
   const u = piece(rng, rng.pick([1, 2] as const), 5)
   const fLatex = `${wrapFactor(u.poly, u.latex)}e^{x}`
-  const value = `${wrapFactor(u.prime, u.primeLatex)}e^{x}+${wrapFactor(u.poly, u.latex)}e^{x}`
+  const value = joinTerms([`${wrapFactor(u.prime, u.primeLatex)}e^{x}`, `${wrapFactor(u.poly, u.latex)}e^{x}`])
   return {
     problem: {
       statement: `Differentiate: $y = ${fLatex}$.`,
@@ -191,7 +191,7 @@ function pointEval(rng: Rng): Built {
         nameStep(u.latex, v.latex),
         primeStep(u.primeLatex, v.primeLatex),
         { text: `Evaluate all four pieces at $x=${x0}$:`, tex: `u(${x0})=${uAt}, \\ v(${x0})=${vAt}, \\ u'(${x0})=${uPrimeAt}, \\ v'(${x0})=${vPrimeAt}` },
-        { text: "Assemble $y'=u'v+uv'$ at that point:", tex: `y'(${x0}) = ${uPrimeAt}\\cdot ${vAt} + ${uAt}\\cdot ${vPrimeAt} = ${value}` },
+        { text: "Assemble $y'=u'v+uv'$ at that point:", tex: `y'(${x0}) = ${paren(uPrimeAt)}\\cdot ${paren(vAt)} + ${paren(uAt)}\\cdot ${paren(vPrimeAt)} = ${value}` },
       ],
       hints: HINTS_POINT,
       inputHint: INPUT_HINT_NUMBER,

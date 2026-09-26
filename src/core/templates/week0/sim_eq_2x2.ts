@@ -49,7 +49,7 @@ function buildSystem(a1: number, b1: number, c1: number, a2: number, b2: number,
     solution: [
       {
         text: `Multiply the first equation by $${b2}$ and the second by $${b1}$, so that the coefficients of $y$ match:`,
-        tex: `${a1 * b2}x+${b1 * b2}y=${c1 * b2}, \\quad ${a2 * b1}x+${b1 * b2}y=${c2 * b1}`,
+        tex: `${eqLatex(a1 * b2, b1 * b2, c1 * b2)}, \\quad ${eqLatex(a2 * b1, b1 * b2, c2 * b1)}`,
       },
       { text: 'Subtract the second equation from the first — $y$ cancels:', tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
       { text: 'Substitute the found $x$ into either equation and solve for $y$:', tex: `y = ${yLatex}` },
@@ -64,7 +64,14 @@ function buildSystem(a1: number, b1: number, c1: number, a2: number, b2: number,
               { text: 'Express $y$ from the first equation:', tex: `y = \\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}` },
               {
                 text: 'Substitute this expression into the second equation:',
-                tex: `${coefPrefix(a2)}x + ${coefPrefix(b2)}\\cdot\\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}} = ${c2}`,
+                tex: `${joinTerms([
+                  a2 === 0 ? '' : `${coefPrefix(a2)}x`,
+                  b2 === 1
+                    ? `\\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}`
+                    : b2 === -1
+                      ? `-\\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}`
+                      : `${coefPrefix(b2)}\\cdot\\frac{${c1} ${a1 < 0 ? '+' : '-'} ${Math.abs(a1)}x}{${b1}}`,
+                ])} = ${c2}`,
               },
               { text: `Multiply both sides by $${b1}$ and collect like terms:`, tex: `${det}x = ${xNum} \\Rightarrow x = ${xLatex}` },
               { text: 'Substitute the found $x$ back into the expression for $y$:', tex: `y = ${yLatex}` },

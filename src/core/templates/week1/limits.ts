@@ -52,7 +52,7 @@ function tier2(rng: Rng): Problem {
         text: 'The numerator and denominator have equal degree — as $x\\to\\infty$ the limit is determined only by the leading coefficients:',
         tex: `\\lim_{x\\to\\infty}\\frac{${numLatex}}{${denLatex}} = \\frac{${a}}{${f}}`,
       },
-      { text: 'Compute the ratio of the leading coefficients:', tex: `\\frac{${a}}{${f}} = ${value}` },
+      ...(`\\frac{${a}}{${f}}` === value ? [] : [{ text: 'Compute the ratio of the leading coefficients:', tex: `\\frac{${a}}{${f}} = ${value}` }]),
     ],
     hints: [
       'Divide the numerator and denominator by $x$ raised to the highest power that appears.',
@@ -74,7 +74,7 @@ function tier3(rng: Rng): Problem {
         tex: `\\frac{\\sqrt{x}-${c}}{x-${c2}}\\cdot\\frac{\\sqrt{x}+${c}}{\\sqrt{x}+${c}} = \\frac{x-${c2}}{\\left(x-${c2}\\right)\\left(\\sqrt{x}+${c}\\right)}`,
       },
       { text: `Cancel the common factor $x-${c2}$:`, tex: `= \\frac{1}{\\sqrt{x}+${c}}` },
-      { text: `Substitute $x=${c2}$:`, tex: `\\frac{1}{\\sqrt{${c2}}+${c}} = \\frac{1}{${2 * c}} = ${value}` },
+      { text: `Substitute $x=${c2}$:`, tex: `\\frac{1}{\\sqrt{${c2}}+${c}} = \\frac{1}{${2 * c}}` },
     ],
     hints: [
       'Multiply the numerator and denominator by the conjugate expression to remove the radical.',

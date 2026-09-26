@@ -98,12 +98,13 @@ function tier2(rng: Rng): Problem {
   const a = buildTier2Vector(rng)
   const sumSq = normSquared(a)
   const value = sqrtLatex(sumSq)
+  const unreduced = `\\sqrt{${sumSq}}`
   const solution: SolutionStep[] = [
     {
       text: 'Square each component and add them:',
       tex: `|\\vec{a}|^2 = ${paren(a[0])}^2 + ${paren(a[1])}^2 + ${paren(a[2])}^2 = ${a[0] ** 2} + ${a[1] ** 2} + ${a[2] ** 2} = ${sumSq}`,
     },
-    { text: 'Take the square root:', tex: `|\\vec{a}| = \\sqrt{${sumSq}} = ${value}` },
+    { text: 'Take the square root:', tex: `|\\vec{a}| = ${unreduced === value ? value : `${unreduced} = ${value}`}` },
   ]
   return {
     statement: `Find the length of the vector $\\vec{a}=${tupleLatex(a)}$.`,

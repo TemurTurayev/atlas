@@ -85,12 +85,13 @@ function tier2(rng: Rng): Problem {
     if (!Number.isInteger(Math.sqrt(diff))) break
   }
   const value = sqrtLatex(diff)
+  const unreduced = `\\sqrt{${diff}}`
   return build(
     `A right triangle has hypotenuse $${c}$ and one leg $${a}$. Find the length of the other leg.`,
     value,
     [
       { text: 'By the Pythagorean theorem:', tex: `b^2 = c^2 - a^2 = ${c}^2 - ${a}^2 = ${c * c} - ${a * a} = ${diff}` },
-      { text: 'Take the square root:', tex: `b = \\sqrt{${diff}} = ${value}` },
+      { text: 'Take the square root:', tex: `b = ${unreduced === value ? value : `${unreduced} = ${value}`}` },
     ],
   )
 }
@@ -101,12 +102,13 @@ function boxDiagonal(rng: Rng): Problem {
   const r = rng.int(2, 12)
   const sq = p * p + q * q + r * r
   const value = sqrtLatex(sq)
+  const unreduced = `\\sqrt{${sq}}`
   return build(
     `A rectangular box has edge lengths $${p}$, $${q}$ and $${r}$. Find the length of its space diagonal.`,
     value,
     [
       { text: 'Space diagonal of the box:', tex: `d^2 = ${p}^2+${q}^2+${r}^2 = ${sq}` },
-      { text: 'Take the square root:', tex: `d = \\sqrt{${sq}} = ${value}` },
+      { text: 'Take the square root:', tex: `d = ${unreduced === value ? value : `${unreduced} = ${value}`}` },
     ],
   )
 }
@@ -126,12 +128,13 @@ function pointDistance(rng: Rng): Problem {
     if (sq > 0) break
   }
   const value = sqrtLatex(sq)
+  const unreduced = `\\sqrt{${sq}}`
   return build(
     `Find the distance between the points $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
     value,
     [
       { text: 'Distance formula between two points:', tex: `d^2 = (${x2}-${paren(x1)})^2+(${y2}-${paren(y1)})^2 = ${sq}` },
-      { text: 'Take the square root:', tex: `d = \\sqrt{${sq}} = ${value}` },
+      { text: 'Take the square root:', tex: `d = ${unreduced === value ? value : `${unreduced} = ${value}`}` },
     ],
   )
 }

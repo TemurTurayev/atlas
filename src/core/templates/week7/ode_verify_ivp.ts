@@ -168,9 +168,10 @@ function tier3(rng: Rng): Problem {
     text: 'Pin down $C$ from the initial condition, exactly as before:',
     tex: `${joinTerms(['C', eq === 0 ? '' : String(eq)])} = ${y0} \\quad\\Longrightarrow\\quad C = ${C}`,
   }
+  const subLatex = joinTerms([withCoef(C, `e^{${exponent}}`), eq === 0 ? '' : String(eq)])
   const evalStep = {
     text: `Substitute $C=${C}$ and $t=${t1}$ into the family:`,
-    tex: `y(${t1}) = ${joinTerms([withCoef(C, `e^{${exponent}}`), eq === 0 ? '' : String(eq)])} = ${answerValue}`,
+    tex: `y(${t1}) = ${subLatex === answerValue ? answerValue : `${subLatex} = ${answerValue}`}`,
   }
 
   return {

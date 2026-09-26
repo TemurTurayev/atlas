@@ -50,9 +50,10 @@ function longDivide(dividend: Poly, divisor: Poly): DivisionResult {
     const term = monomial(coef, shift)
     const subtractPoly = polyMul(term, dvsr)
     const next = trim(polyAdd(rem, polyScale(subtractPoly, -1)))
+    const termLatex = coef < 0 ? `\\left(${polyToLatex(term)}\\right)` : polyToLatex(term)
     steps.push({
       text: `Divide the leading terms: $${polyToLatex(monomial(rem[remDeg], remDeg))} \\div ${polyToLatex(monomial(lead, divDeg))} = ${polyToLatex(term)}$. Multiply by the divisor and subtract:`,
-      tex: `${polyToLatex(rem)} - ${polyToLatex(term)}\\left(${polyToLatex(dvsr)}\\right) = ${polyToLatex(next)}`,
+      tex: `${polyToLatex(rem)} - ${termLatex}\\left(${polyToLatex(dvsr)}\\right) = ${polyToLatex(next)}`,
     })
     rem = next
   }

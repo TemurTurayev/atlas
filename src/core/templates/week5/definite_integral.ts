@@ -1,4 +1,4 @@
-import { coefPrefix } from '../../math/latex'
+import { coefPrefix, linear } from '../../math/latex'
 import { polyEval, polyFromRoots, polyToLatex, type Poly } from '../../math/poly'
 import { rat, ratToLatex, sub } from '../../math/rational'
 import type { Rng } from '../../random/rng'
@@ -152,11 +152,11 @@ function curvesBetween(rng: Rng): Problem {
     solution: [
       {
         text: 'Set the two expressions equal to find where the curves meet:',
-        tex: `${fLatex} - \\left(${gLatex}\\right) = ${c}\\left(x-${p1}\\right)\\left(x-${p2}\\right) = 0 \\quad\\Longrightarrow\\quad x = ${p1} \\text{ or } x = ${p2}`,
+        tex: `${fLatex} - \\left(${gLatex}\\right) = ${c}\\left(${linear(1, -p1)}\\right)\\left(${linear(1, -p2)}\\right) = 0 \\quad\\Longrightarrow\\quad x = ${p1} \\text{ or } x = ${p2}`,
       },
       { text: `Since $f$ is an upward-opening parabola, it dips below the line between the two intersection points, so $g(x)$ is on top there.` },
       {
-        text: `Substitute $u=x-${p1}$, so the difference $g(x)-f(x)$ becomes $${c * gap}u-${c}u^{2}$ for $u$ running from $0$ to $${gap}$:`,
+        text: `Substitute $u=${linear(1, -p1)}$, so the difference $g(x)-f(x)$ becomes $${c * gap}u-${c}u^{2}$ for $u$ running from $0$ to $${gap}$:`,
         tex: `\\int_0^{${gap}}\\left(${c * gap}u-${c}u^{2}\\right)du = \\left[\\frac{${c * gap}}{2}u^{2}-\\frac{${c}}{3}u^{3}\\right]_0^{${gap}}`,
       },
       {
@@ -182,7 +182,7 @@ function standardFunction(rng: Rng): Problem {
       answer: { kind: 'number', value },
       solution: [
         { text: 'The exponential is its own antiderivative:', tex: `\\int ${fLatex}\\,dx = ${fLatex}` },
-        { text: 'Evaluate at the two limits and subtract (recall $e^{0}=1$):', tex: `${coefPrefix(A)}e^{${U}} - ${coefPrefix(A)}e^{0} = ${value}` },
+        { text: 'Evaluate at the two limits and subtract (recall $e^{0}=1$):', tex: `${coefPrefix(A)}e^{${U}} - \\left(${coefPrefix(A)}e^{0}\\right) = ${value}` },
       ],
       hints: HINTS_STANDARD,
       inputHint: INPUT_HINT_CLOSED,
@@ -211,7 +211,7 @@ function standardFunction(rng: Rng): Problem {
     answer: { kind: 'number', value },
     solution: [
       { text: 'An antiderivative of $\\frac{1}{x}$ is $\\ln x$ (the interval is entirely positive, so no absolute value is needed):', tex: `\\int ${fLatex}\\,dx = ${A}\\ln x` },
-      { text: 'Evaluate at the two limits and subtract (recall $\\ln 1=0$):', tex: `${A}\\ln(2) - ${A}\\ln(1) = ${value}` },
+      { text: 'Evaluate at the two limits and subtract (recall $\\ln 1=0$):', tex: `${coefPrefix(A)}\\ln(2) - \\left(${coefPrefix(A)}\\ln(1)\\right) = ${value}` },
     ],
     hints: HINTS_STANDARD,
     inputHint: INPUT_HINT_CLOSED,

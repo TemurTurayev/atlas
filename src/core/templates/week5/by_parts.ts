@@ -109,7 +109,7 @@ function tier2(rng: Rng): Problem {
         text: `Choose $u=${coefPrefix(c)}x^{2}$ — differentiating a polynomial lowers its degree — and $dv=e^{${axLatex(a)}}\\,dx$. Choosing $u=e^{${axLatex(a)}}$ instead would leave a polynomial of the same degree to integrate against, making the problem worse, not better.`,
       },
       { text: `Then $du=${coefPrefix(2 * c)}x\\,dx$ and $v=${ratCoefPrefix(rat(1, a))}e^{${axLatex(a)}}$.` },
-      { text: 'Assemble $uv-\\displaystyle\\int v\\,du$:', tex: `uv-\\int v\\,du = ${ratCoefPrefix(rat(c, a))}x^{2}e^{${axLatex(a)}} - ${ratCoefPrefix(rat(2 * c, a))}\\int x e^{${axLatex(a)}}\\,dx` },
+      { text: 'Assemble $uv-\\displaystyle\\int v\\,du$:', tex: `uv-\\int v\\,du = ${joinTerms([`${ratCoefPrefix(rat(c, a))}x^{2}e^{${axLatex(a)}}`, `${ratCoefPrefix(rat(-2 * c, a))}\\int x e^{${axLatex(a)}}\\,dx`])}` },
       { text: `Apply integration by parts once more, exactly as for a single power of $x$:`, tex: `\\int x e^{${axLatex(a)}}\\,dx = ${inner1} + C` },
       { text: 'Substitute back and simplify:', tex: `= ${answerValue} + C` },
     ],

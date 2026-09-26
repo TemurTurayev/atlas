@@ -1,4 +1,4 @@
-import { coefPrefix, joinTerms } from '../../math/latex'
+import { coefPrefix, joinTerms, paren } from '../../math/latex'
 import type { Rng } from '../../random/rng'
 import type { ChoiceOption, Problem, SkillTemplate } from '../types'
 
@@ -53,12 +53,13 @@ function tier1(rng: Rng): Problem {
   const hStr = clean(h)
   const t1 = clean(t0 + h)
 
+  const sumStr = joinTerms([String(y0), clean(increment)])
   return {
     statement: `Use one step of Euler's method with step size $h = ${hStr}$ to estimate $y(${t1})$ for $y' = ${affineLatex(a, b, c)}$, $y(${t0}) = ${y0}$.`,
     answer: { kind: 'number', value: clean(y1) },
     solution: [
       { text: 'Write the slope function and evaluate it at the starting point:', tex: `f(t,y) = ${affineLatex(a, b, c)}, \\qquad f(${t0}, ${y0}) = ${f0}` },
-      { text: 'One Euler step is $y_1 = y_0 + h\\,f(t_0, y_0)$:', tex: `y_1 = ${y0} + ${hStr}\\cdot ${f0} = ${y0} + ${clean(increment)} = ${clean(y1)}` },
+      { text: 'One Euler step is $y_1 = y_0 + h\\,f(t_0, y_0)$:', tex: `y_1 = ${y0} + ${hStr}\\cdot ${paren(f0)} = ${sumStr === clean(y1) ? clean(y1) : `${sumStr} = ${clean(y1)}`}` },
     ],
     hints: HINTS_STEP,
     inputHint: INPUT_HINT_NUMBER,
@@ -90,7 +91,7 @@ function tier2(rng: Rng): Problem {
     const slope = k * prev.y + c
     return {
       text: `Step ${i + 1}: at $t_{${i}} = ${clean(prev.t)}$, $y_{${i}} = ${clean(prev.y)}$, the slope is $f = ${coefPrefix(k)}\\left(${clean(prev.y)}\\right)${c === 0 ? '' : (c > 0 ? '+' : '') + c} = ${slope}$:`,
-      tex: `y_{${i + 1}} = ${clean(prev.y)} + ${clean(h)}\\cdot ${slope} = ${clean(row.y)}`,
+      tex: `y_{${i + 1}} = ${clean(prev.y)} + ${clean(h)}\\cdot ${paren(slope)} = ${clean(row.y)}`,
     }
   })
 
@@ -130,9 +131,9 @@ function eulerVsExact(rng: Rng): Problem {
       statement: `The initial value problem $y' = ${coefPrefix(2 * a)}t$, $y(${t0}) = ${y0}$ has exact solution $y(t) = ${quadratic}$. Using one Euler step of size $h = ${clean(h)}$, find the error in the Euler estimate for $y(${clean(t1)})$, defined as (Euler's estimate) $-$ (the exact value).`,
       answer: { kind: 'number', value: clean(error) },
       solution: [
-        { text: 'One Euler step from the initial point:', tex: `y_1 = ${y0} + ${clean(h)}\\cdot ${slope0} = ${clean(eulerEstimate)}` },
+        { text: 'One Euler step from the initial point:', tex: `y_1 = ${y0} + ${clean(h)}\\cdot ${paren(slope0)} = ${clean(eulerEstimate)}` },
         { text: `The exact value at $t = ${clean(t1)}$:`, tex: `y(${clean(t1)}) = ${quadraticAt(clean(t1))} = ${clean(exact)}` },
-        { text: 'The error is the Euler estimate minus the exact value:', tex: `${clean(eulerEstimate)} - ${clean(exact)} = ${clean(error)}` },
+        { text: 'The error is the Euler estimate minus the exact value:', tex: `${clean(eulerEstimate)} - ${paren(clean(exact))} = ${clean(error)}` },
       ],
       hints: HINTS_COMPARE,
       inputHint: INPUT_HINT_NUMBER,

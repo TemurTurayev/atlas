@@ -1,4 +1,4 @@
-import { paren } from '../../math/latex'
+import { joinTerms, paren } from '../../math/latex'
 import { rat, ratToLatex } from '../../math/rational'
 import { cross, dot, tupleLatex, type Vec } from '../../math/vector'
 import type { Rng } from '../../random/rng'
@@ -35,7 +35,7 @@ const isZeroVec = (v: Vec): boolean => v.every((x) => x === 0)
 function cosineProblem(a: Vec, b: Vec, normA: number, normB: number): Problem {
   const dotAB = dot(a, b)
   const cosLatex = ratToLatex(rat(dotAB, normA * normB))
-  const terms = a.map((x, i) => `${x}\\cdot${paren(b[i])}`).join(' + ')
+  const terms = joinTerms(a.map((x, i) => `${x}\\cdot${paren(b[i])}`))
   return {
     statement: `Given $\\vec a=${tupleLatex(a)}$ and $\\vec b=${tupleLatex(b)}$, find $\\cos\\theta$, where $\\theta$ is the angle between $\\vec a$ and $\\vec b$.`,
     answer: { kind: 'number', value: cosLatex },
@@ -256,7 +256,7 @@ function orthogonalT(rng: Rng): Problem {
     const tRat = rat(-sumKnown, a[p])
     if (othersAllZero && tRat.n === 0) continue // would make b the zero vector
     const tLatex = ratToLatex(tRat)
-    const dotTerms = bDisplay.map((c, i) => `${a[i]}\\cdot ${paren(c)}`).join(' + ')
+    const dotTerms = joinTerms(bDisplay.map((c, i) => `${a[i]}\\cdot ${paren(c)}`))
     return {
       statement: `Vectors $\\vec a=${tupleLatex(a)}$ and $\\vec b=${tupleLatex(bDisplay)}$ are perpendicular. Find $t$.`,
       answer: { kind: 'number', value: tLatex },

@@ -43,12 +43,14 @@ function tier1(rng: Rng): Problem {
   const y1 = rng.int(-8, 8)
   const x2 = x1 + q
   const y2 = y1 + p
+  const fracStr = `\\frac{${y2 - y1}}{${x2 - x1}}`
+  const reducedStr = ratToLatex(slope)
   return {
     statement: `Find the slope of the line through $(${x1}, ${y1})$ and $(${x2}, ${y2})$.`,
-    answer: { kind: 'number', value: ratToLatex(slope) },
+    answer: { kind: 'number', value: reducedStr },
     solution: [
       { text: 'Slope from two points:', tex: `k = \\frac{y_2-y_1}{x_2-x_1} = \\frac{${y2}-${paren(y1)}}{${x2}-${paren(x1)}}` },
-      { text: 'Compute:', tex: `k = \\frac{${y2 - y1}}{${x2 - x1}} = ${ratToLatex(slope)}` },
+      { text: 'Compute:', tex: `k = ${fracStr === reducedStr ? reducedStr : `${fracStr} = ${reducedStr}`}` },
     ],
     hints: TIER1_HINTS,
     inputHint: 'Write a fraction with /, e.g. 3/4 or -2/5',
