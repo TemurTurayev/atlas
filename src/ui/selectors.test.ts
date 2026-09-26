@@ -32,11 +32,11 @@ describe('selectors', () => {
     expect(skillStatus(w, 'int_neg')).toBe('mastered')
     expect(skillStatus(w, 'order_ops')).toBe('learning')
     expect(skillStatus(w, 'quadratic_eq')).toBe('locked')
-    // A skill whose week has no generators yet; pick it from the graph so writing that content
-    // does not break this test the way adding week 4 once did.
-    const untaught = GRAPH.ladder.find((id) => !hasTemplate(id))
-    expect(untaught, 'every skill has content — drop this case').toBeDefined()
-    expect(skillStatus(w, untaught as string)).toBe('soon')
+  })
+
+  it('has content for every skill in the course, so the map shows no "soon" topic', () => {
+    // 'soon' stays in the selector for skills added to the graph later.
+    expect(GRAPH.ladder.filter((id) => !hasTemplate(id))).toEqual([])
   })
 })
 
