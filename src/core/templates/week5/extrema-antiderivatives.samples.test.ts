@@ -35,12 +35,16 @@ function numericSecondDerivative(expr: Expr, x: number, h = 1e-2): number {
   return (plus - 2 * mid + minus) / (h * h)
 }
 
-/** Plain trapezoidal rule; used to check a claimed F(target) against b + integral of f from a to target. */
-function integrateNumerically(f: (x: number) => number, from: number, to: number, steps = 4000): number {
+/**
+ * Simpson's rule; used to check a claimed F(target) against b + integral of f from a to target. Exact for
+ * cubics and far more accurate than the trapezoid at the same cost, so 200 intervals replace 4000 — every
+ * point is a Compute Engine evaluation, and 4000 of them per problem made this test the suite's slowest.
+ */
+function integrateNumerically(f: (x: number) => number, from: number, to: number, steps = 200): number {
   const h = (to - from) / steps
-  let sum = 0.5 * (f(from) + f(to))
-  for (let i = 1; i < steps; i += 1) sum += f(from + i * h)
-  return sum * h
+  let sum = f(from) + f(to)
+  for (let i = 1; i < steps; i += 1) sum += (i % 2 === 1 ? 4 : 2) * f(from + i * h)
+  return (sum * h) / 3
 }
 
 /** The "$f(x) = ...$" formula that every extrema_1d statement carries. */
@@ -86,10 +90,14 @@ describe('extrema_1d', () => {
         if (!match) throw new Error(`seed ${seed}: no interval in: ${p.statement}`)
         const lo = Number(match[1])
         const hi = Number(match[2])
-        const steps = 4000
+        // A polynomial peaks at an endpoint or a critical point, and this template's critical points are
+        // whole numbers: a coarse grid plus every integer finds the maximum exactly. (4000 Compute Engine
+        // evaluations per problem made this the slowest test in the suite.)
+        const steps = 400
+        const grid = Array.from({ length: steps + 1 }, (_, i) => lo + ((hi - lo) * i) / steps)
+        const integers = Array.from({ length: hi - lo + 1 }, (_, i) => lo + i)
         let scanMax = -Infinity
-        for (let i = 0; i <= steps; i += 1) {
-          const x = lo + ((hi - lo) * i) / steps
+        for (const x of [...grid, ...integers]) {
           const v = evalReal(f, { x })
           if (v !== null) scanMax = Math.max(scanMax, v)
         }
