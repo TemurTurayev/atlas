@@ -5,7 +5,7 @@ import { perturbedAnswer, referenceAnswer } from '../checker/reference'
 import { GRAPH } from '../graph'
 import { createRng } from '../random/rng'
 import { TEMPLATES } from './registry'
-import { mathSegments, repeatedValues, signSlips, strayLatex } from './testing'
+import { mathSegments, repeatedValues, signSlips, strayLatex, unbracedScripts } from './testing'
 import { TIERS, type AnswerSpec } from './types'
 
 const GEN_SEEDS = 300
@@ -73,13 +73,14 @@ describe.each(entries)('template %s', (skillId, template) => {
     }
   })
 
-  it.each(TIERS)('tier %i: no doubled signs or repeated values in formulas', (tier) => {
+  it.each(TIERS)('tier %i: no doubled signs, repeated values or unbraced scripts in formulas', (tier) => {
     for (let seed = 1; seed <= CHECK_SEEDS; seed += 1) {
       const p = template.generate(createRng(seed), tier)
       const prose = [p.statement, ...p.hints, ...p.solution.map((s) => s.text), ...(p.alternative?.steps ?? []).map((s) => s.text)]
       const display = [...p.solution, ...(p.alternative?.steps ?? [])].map((s) => s.tex ?? '')
       ;[...prose.flatMap(mathSegments), ...display].forEach((tex) => expect(signSlips(tex), `seed ${seed}: ${tex}`).toEqual([]))
       ;[...prose.flatMap(mathSegments), ...display].forEach((tex) => expect(repeatedValues(tex), `seed ${seed}: ${tex}`).toEqual([]))
+      ;[...prose.flatMap(mathSegments), ...display].forEach((tex) => expect(unbracedScripts(tex), `seed ${seed}: ${tex}`).toEqual([]))
     }
   })
 

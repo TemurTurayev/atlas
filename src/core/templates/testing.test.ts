@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mathSegments, repeatedValues, signSlips, strayLatex } from './testing'
+import { mathSegments, repeatedValues, signSlips, strayLatex, unbracedScripts } from './testing'
 
 describe('strayLatex', () => {
   it('passes prose whose LaTeX lives inside $…$', () => {
@@ -43,5 +43,15 @@ describe('repeatedValues', () => {
     expect(repeatedValues('f(x) = x, \\quad g(x) = x')).toEqual([])
     expect(repeatedValues('0 = 0')).toEqual([])
     expect(repeatedValues('d = 0 = 0')).toEqual(['0'])
+  })
+})
+
+describe('unbracedScripts', () => {
+  it('flags multi-character scripts without braces', () => {
+    expect(unbracedScripts('4 \\times 10^14')).toEqual(['^14'])
+    expect(unbracedScripts('x^-1 + a_12')).toEqual(['^-1', '_12'])
+  })
+  it('passes braced and single-character scripts', () => {
+    expect(unbracedScripts('10^{14} + x^2 + a_{12} + e^{-x}')).toEqual([])
   })
 })

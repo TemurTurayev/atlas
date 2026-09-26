@@ -28,3 +28,8 @@ export function repeatedValues(tex: string): string[] {
   if (parts.length === 2 && parts[0] === '0' && parts[1] === '0') return []
   return parts.filter((part, i) => i > 0 && part !== '' && part === parts[i - 1])
 }
+
+/** "10^14" renders as 10¹4 and "x^-1" as x⁻1: a script longer than one character needs braces. */
+export function unbracedScripts(tex: string): string[] {
+  return [...tex.matchAll(/[\^_](?:\d{2,}|-\d)/g)].map((m) => m[0])
+}
