@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { checkAnswer } from './check'
+import { perturbedAnswer, referenceAnswer } from './reference'
 import type { AnswerSpec } from '../templates/types'
 
 const integral = (value: string): AnswerSpec => ({ kind: 'expression', value, variables: ['x'], upToConstant: true })
@@ -29,5 +30,18 @@ describe('an antiderivative', () => {
     expect(checkAnswer(plain('x^3+x'), typed('x^3+x+5')).status).toBe('incorrect')
     expect(checkAnswer(plain('x^3+x'), typed('x^3+x+C')).status).toBe('malformed')
     expect(checkAnswer(plain('x^3+x'), typed('x^3+x')).status).toBe('correct')
+  })
+})
+
+describe('the perturbed answer the harness uses', () => {
+  it('is not just another constant of integration', () => {
+    const spec = integral('x^3+x')
+    expect(checkAnswer(spec, perturbedAnswer(spec)).status).not.toBe('correct')
+    expect(checkAnswer(spec, referenceAnswer(spec)).status).toBe('correct')
+  })
+
+  it('handles a variable that is written as a Greek name', () => {
+    const spec: AnswerSpec = { kind: 'expression', value: '\\lambda^{2}', variables: ['lambda'], upToConstant: true }
+    expect(checkAnswer(spec, perturbedAnswer(spec)).status).not.toBe('correct')
   })
 })

@@ -46,6 +46,9 @@ export function userAnswerLatex(answer: UserAnswer, spec: AnswerSpec): string {
   return answer.latex
 }
 
+/** "x" stays "x"; a spelled-out Greek name needs its backslash back. */
+const variableLatex = (name: string): string => (/^[a-zA-Z]$/.test(name) ? name : `\\${name}`)
+
 /**
  * A wrong vector. Adding to the only nonzero component merely rescales the direction, and an
  * up-to-scale answer counts every multiple as correct — so disturb a zero component instead.
@@ -69,8 +72,17 @@ function perturbIntervals(parts: readonly IntervalPart[]): IntervalPart[] {
 export function perturbedAnswer(spec: AnswerSpec): UserAnswer {
   switch (spec.kind) {
     case 'number':
-    case 'expression':
       return { kind: 'latex', latex: `\\left(${spec.value}\\right)+1` }
+    case 'expression':
+      // Adding a constant to an antiderivative gives the same answer back, so that perturbation
+      // would be accepted and prove nothing; adding the variable itself never is.
+      return {
+        kind: 'latex',
+        latex:
+          spec.upToConstant === true && spec.variables.length > 0
+            ? `\\left(${spec.value}\\right)+${variableLatex(spec.variables[0])}`
+            : `\\left(${spec.value}\\right)+1`,
+      }
     case 'numberSet':
       return { kind: 'latex', latex: [...spec.values, '1000'].join(', ') }
     case 'finiteSet':
