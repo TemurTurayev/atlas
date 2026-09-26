@@ -6,7 +6,7 @@ import { GRAPH } from '../graph'
 import { createRng } from '../random/rng'
 import { TEMPLATES } from './registry'
 import { mathSegments, strayLatex } from './testing'
-import { TIERS } from './types'
+import { TIERS, type AnswerSpec } from './types'
 
 const GEN_SEEDS = 300
 const CHECK_SEEDS = 25
@@ -18,6 +18,13 @@ const MIN_DISTINCT = 15
 const renders = (tex: string): boolean => {
   katex.renderToString(tex, { throwOnError: true })
   return true
+}
+
+/** An answer's identity for the variety check: shuffling the options of one question does not make a new one. */
+function problemKey(answer: AnswerSpec): string {
+  if (answer.kind !== 'choice') return JSON.stringify(answer)
+  const labels = answer.options.map((o) => o.label).sort()
+  return JSON.stringify({ labels, correct: answer.options.find((o) => o.id === answer.correctId)?.label })
 }
 
 const entries = [...TEMPLATES.values()].map((t) => [t.skillId, t] as const)
@@ -48,7 +55,7 @@ describe.each(entries)('template %s', (skillId, template) => {
     const seen = new Set<string>()
     for (let seed = 1; seed <= VARIETY_SEEDS; seed += 1) {
       const p = template.generate(createRng(seed), tier)
-      seen.add(`${p.statement}\n${JSON.stringify(p.answer)}`)
+      seen.add(`${p.statement}\n${problemKey(p.answer)}`)
     }
     expect(seen.size, `${skillId} tier ${tier}`).toBeGreaterThanOrEqual(MIN_DISTINCT)
   })
