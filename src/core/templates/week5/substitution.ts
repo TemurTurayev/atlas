@@ -12,7 +12,6 @@ const theory = [
   'Common mistakes: forgetting the factor $\\frac{1}{a}$ (or $\\frac{1}{g\'(x)}$) introduced by $dx=\\frac{du}{g\'(x)}$; and, for a definite integral, evaluating the $u$-antiderivative at the original $x$-limits instead of the converted ones.',
 ].join('\n')
 
-/** Coefficient prefix for a rational multiplying a variable term: 1 → "", -1 → "-", else the fraction or integer. */
 function ratCoefPrefix(r: Rational): string {
   if (equals(r, rat(1))) return ''
   if (equals(r, rat(-1))) return '-'
@@ -43,8 +42,8 @@ type LinearKind = 'power' | 'exp' | 'sin' | 'cos'
 
 function tier1(rng: Rng): Problem {
   const kind = rng.pick<LinearKind>(['power', 'exp', 'sin', 'cos'])
-  const a = rng.intExcept(-3, 3, [0])
-  const b = rng.int(-4, 4)
+  const a = rng.intExcept(-5, 5, [0])
+  const b = rng.int(-6, 6)
   const inner = linear(a, b)
 
   let fLatex: string
@@ -53,7 +52,7 @@ function tier1(rng: Rng): Problem {
   let ruleNote: string
 
   if (kind === 'power') {
-    const n = rng.int(2, 4)
+    const n = rng.int(2, 5)
     fLatex = `\\left(${inner}\\right)^{${n}}`
     integrandU = `u^{${n}}`
     answerValue = `${ratCoefPrefix(rat(1, a * (n + 1)))}\\left(${inner}\\right)^{${n + 1}}`
@@ -89,12 +88,12 @@ function tier1(rng: Rng): Problem {
 }
 
 function tier2(rng: Rng): Problem {
-  const c = rng.intExcept(-4, 4, [0])
+  const c = rng.intExcept(-6, 6, [0])
   const half = rat(c, 2)
   const isExp = rng.chance(0.5)
 
   if (isExp) {
-    const k = rng.int(-3, 3)
+    const k = rng.int(-5, 5)
     const inner = quadShift(k)
     const fLatex = `${coefPrefix(c)}x e^{${inner}}`
     const answerValue = `${ratCoefPrefix(half)}e^{${inner}}`
@@ -111,7 +110,7 @@ function tier2(rng: Rng): Problem {
     }
   }
 
-  const k = rng.int(1, 4)
+  const k = rng.int(1, 8)
   const fLatex = `\\frac{${coefPrefix(c)}x}{x^{2}+${k}}`
   const answerValue = `${ratCoefPrefix(half)}\\ln\\left(x^{2}+${k}\\right)`
   return {
@@ -128,12 +127,12 @@ function tier2(rng: Rng): Problem {
 }
 
 function tier3(rng: Rng): Problem {
-  const c = rng.pick([-4, -2, 2, 4])
+  const c = rng.pick([-6, -5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6])
   const half = rat(c, 2)
   const useLog = rng.chance(0.5)
 
   if (!useLog) {
-    const U = rng.pick([1, 2])
+    const U = rng.pick([1, 2, 3, 4])
     const U2 = U * U
     const fLatex = `${coefPrefix(c)}x e^{x^{2}}`
     const value = `${ratCoefPrefix(half)}\\left(e^{${U2}}-1\\right)`
@@ -151,7 +150,7 @@ function tier3(rng: Rng): Problem {
     }
   }
 
-  const U = rng.pick([1, 2, 3])
+  const U = rng.pick([1, 2, 3, 4])
   const k = U * U
   const upper = 2 * k
   const fLatex = `\\frac{${coefPrefix(c)}x}{x^{2}+${k}}`

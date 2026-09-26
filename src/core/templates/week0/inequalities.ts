@@ -33,9 +33,9 @@ function boundaryPart(dir: Dir, x0: number): IntervalPart {
 }
 
 function tier1(rng: Rng): Problem {
-  const a = rng.int(2, 6)
-  const x0 = rng.int(-8, 8)
-  const b = rng.intExcept(-12, 12, [0])
+  const a = rng.int(2, 8)
+  const x0 = rng.int(-12, 12)
+  const b = rng.intExcept(-15, 15, [0])
   const rhs = a * x0 + b
   const dir = rng.pick<Dir>(['<', '>', '\\le', '\\ge'])
   const statement = `${linear(a, b)} ${dir} ${rhs}`
@@ -52,14 +52,68 @@ function tier1(rng: Rng): Problem {
 }
 
 function tier2(rng: Rng): Problem {
-  const k = rng.int(2, 8)
-  const statement = `x^{2} - ${k * k} < 0`
+  const dir = rng.pick<Dir>(['<', '>', '\\le', '\\ge'])
+  const isSimpleSquare = rng.chance(0.5)
+
+  if (isSimpleSquare) {
+    const k = rng.int(2, 12)
+    const statement = `x^{2} - ${k * k} ${dir} 0`
+    const closed = dir === '\\le' || dir === '\\ge'
+    let parts: IntervalPart[]
+    let solnText: string
+    let solnTex: string
+
+    if (dir === '<' || dir === '\\le') {
+      parts = [{ lo: String(-k), hi: String(k), loClosed: closed, hiClosed: closed }]
+      solnText = 'The product is negative (or zero) between the roots:'
+      solnTex = `-${k} ${dir === '<' ? '<' : '\\le'} x ${dir === '<' ? '<' : '\\le'} ${k}`
+    } else {
+      parts = [
+        { lo: null, hi: String(-k), loClosed: false, hiClosed: closed },
+        { lo: String(k), hi: null, loClosed: closed, hiClosed: false },
+      ]
+      solnText = 'The product is positive (or zero) outside the roots:'
+      solnTex = `x ${dir === '>' ? '<' : '\\le'} -${k} \\quad \\text{or} \\quad x ${dir === '>' ? '>' : '\\ge'} ${k}`
+    }
+
+    return {
+      statement: `Solve the inequality: $${statement}$`,
+      answer: { kind: 'interval', parts },
+      solution: [
+        { text: 'Factor the left side (difference of squares):', tex: `x^{2}-${k * k} = \\left(x-${k}\\right)\\left(x+${k}\\right)` },
+        { text: solnText, tex: solnTex },
+      ],
+      hints: HINTS,
+      inputHint: INPUT_HINT,
+    }
+  }
+
+  // Factored form (x - a)(x - b) dir 0
+  const a = rng.int(-8, 6)
+  const b = rng.int(a + 1, a + 9)
+  const closed = dir === '\\le' || dir === '\\ge'
+  const polyStr = linear(1, -a) === 'x' ? `x(${linear(1, -b)})` : `(${linear(1, -a)})(${linear(1, -b)})`
+  const statement = `${polyStr} ${dir} 0`
+  let parts: IntervalPart[]
+  let solnTex: string
+
+  if (dir === '<' || dir === '\\le') {
+    parts = [{ lo: String(a), hi: String(b), loClosed: closed, hiClosed: closed }]
+    solnTex = `${a} ${dir === '<' ? '<' : '\\le'} x ${dir === '<' ? '<' : '\\le'} ${b}`
+  } else {
+    parts = [
+      { lo: null, hi: String(a), loClosed: false, hiClosed: closed },
+      { lo: String(b), hi: null, loClosed: closed, hiClosed: false },
+    ]
+    solnTex = `x ${dir === '>' ? '<' : '\\le'} ${a} \\quad \\text{or} \\quad x ${dir === '>' ? '>' : '\\ge'} ${b}`
+  }
+
   return {
     statement: `Solve the inequality: $${statement}$`,
-    answer: { kind: 'interval', parts: [{ lo: String(-k), hi: String(k), loClosed: false, hiClosed: false }] },
+    answer: { kind: 'interval', parts },
     solution: [
-      { text: 'Factor the left side (difference of squares):', tex: `x^{2}-${k * k} = \\left(x-${k}\\right)\\left(x+${k}\\right)` },
-      { text: 'The product is negative strictly between the roots:', tex: `-${k} < x < ${k}` },
+      { text: `The roots of the quadratic equation are $x = ${a}$ and $x = ${b}$.` },
+      { text: dir === '<' || dir === '\\le' ? 'A quadratic with positive leading coefficient is negative between its roots:' : 'A quadratic with positive leading coefficient is positive outside its roots:', tex: solnTex },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -67,9 +121,9 @@ function tier2(rng: Rng): Problem {
 }
 
 function absValueBranch(rng: Rng): Problem {
-  const p = rng.int(-6, 6)
-  const k = rng.int(2, 9)
-  const closed = rng.chance(0.7)
+  const p = rng.int(-8, 8)
+  const k = rng.int(2, 12)
+  const closed = rng.chance(0.5)
   const dir: '\\le' | '<' = closed ? '\\le' : '<'
   const inner = linear(1, -p)
   const statement = `\\left|${inner}\\right| ${dir} ${k}`
@@ -86,7 +140,7 @@ function absValueBranch(rng: Rng): Problem {
 }
 
 function quadraticParamBranch(rng: Rng): Problem {
-  const c = rng.pick([1, 4, 9, 16, 25])
+  const c = rng.pick([1, 4, 9, 16, 25, 36, 49])
   const boundary = 2 * Math.sqrt(c)
   const statement = `x^{2}+bx+${c}=0`
   return {

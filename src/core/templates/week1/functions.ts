@@ -17,13 +17,13 @@ const INPUT_HINT = 'Build the answer with the buttons: ( excludes the endpoint, 
 const part = (lo: string | null, hi: string | null, loClosed: boolean, hiClosed: boolean): IntervalPart => ({ lo, hi, loClosed, hiClosed })
 
 function tier1(rng: Rng): Problem {
-  const a = rng.int(-6, 6)
+  const a = rng.int(-20, 20)
   const f = `\\sqrt{${linear(1, -a)}}`
   return {
     statement: `Find the domain of $f(x) = ${f}$.`,
     answer: { kind: 'interval', parts: [part(String(a), null, true, false)] },
     solution: [
-      { text: `The radicand cannot be negative:`, tex: `${linear(1, -a)} \\ge 0` },
+      { text: 'The radicand cannot be negative:', tex: `${linear(1, -a)} \\ge 0` },
       { text: 'Solve the inequality:', tex: `x \\ge ${a}` },
     ],
     hints: HINTS,
@@ -32,8 +32,8 @@ function tier1(rng: Rng): Problem {
 }
 
 function tier2(rng: Rng): Problem {
-  const a = rng.int(-5, 4)
-  const b = rng.int(a + 1, a + 7)
+  const a = rng.int(-12, 10)
+  const b = rng.int(a + 1, a + 12)
   const f = `\\dfrac{\\sqrt{${linear(1, -a)}}}{${linear(1, -b)}}`
   return {
     statement: `Find the domain of $f(x) = ${f}$.`,
@@ -52,7 +52,7 @@ function tier2(rng: Rng): Problem {
 }
 
 function logDomain(rng: Rng): Problem {
-  const a = rng.int(-6, 6)
+  const a = rng.int(-20, 20)
   const f = `\\ln\\left(${linear(1, -a)}\\right)`
   return {
     statement: `Find the domain of $f(x) = ${f}$.`,
@@ -67,8 +67,8 @@ function logDomain(rng: Rng): Problem {
 }
 
 function quadraticRange(rng: Rng): Problem {
-  const h = rng.int(-5, 5)
-  const k = rng.int(-6, 6)
+  const h = rng.int(-15, 15)
+  const k = rng.int(-15, 15)
   const opensUp = rng.chance(0.5)
   const sign = opensUp ? '' : '-'
   const f = `${sign}\\left(${linear(1, -h)}\\right)^{2}${k === 0 ? '' : k > 0 ? `+${k}` : k}`

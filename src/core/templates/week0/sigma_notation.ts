@@ -15,15 +15,16 @@ const HINTS = [
 const INPUT_HINT = 'Enter a number'
 
 function tier1(rng: Rng): Problem {
-  const n = rng.int(3, 6)
+  const n = rng.int(3, 40)
   const terms = Array.from({ length: n }, (_, i) => (i + 1) ** 2)
-  const sum = terms.reduce((s, t) => s + t, 0)
+  const sum = (n * (n + 1) * (2 * n + 1)) / 6
   const statement = `\\sum_{i=1}^{${n}} i^{2}`
+  const solutionTerms = n <= 6 ? `${terms.map((_, i) => `${i + 1}^{2}`).join('+')} = ${terms.join('+')}` : `1^2 + 2^2 + \\dots + ${n}^2 = 1 + 4 + \\dots + ${n ** 2}`
   return {
     statement: `Evaluate $${statement}$.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { text: 'Write out the terms:', tex: `${terms.map((_, i) => `${i + 1}^{2}`).join('+')} = ${terms.join('+')}` },
+      { text: 'Write out the terms:', tex: solutionTerms },
       { text: 'Add them up:', tex: `${sum}` },
     ],
     hints: HINTS,
@@ -32,16 +33,17 @@ function tier1(rng: Rng): Problem {
 }
 
 function tier2(rng: Rng): Problem {
-  const n = rng.int(3, 7)
-  const terms = Array.from({ length: n + 1 }, (_, k) => 2 * k + 1)
-  const sum = terms.reduce((s, t) => s + t, 0)
+  const n = rng.int(3, 45)
+  const terms = Array.from({ length: Math.min(n + 1, 5) }, (_, k) => 2 * k + 1)
+  const sum = (n + 1) ** 2
   const statement = `\\sum_{k=0}^{${n}} (2k+1)`
+  const termsTex = n <= 5 ? Array.from({ length: n + 1 }, (_, k) => 2 * k + 1).join('+') : `${terms.join('+')} + \\dots + ${2 * n + 1}`
   return {
     statement: `Evaluate $${statement}$.`,
     answer: { kind: 'number', value: String(sum) },
     solution: [
-      { text: `Write out the terms for $k=0,1,\\dots,${n}$:`, tex: `${terms.join('+')}` },
-      { text: 'Add them up:', tex: `${sum}` },
+      { text: `Write out the terms for $k=0,1,\\dots,${n}$:`, tex: termsTex },
+      { text: 'Add them up (sum of first $n+1$ odd numbers is $(n+1)^2$):', tex: `${sum}` },
     ],
     hints: HINTS,
     inputHint: INPUT_HINT,
@@ -49,7 +51,7 @@ function tier2(rng: Rng): Problem {
 }
 
 function bigSumBranch(rng: Rng): Problem {
-  const n = rng.int(20, 60)
+  const n = rng.int(15, 80)
   const sum = (n * (n + 1)) / 2
   const statement = `\\sum_{i=1}^{${n}} i`
   return {
@@ -65,8 +67,8 @@ function bigSumBranch(rng: Rng): Problem {
 }
 
 function shiftedBranch(rng: Rng): Problem {
-  const k = rng.int(2, 6)
-  const count = rng.int(10, 30)
+  const k = rng.int(2, 15)
+  const count = rng.int(10, 50)
   const upper = k + count - 1
   let sum = 0
   for (let i = k; i <= upper; i += 1) sum += i

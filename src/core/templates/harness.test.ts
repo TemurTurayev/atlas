@@ -10,6 +10,10 @@ import { TIERS } from './types'
 
 const GEN_SEEDS = 300
 const CHECK_SEEDS = 25
+// A skill is practised many times; a generator with a handful of problems gets memorised, not learned.
+// 15 of 60 leaves room for topics with a naturally short list, such as the standard angles.
+const VARIETY_SEEDS = 60
+const MIN_DISTINCT = 15
 
 const renders = (tex: string): boolean => {
   katex.renderToString(tex, { throwOnError: true })
@@ -38,6 +42,15 @@ describe.each(entries)('template %s', (skillId, template) => {
       expect(a.solution.length, `seed ${seed}`).toBeGreaterThan(0)
       expect(a.hints.length, `seed ${seed}`).toBeGreaterThan(0)
     }
+  })
+
+  it.each(TIERS)('tier %i: varied enough that answers cannot be memorised', (tier) => {
+    const seen = new Set<string>()
+    for (let seed = 1; seed <= VARIETY_SEEDS; seed += 1) {
+      const p = template.generate(createRng(seed), tier)
+      seen.add(`${p.statement}\n${JSON.stringify(p.answer)}`)
+    }
+    expect(seen.size, `${skillId} tier ${tier}`).toBeGreaterThanOrEqual(MIN_DISTINCT)
   })
 
   it('theory keeps its LaTeX inside $…$', () => {

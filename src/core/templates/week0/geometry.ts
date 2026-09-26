@@ -19,8 +19,8 @@ function build(statement: string, value: string, solution: Problem['solution'], 
 
 function rectangleOrTriangle(rng: Rng): Problem {
   if (rng.chance(0.5)) {
-    const a = rng.int(3, 12)
-    const b = rng.int(3, 12)
+    const a = rng.int(3, 20)
+    const b = rng.int(3, 20)
     return build(
       `A rectangle has sides $${a}$ cm and $${b}$ cm. Find its area.`,
       String(a * b),
@@ -29,9 +29,9 @@ function rectangleOrTriangle(rng: Rng): Problem {
       PLAIN_HINT,
     )
   }
-  const baseHalf = rng.int(2, 8)
+  const baseHalf = rng.int(2, 15)
   const base = baseHalf * 2
-  const height = rng.int(3, 12)
+  const height = rng.int(3, 20)
   const area = baseHalf * height
   return build(
     `A triangle has base $${base}$ cm and height $${height}$ cm. Find its area.`,
@@ -43,7 +43,7 @@ function rectangleOrTriangle(rng: Rng): Problem {
 }
 
 function circle(rng: Rng): Problem {
-  const r = rng.int(2, 9)
+  const r = rng.int(2, 40)
   if (rng.chance(0.5)) {
     const value = `${r * r}\\pi`
     return build(
@@ -67,8 +67,8 @@ function circle(rng: Rng): Problem {
 function volume(rng: Rng): Problem {
   const roll = rng.next()
   if (roll < 0.4) {
-    const r = rng.int(2, 6)
-    const h = rng.int(3, 10)
+    const r = rng.int(2, 10)
+    const h = rng.int(3, 15)
     const value = `${r * r * h}\\pi`
     return build(
       `A cylinder has radius $${r}$ cm and height $${h}$ cm. Find its volume. Leave $\\pi$ exact.`,
@@ -79,7 +79,7 @@ function volume(rng: Rng): Problem {
     )
   }
   if (roll < 0.75) {
-    const k = rng.int(1, 3)
+    const k = rng.int(1, 5)
     const r = 3 * k
     const value = `${36 * k * k * k}\\pi`
     return build(
@@ -90,9 +90,9 @@ function volume(rng: Rng): Problem {
       PI_HINT,
     )
   }
-  const width = rng.int(2, 6) * 2
-  const rectHeight = rng.int(3, 8)
-  const triHeight = rng.int(2, 6)
+  const width = rng.int(2, 10) * 2
+  const rectHeight = rng.int(3, 12)
+  const triHeight = rng.int(2, 10)
   const area = width * rectHeight + (width * triHeight) / 2
   return build(
     `A figure is a rectangle $${width}$ cm wide and $${rectHeight}$ cm tall, topped by a triangle with the same base and height $${triHeight}$ cm. Find the total area.`,

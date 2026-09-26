@@ -29,7 +29,6 @@ const HINTS_THRESHOLD = [
 
 const INPUT_HINT_NUMBER = 'A single number; a fraction like 2/3 is fine'
 
-/** Rounds away floating-point noise (e.g. 0.1*3) and formats without a trailing ".0". */
 function clean(x: number): string {
   const rounded = Math.round(x * 1000) / 1000
   return Object.is(rounded, -0) ? '0' : String(rounded)
@@ -37,10 +36,9 @@ function clean(x: number): string {
 
 const GAMMA_CHOICES = [0.1, 0.2, 0.25, 0.5]
 
-/** beta/gamma computed backwards from a whole-number target, so beta is always a clean decimal. */
 function reproductionNumber(rng: Rng): Problem {
   const gamma = rng.pick(GAMMA_CHOICES)
-  const r0 = rng.int(2, 8)
+  const r0 = rng.int(2, 12)
   const beta = clean(gamma * r0)
 
   return {
@@ -52,9 +50,8 @@ function reproductionNumber(rng: Rng): Problem {
   }
 }
 
-/** The three compartments always sum to N, so the missing one is a plain subtraction. */
 function compartmentReading(rng: Rng): Problem {
-  const n = rng.int(2, 10) * 100
+  const n = rng.int(2, 20) * 100
   const s = rng.int(1, n - 2)
   const r = rng.int(0, n - s - 1)
   const infected = n - s - r
@@ -74,18 +71,14 @@ function tier1(rng: Rng): Problem {
 
 const GROWTH_LABELS = ['the epidemic is growing', 'the epidemic is dying out', 'cannot tell from this information']
 
-/**
- * N is built as threshold * r0, so the threshold N/r0 is exactly an integer; S is placed at least 5
- * away from it on either side, so the comparison is never ambiguous.
- */
 function tier2(rng: Rng): Problem {
-  const r0 = rng.int(2, 6)
-  const threshold = rng.int(20, 80)
+  const r0 = rng.int(2, 10)
+  const threshold = rng.int(30, 150)
   const n = threshold * r0
   const gamma = rng.pick(GAMMA_CHOICES)
   const beta = clean(gamma * r0)
   const isGrowing = rng.chance(0.5)
-  const margin = rng.int(5, 15)
+  const margin = rng.int(5, 20)
   const s = isGrowing ? threshold + margin : threshold - margin
   const correctId = isGrowing ? GROWTH_LABELS[0] : GROWTH_LABELS[1]
   const options: ChoiceOption[] = rng.shuffle(GROWTH_LABELS.map((label) => ({ id: label, label })))
@@ -119,9 +112,21 @@ const THRESHOLD_TABLE: readonly ThresholdEntry[] = [
   { r0Display: '4', herdFracLatex: '\\frac{3}{4}', herdPercent: '75', peakFracLatex: '\\frac{1}{4}', peakPercent: '25' },
   { r0Display: '5', herdFracLatex: '\\frac{4}{5}', herdPercent: '80', peakFracLatex: '\\frac{1}{5}', peakPercent: '20' },
   { r0Display: '6', herdFracLatex: '\\frac{5}{6}', herdPercent: '83.3', peakFracLatex: '\\frac{1}{6}', peakPercent: '16.7' },
+  { r0Display: '7', herdFracLatex: '\\frac{6}{7}', herdPercent: '85.7', peakFracLatex: '\\frac{1}{7}', peakPercent: '14.3' },
+  { r0Display: '8', herdFracLatex: '\\frac{7}{8}', herdPercent: '87.5', peakFracLatex: '\\frac{1}{8}', peakPercent: '12.5' },
+  { r0Display: '9', herdFracLatex: '\\frac{8}{9}', herdPercent: '88.9', peakFracLatex: '\\frac{1}{9}', peakPercent: '11.1' },
   { r0Display: '10', herdFracLatex: '\\frac{9}{10}', herdPercent: '90', peakFracLatex: '\\frac{1}{10}', peakPercent: '10' },
+  { r0Display: '12', herdFracLatex: '\\frac{11}{12}', herdPercent: '91.7', peakFracLatex: '\\frac{1}{12}', peakPercent: '8.3' },
+  { r0Display: '15', herdFracLatex: '\\frac{14}{15}', herdPercent: '93.3', peakFracLatex: '\\frac{1}{15}', peakPercent: '6.7' },
   { r0Display: '1.5', herdFracLatex: '\\frac{1}{3}', herdPercent: '33.3', peakFracLatex: '\\frac{2}{3}', peakPercent: '66.7' },
   { r0Display: '1.25', herdFracLatex: '\\frac{1}{5}', herdPercent: '20', peakFracLatex: '\\frac{4}{5}', peakPercent: '80' },
+  { r0Display: '1.2', herdFracLatex: '\\frac{1}{6}', herdPercent: '16.7', peakFracLatex: '\\frac{5}{6}', peakPercent: '83.3' },
+  { r0Display: '1.6', herdFracLatex: '\\frac{3}{8}', herdPercent: '37.5', peakFracLatex: '\\frac{5}{8}', peakPercent: '62.5' },
+  { r0Display: '1.75', herdFracLatex: '\\frac{3}{7}', herdPercent: '42.9', peakFracLatex: '\\frac{4}{7}', peakPercent: '57.1' },
+  { r0Display: '2.25', herdFracLatex: '\\frac{5}{9}', herdPercent: '55.6', peakFracLatex: '\\frac{4}{9}', peakPercent: '44.4' },
+  { r0Display: '2.5', herdFracLatex: '\\frac{3}{5}', herdPercent: '60', peakFracLatex: '\\frac{2}{5}', peakPercent: '40' },
+  { r0Display: '3.5', herdFracLatex: '\\frac{5}{7}', herdPercent: '71.4', peakFracLatex: '\\frac{2}{7}', peakPercent: '28.6' },
+  { r0Display: '4.5', herdFracLatex: '\\frac{7}{9}', herdPercent: '77.8', peakFracLatex: '\\frac{2}{9}', peakPercent: '22.2' },
 ]
 
 function herdImmunity(entry: ThresholdEntry): Problem {

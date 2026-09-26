@@ -19,7 +19,7 @@ const INPUT_HINT = 'Enter the fraction using /, e.g. (x-1)/x'
 const DOMAIN = { x: [1.5, 4] as const }
 
 function tier1(rng: Rng): Problem {
-  const b = rng.intExcept(-8, 8, [0])
+  const b = rng.intExcept(-30, 30, [0])
   const numerator: Poly = [-(b * b), 0, 1]
   const statement = `\\frac{${polyToLatex(numerator)}}{${linear(1, b)}}`
   return {
@@ -35,7 +35,7 @@ function tier1(rng: Rng): Problem {
 }
 
 function tier2(rng: Rng): Problem {
-  const b = rng.intExcept(-8, 8, [0])
+  const b = rng.intExcept(-30, 30, [0])
   const numerator: Poly = [-(b * b), 0, 1]
   const denominator: Poly = [0, b, 1]
   const statement = `\\frac{${polyToLatex(numerator)}}{${polyToLatex(denominator)}}`
@@ -53,7 +53,8 @@ function tier2(rng: Rng): Problem {
 }
 
 function tier3(rng: Rng): Problem {
-  const [p, q] = rng.shuffle([0, 1, 2, 3]).slice(0, 2)
+  const pool = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  const [p, q] = rng.shuffle(pool).slice(0, 2)
   const lo = Math.min(p, q)
   const hi = Math.max(p, q)
   const denominator = polyMul([lo, 1], [hi, 1])

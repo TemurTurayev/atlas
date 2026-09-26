@@ -9,7 +9,7 @@ const theory = [
   'Common mistake: confusing $\\log(x+y)$ with $\\log x+\\log y$ — only the logarithms themselves can be added, not their arguments inside the sum.',
 ].join('\n')
 
-type Base = 2 | 3 | 5 | 10 | 'e'
+type Base = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 'e'
 
 function logLatex(base: Base, argument: string): string {
   if (base === 'e') return `\\ln\\left(${argument}\\right)`
@@ -20,8 +20,8 @@ function logLatex(base: Base, argument: string): string {
 const varPow = (v: string, e: number): string => (e === 1 ? v : `${v}^{${e}}`)
 
 function tier1(rng: Rng): Problem {
-  const b = rng.pick([2, 3, 5, 10] as const)
-  const m = rng.int(2, 5)
+  const b = rng.pick([2, 3, 4, 5, 6, 7, 8, 9, 10] as const)
+  const m = rng.int(1, 6)
   const N = b ** m
   const expr = logLatex(b, String(N))
   return {
@@ -40,8 +40,8 @@ function tier1(rng: Rng): Problem {
 
 function tier2(rng: Rng): Problem {
   const base = rng.pick<Base>([2, 3, 'e'])
-  const p = rng.int(2, 4)
-  const q = rng.int(2, 4)
+  const p = rng.int(2, 5)
+  const q = rng.int(2, 5)
   const term1 = `${varPow('a', p)}${varPow('b', q)}`
   const term2 = 'ab'
   const resultTerm = `${varPow('a', p - 1)}${varPow('b', q - 1)}`
@@ -66,8 +66,8 @@ function tier2(rng: Rng): Problem {
 
 function tier3(rng: Rng): Problem {
   const base = rng.pick<Base>([2, 3, 'e'])
-  const m = rng.int(1, 3)
-  const n = rng.int(1, 3)
+  const m = rng.int(1, 4)
+  const n = rng.int(1, 4)
   const leftTerm = m === 1 ? logLatex(base, 'x') : `${m}${logLatex(base, 'x')}`
   const rightTerm = n === 1 ? logLatex(base, 'y') : `${n}${logLatex(base, 'y')}`
   const poweredTerm = `${varPow('x', m)}${varPow('y', n)}`

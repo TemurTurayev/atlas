@@ -17,9 +17,19 @@ function randomDistinctPair(rng: Rng, max: number): readonly [number, number] {
 }
 
 function tier1(rng: Rng): Problem {
-  const n = rng.int(2, 6)
+  const n = rng.int(1, 28)
+  const phrasing = rng.int(1, 3)
+  let statement: string
+  if (phrasing === 1) {
+    statement = `Let $|A| = ${n}$. Find $|P(A)|$, the number of subsets of $A$.`
+  } else if (phrasing === 2) {
+    statement = `Given $|A| = ${n}$, find $|P(A)|$, the size of the power set.`
+  } else {
+    statement = `For $|A| = ${n}$, compute $|P(A)|$, the total number of subsets.`
+  }
+
   return {
-    statement: `Let $|A| = ${n}$. Find $|P(A)|$, the number of subsets of $A$.`,
+    statement,
     answer: { kind: 'number', value: String(2 ** n) },
     solution: [
       { text: `Each of the $${n}$ elements independently either belongs to a subset or does not: $2^{${n}}$ possibilities.` },

@@ -26,8 +26,8 @@ const mulConst = (e: string, s: number): string => (s === 1 ? e : s === -1 ? `-$
 
 function tier1(rng: Rng): Problem {
   const kind = rng.pick<BaseFn>(['sq', 'abs', 'cube'])
-  const h = rng.intExcept(-6, 6, [0])
-  const k = rng.intExcept(-6, 6, [0])
+  const h = rng.intExcept(-10, 10, [0])
+  const k = rng.intExcept(-10, 10, [0])
   const shifted = applyBase(kind, linear(1, -h))
   const value = addConst(shifted, k)
   const target = `f(${linear(1, -h)})${k > 0 ? `+${k}` : k}`
@@ -45,13 +45,13 @@ function tier1(rng: Rng): Problem {
 
 function tier2(rng: Rng): Problem {
   const kind = rng.pick<BaseFn>(['sq', 'abs', 'cube'])
-  const s = rng.pick([-2, -3, -4])
+  const s = rng.pick([-15, -12, -10, -9, -8, -7, -6, -5, -4, -3, -2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15])
   const value = mulConst(baseLabel(kind), s)
   return {
     statement: `Given $f(x) = ${baseLabel(kind)}$, write the formula for $y = ${s}f(x)$.`,
     answer: { kind: 'expression', value, variables: ['x'] },
     solution: [
-      { text: `Multiply $f(x)$ by $${s}$: the minus sign gives a reflection across the $x$-axis, and $|${s}| > 1$ gives a vertical stretch.` },
+      { text: `Multiply $f(x)$ by $${s}$: ${s < 0 ? 'the minus sign reflects across the $x$-axis, and ' : ''}$|${s}| > 1$ gives a vertical stretch.` },
       { text: 'The transformed formula:', tex: `y = ${value}` },
     ],
     hints: ['A negative factor reflects the graph across the $x$-axis.', 'A factor with absolute value greater than 1 stretches the graph vertically.'],

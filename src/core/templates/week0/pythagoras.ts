@@ -26,6 +26,9 @@ const TRIPLES: readonly (readonly [number, number, number])[] = [
   [20, 21, 29],
   [9, 40, 41],
   [12, 35, 37],
+  [11, 60, 61],
+  [16, 30, 34],
+  [13, 84, 85],
 ]
 
 function simplifySqrt(n: number): { readonly coef: number; readonly radicand: number } {
@@ -52,8 +55,12 @@ function build(statement: string, value: string, solution: Problem['solution']):
 }
 
 function tier1(rng: Rng): Problem {
-  const [leg1, leg2, hyp] = rng.pick(TRIPLES)
-  const k = rng.int(1, 2)
+  const triple = rng.pick(TRIPLES)
+  const swapLegs = rng.chance(0.5)
+  const leg1 = swapLegs ? triple[1] : triple[0]
+  const leg2 = swapLegs ? triple[0] : triple[1]
+  const hyp = triple[2]
+  const k = rng.int(1, 5)
   const a = leg1 * k
   const b = leg2 * k
   const c = hyp * k
@@ -72,7 +79,7 @@ function tier2(rng: Rng): Problem {
   let a = 0
   let diff = 0
   for (let i = 0; i < 200; i += 1) {
-    c = rng.int(7, 16)
+    c = rng.int(7, 25)
     a = rng.int(2, c - 2)
     diff = c * c - a * a
     if (!Number.isInteger(Math.sqrt(diff))) break
@@ -89,9 +96,9 @@ function tier2(rng: Rng): Problem {
 }
 
 function boxDiagonal(rng: Rng): Problem {
-  const p = rng.int(2, 9)
-  const q = rng.int(2, 9)
-  const r = rng.int(2, 9)
+  const p = rng.int(2, 12)
+  const q = rng.int(2, 12)
+  const r = rng.int(2, 12)
   const sq = p * p + q * q + r * r
   const value = sqrtLatex(sq)
   return build(
@@ -111,10 +118,10 @@ function pointDistance(rng: Rng): Problem {
   let y2 = 0
   let sq = 0
   for (let i = 0; i < 200; i += 1) {
-    x1 = rng.int(-6, 6)
-    y1 = rng.int(-6, 6)
-    x2 = rng.int(-6, 6)
-    y2 = rng.int(-6, 6)
+    x1 = rng.int(-10, 10)
+    y1 = rng.int(-10, 10)
+    x2 = rng.int(-10, 10)
+    y2 = rng.int(-10, 10)
     sq = (x2 - x1) ** 2 + (y2 - y1) ** 2
     if (sq > 0) break
   }

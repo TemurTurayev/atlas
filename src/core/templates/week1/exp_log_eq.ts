@@ -10,8 +10,8 @@ const theory = [
 ].join('\n')
 
 function tier1(rng: Rng): Problem {
-  const b = rng.pick([2, 3, 5])
-  const m = rng.int(2, 5)
+  const b = rng.pick([2, 3, 4, 5, 6, 7, 8, 9, 10])
+  const m = rng.int(1, 6)
   const N = b ** m
   return {
     statement: `Solve for $x$: $${b}^{x} = ${N}$.`,
@@ -33,8 +33,8 @@ const K_OPTIONS: readonly { readonly n: number; readonly latex: string }[] = [
 
 function tier2(rng: Rng): Problem {
   const { n, latex: kLatex } = rng.pick(K_OPTIONS)
-  const A = rng.int(2, 9)
-  const R = rng.intExcept(2, 9, [1])
+  const A = rng.int(2, 12)
+  const R = rng.intExcept(2, 12, [1])
   const B = A * R
   return {
     statement: `Solve for $t$: $${A}e^{${kLatex}t} = ${B}$.`,
@@ -59,15 +59,60 @@ interface LogEqCase {
   readonly c: number
 }
 
-/** Curated so that (x0-p)(x0+p) = b^c exactly. */
+/** Curated so that x0^2 - p^2 = b^c exactly. */
 const CASES: readonly LogEqCase[] = [
   { b: 2, p: 1, x0: 3, c: 3 },
   { b: 2, p: 3, x0: 5, c: 4 },
   { b: 2, p: 7, x0: 9, c: 5 },
+  { b: 2, p: 2, x0: 6, c: 5 },
+  { b: 2, p: 15, x0: 17, c: 6 },
+  { b: 2, p: 6, x0: 10, c: 6 },
+  { b: 2, p: 31, x0: 33, c: 7 },
+  { b: 2, p: 14, x0: 18, c: 7 },
+  { b: 2, p: 4, x0: 12, c: 7 },
+  { b: 2, p: 63, x0: 65, c: 8 },
+  { b: 2, p: 30, x0: 34, c: 8 },
+  { b: 2, p: 12, x0: 20, c: 8 },
+  { b: 2, p: 127, x0: 129, c: 9 },
+  { b: 2, p: 62, x0: 66, c: 9 },
+  { b: 2, p: 28, x0: 36, c: 9 },
+  { b: 2, p: 8, x0: 24, c: 9 },
   { b: 3, p: 1, x0: 2, c: 1 },
   { b: 3, p: 4, x0: 5, c: 2 },
+  { b: 3, p: 13, x0: 14, c: 3 },
   { b: 3, p: 3, x0: 6, c: 3 },
+  { b: 3, p: 40, x0: 41, c: 4 },
+  { b: 3, p: 12, x0: 15, c: 4 },
+  { b: 3, p: 121, x0: 122, c: 5 },
+  { b: 3, p: 39, x0: 42, c: 5 },
+  { b: 3, p: 9, x0: 18, c: 5 },
+  { b: 4, p: 3, x0: 5, c: 2 },
+  { b: 4, p: 15, x0: 17, c: 3 },
+  { b: 4, p: 6, x0: 10, c: 3 },
+  { b: 4, p: 63, x0: 65, c: 4 },
+  { b: 4, p: 30, x0: 34, c: 4 },
   { b: 5, p: 2, x0: 3, c: 1 },
+  { b: 5, p: 12, x0: 13, c: 2 },
+  { b: 5, p: 62, x0: 63, c: 3 },
+  { b: 5, p: 10, x0: 15, c: 3 },
+  { b: 6, p: 8, x0: 10, c: 2 },
+  { b: 6, p: 53, x0: 55, c: 3 },
+  { b: 6, p: 25, x0: 29, c: 3 },
+  { b: 6, p: 15, x0: 21, c: 3 },
+  { b: 7, p: 3, x0: 4, c: 1 },
+  { b: 7, p: 24, x0: 25, c: 2 },
+  { b: 7, p: 21, x0: 28, c: 3 },
+  { b: 8, p: 15, x0: 17, c: 2 },
+  { b: 8, p: 6, x0: 10, c: 2 },
+  { b: 8, p: 62, x0: 66, c: 3 },
+  { b: 8, p: 28, x0: 36, c: 3 },
+  { b: 9, p: 4, x0: 5, c: 1 },
+  { b: 9, p: 40, x0: 41, c: 2 },
+  { b: 9, p: 12, x0: 15, c: 2 },
+  { b: 10, p: 24, x0: 26, c: 2 },
+  { b: 10, p: 249, x0: 251, c: 3 },
+  { b: 10, p: 45, x0: 55, c: 3 },
+  { b: 10, p: 15, x0: 35, c: 3 },
 ]
 
 function tier3(rng: Rng): Problem {

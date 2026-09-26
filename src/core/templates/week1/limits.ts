@@ -13,7 +13,7 @@ const theory = [
 ].join('\n')
 
 function tier1(rng: Rng): Problem {
-  const c = rng.intExcept(-8, 8, [0])
+  const c = rng.intExcept(-25, 25, [0])
   const c2 = c * c
   const value = 2 * c
   const factorMinus = linear(1, -c)
@@ -33,12 +33,12 @@ function tier1(rng: Rng): Problem {
 }
 
 function tier2(rng: Rng): Problem {
-  const a = rng.intExcept(-6, 6, [0])
-  const f = rng.intExcept(-6, 6, [0])
-  const b = rng.int(-6, 6)
-  const e = rng.int(-9, 9)
-  const g = rng.int(-6, 6)
-  const h = rng.int(-9, 9)
+  const a = rng.intExcept(-10, 10, [0])
+  const f = rng.intExcept(-10, 10, [0])
+  const b = rng.int(-10, 10)
+  const e = rng.int(-15, 15)
+  const g = rng.int(-10, 10)
+  const h = rng.int(-15, 15)
   const numerator: Poly = [e, b, a]
   const denominator: Poly = [h, g, f]
   const numLatex = polyToLatex(numerator)
@@ -62,7 +62,7 @@ function tier2(rng: Rng): Problem {
 }
 
 function tier3(rng: Rng): Problem {
-  const c = rng.int(2, 9)
+  const c = rng.int(2, 40)
   const c2 = c * c
   const value = ratToLatex(rat(1, 2 * c))
   return {
