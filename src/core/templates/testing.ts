@@ -9,5 +9,6 @@ export function mathSegments(text: string): string[] {
  */
 export function strayLatex(text: string): string[] {
   const prose = text.replace(/\$[^$]+\$/g, ' ')
-  return [...prose.matchAll(/\\[a-zA-Z]+|[_^]\{|\\frac/g)].map((m) => m[0])
+  // Commands (\sqrt), escaped symbols (\%, \,) and sub- or superscripts all print literally out here.
+  return [...prose.matchAll(/\\[a-zA-Z]+|\\[^a-zA-Z\s]|[_^]\{/g)].map((m) => m[0])
 }
